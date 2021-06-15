@@ -30,10 +30,3 @@ class LoadItemsFromCloudRequested extends ItemsManagerEvent {
   @override
   String toString() => 'LoadItemsFromCloudRequested';
 }
-
-class ReloadRequested extends ItemsManagerEvent {
-  const ReloadRequested();
-
-  @override
-  String toString() => 'ReloadRequested';
-}

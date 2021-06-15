@@ -1,5 +1,9 @@
 part of 'items_manager_bloc.dart';
 
+abstract class ItemsBuildUi{
+
+}
+
 abstract class ItemsManagerState extends Equatable {
   const ItemsManagerState();
 
@@ -7,11 +11,11 @@ abstract class ItemsManagerState extends Equatable {
   List<Object> get props => [];
 }
 
-class ItemsLoading extends ItemsManagerState {
+class ItemsLoading extends ItemsManagerState implements ItemsBuildUi {
   @override
   String toString() => 'ItemsLoading';
 }
-class ItemsLoaded extends ItemsManagerState {
+class ItemsLoaded extends ItemsManagerState implements ItemsBuildUi {
   @override
   String toString() => 'ItemsLoaded';
 }
@@ -21,7 +25,7 @@ class ReloadFromCloudEmpty extends ItemsManagerState{
   String toString() => 'ReloadFromCloudEmpty';
 }
 
-class LoadItemsFailed extends ItemsManagerState {
+class LoadItemsFailed extends ItemsManagerState implements ItemsBuildUi {
   @override
   String toString() => 'LoadItemsFailed';
 }

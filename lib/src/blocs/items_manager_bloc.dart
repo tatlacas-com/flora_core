@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:tatlacas_flutter_core/src/models/section.dart';
 
 import '../items_repository.dart';
 
@@ -14,17 +15,27 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepository>
     extends Bloc<ItemsManagerEvent, ItemsManagerState> {
   final TRepo repository;
 
-  List<dynamic> _items = [];
+  List<Section> _items = [];
 
-  List<dynamic> get items => _items;
+  List<Section> get items => _items;
 
   ItemsManagerBloc({required this.repository}) : super(ItemsLoading());
 
-  int get totalItems => _items.length;
+  int get totalSections => _items.length;
+
+  int totalSectionItems(int section) => _items[section].items.length;
 
   bool get isEmpty => _items.isEmpty;
 
   bool get isNotEmpty => _items.isNotEmpty;
+
+  bool isSectionEmpty(int section) => _items[section].items.isEmpty;
+
+  bool isSectionNotEmpty(int section) => _items[section].items.isNotEmpty;
+  Section section(int section) => _items[section];
+  bool usesGrid(int section) => _items[section].usesGrid;
+
+  dynamic sectionHeader(int section) => _items[section].sectionHeader;
 
   @override
   Stream<ItemsManagerState> mapEventToState(
