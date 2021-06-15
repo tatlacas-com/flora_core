@@ -25,7 +25,7 @@ class ItemsListScreenState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  List<Widget> buildAppBarSlivers(context, innerBoxIsScrolled) {
+  List<Widget> buildAppBarSlivers(BuildContext context, innerBoxIsScrolled) {
     return [];
   }
 

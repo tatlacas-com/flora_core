@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 
 class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
-  const ItemsList({Key? key}) : super(key: key);
+ final ItemsListState<TBloc> Function()? onCreateState;
+  const ItemsList({Key? key,this.onCreateState}) : super(key: key);
 
   bool get buildSliversInSliverOverlapInjector => false;
 
@@ -20,7 +21,7 @@ class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
   double get mainAxisSpacing => 16;
 
   @override
-  ItemsListState createState() => ItemsListState<TBloc>();
+  ItemsListState<TBloc> createState() => onCreateState?.call() ?? ItemsListState<TBloc>();
 }
 
 class ItemsListState<TBloc extends ItemsManagerBloc>
@@ -52,7 +53,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         bloc.add(ReloadItemsRequested());
       },
       child: CustomScrollView(
-        key: PageStorageKey<String>(TBloc.runtimeType.toString()),
+        // key: PageStorageKey<String>(TBloc.runtimeType.toString()),
         slivers: content,
       ),
     );
@@ -250,7 +251,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     required int section,
     required int row,
   }) {
-    return Text('buildListItem');
+    return Text('buildVerticalSliverListItem');
   }
 
   Widget _buildVerticalSliverAnimatedList(int section, Section sectionItems) {
