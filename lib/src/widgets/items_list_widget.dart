@@ -331,6 +331,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget buildEmptyView({String? emptyMessage}) {
-    return Text('Empty View');
+    return Center(child: Text('Empty View'));
   }
 }
