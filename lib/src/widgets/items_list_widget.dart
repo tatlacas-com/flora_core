@@ -25,7 +25,7 @@ class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
 }
 
 class ItemsListState<TBloc extends ItemsManagerBloc>
-    extends State<ItemsList<TBloc>> {
+    extends State<ItemsList<TBloc>> with AutomaticKeepAliveClientMixin {
   late TBloc bloc;
 
   final Map<int, GlobalKey<SliverAnimatedListState>> _animatedListKeys =
@@ -44,6 +44,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     bloc = context.read<TBloc>();
     var content = widget.buildSliversInSliverOverlapInjector
         ? buildSectionsWithOverlapInjector(context)
@@ -53,7 +54,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         bloc.add(ReloadItemsRequested());
       },
       child: CustomScrollView(
-        // key: PageStorageKey<String>(TBloc.runtimeType.toString()),
+        key: PageStorageKey<String>(TBloc.runtimeType.toString()),
         slivers: content,
       ),
     );
@@ -334,4 +335,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget buildEmptyView({String? emptyMessage}) {
     return Center(child: Text('Empty View'));
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
