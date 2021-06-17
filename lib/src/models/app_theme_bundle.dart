@@ -16,4 +16,7 @@ class AppThemeBundle<TEntity extends AppThemeEntity> {
     this.highContrastDarkTheme,
     this.highContrastTheme,
   });
+
+  @override
+  String toString()=> 'AppThemeBundle {theme:$theme, darkTheme:$darkTheme, highContrastDarkTheme:$highContrastDarkTheme, highContrastTheme:$highContrastTheme, themeMode:$themeMode}';
 }

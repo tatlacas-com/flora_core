@@ -671,4 +671,7 @@ abstract class AppThemeEntity extends Entity {
   }
 
 //#endregion
+
+@override
+  String toString() => 'AppThemeEntity {themeName:$themeName}';
 }

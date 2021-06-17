@@ -11,17 +11,17 @@ class ItemsListScreen<TBloc extends ItemsManagerBloc> extends StatefulWidget {
   final Widget Function(BuildContext context)? buildBodyContent;
 
   @override
-  ItemsListScreenState createState() => ItemsListScreenState<TBloc>();
+  State<ItemsListScreen> createState() => ItemsListScreenState<ItemsListScreen,TBloc>();
 }
 
-class ItemsListScreenState<TBloc extends ItemsManagerBloc>
-    extends State<ItemsListScreen> {
+class ItemsListScreenState<T extends ItemsListScreen,TBloc extends ItemsManagerBloc>
+    extends State<T> {
   ScrollController scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: buildScaffoldBody(),
+      body: buildScaffoldBody(context),
     );
   }
 
@@ -29,24 +29,24 @@ class ItemsListScreenState<TBloc extends ItemsManagerBloc>
     return [];
   }
 
-  Widget buildScaffoldBody() {
+  Widget buildScaffoldBody(BuildContext context) {
     return widget.useNestedScrollView
         ? NestedScrollView(
             controller: scrollController,
             floatHeaderSlivers: widget.floatHeaderSlivers,
             headerSliverBuilder: buildAppBarSlivers,
-            body: buildBody(),
+            body: buildBody(context),
           )
-        : buildBody();
+        : buildBody(context);
   }
 
 
-  Widget buildBody() {
+  Widget buildBody(BuildContext context) {
     return SafeArea(
         child: BlocBuilder<TBloc, ItemsManagerState>(
       buildWhen: (prev, next) => next is ItemsBuildUi,
       builder: (context, state) {
-        if (state is ItemsLoading) return buildLoadingView();
+        if (state is ItemsLoading) return buildLoadingView(context);
         if (state is LoadItemsFailed)
           return Center(
             child: Text('Failed to load items'),
@@ -56,7 +56,7 @@ class ItemsListScreenState<TBloc extends ItemsManagerBloc>
     ));
   }
 
-  Widget buildLoadingView() {
+  Widget buildLoadingView(BuildContext context) {
     return Center(
       child: SizedBox(
         child: CircularProgressIndicator(),

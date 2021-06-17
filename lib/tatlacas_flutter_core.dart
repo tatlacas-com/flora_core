@@ -8,6 +8,8 @@ export 'src/items_repository.dart';
 export 'src/models/section.dart';
 
 export 'src/widgets/items_list_widget.dart';
+export 'src/widgets/fs_dotted_line.dart';
+export 'src/widgets/fs_line_dots.dart';
 
 export 'src/screens/items_list_screen.dart';
 export 'src/models/app_theme_entity.dart';
