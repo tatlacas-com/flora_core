@@ -10,3 +10,8 @@ export 'src/models/section.dart';
 export 'src/widgets/items_list_widget.dart';
 
 export 'src/screens/items_list_screen.dart';
+export 'src/models/app_theme_entity.dart';
+export 'src/models/app_theme_bundle.dart';
+export 'src/app_theme_repository.dart';
+export 'src/models/app_theme_properties.dart';
+export 'src/models/i_preference_storage.dart';
