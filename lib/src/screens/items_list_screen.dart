@@ -4,14 +4,15 @@ import 'package:tatlacas_flutter_core/src/widgets/items_list_widget.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 
 class ItemsListScreen<TBloc extends ItemsManagerBloc> extends StatefulWidget {
-  const ItemsListScreen({Key? key,this.buildBodyContent}) : super(key: key);
+  const ItemsListScreen({Key? key,this.buildBodyContent,this.onCreateState}) : super(key: key);
 
   bool get useNestedScrollView => true;
   bool get floatHeaderSlivers => false;
   final Widget Function(BuildContext context)? buildBodyContent;
+  final State<ItemsListScreen> Function()? onCreateState;
 
   @override
-  State<ItemsListScreen> createState() => ItemsListScreenState<ItemsListScreen,TBloc>();
+  State<ItemsListScreen> createState() => onCreateState?.call() ?? ItemsListScreenState<ItemsListScreen,TBloc>();
 }
 
 class ItemsListScreenState<T extends ItemsListScreen,TBloc extends ItemsManagerBloc>
