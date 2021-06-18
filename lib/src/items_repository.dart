@@ -3,7 +3,7 @@ import 'dart:async';
 import 'models/section.dart';
 
 abstract class ItemsRepository{
-  Future<List<Section>> loadItemsFromLocalStorage();
-  Future<List<Section>> loadItemsFromCloud();
+  Future<List<Section>> loadItemsFromLocalStorage() async=>[];
+  Future<List<Section>> loadItemsFromCloud()async=>[];
   const ItemsRepository();
 }

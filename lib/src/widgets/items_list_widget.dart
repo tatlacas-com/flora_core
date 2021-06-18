@@ -99,7 +99,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
         sliver: SliverFillRemaining(
           hasScrollBody: false,
-          child: buildEmptyView(),
+          child: buildEmptyView(context),
         ),
       ));
     }
@@ -332,7 +332,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     animatedList.insertItem(row, duration: duration);
   }
 
-  Widget buildEmptyView({String? emptyMessage}) {
+  Widget buildEmptyView(BuildContext context,{String? emptyMessage}) {
     return Center(child: Text('Empty View'));
   }
 

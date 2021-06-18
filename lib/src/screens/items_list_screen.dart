@@ -47,14 +47,18 @@ class ItemsListScreenState<T extends ItemsListScreen,TBloc extends ItemsManagerB
         child: BlocBuilder<TBloc, ItemsManagerState>(
       buildWhen: (prev, next) => next is ItemsBuildUi,
       builder: (context, state) {
-        if (state is ItemsLoading) return buildLoadingView(context);
-        if (state is LoadItemsFailed)
-          return Center(
-            child: Text('Failed to load items'),
-          );
-        return widget.buildBodyContent?.call(context) ?? buildBodyContent(context);
+        return buildOnStateChanged(state, context);
       },
     ));
+  }
+
+  Widget buildOnStateChanged(ItemsManagerState state, BuildContext context) {
+      if (state is ItemsLoading) return buildLoadingView(context);
+    if (state is LoadItemsFailed)
+      return Center(
+        child: Text('Failed to load items'),
+      );
+    return widget.buildBodyContent?.call(context) ?? buildBodyContent(context);
   }
 
   Widget buildLoadingView(BuildContext context) {
