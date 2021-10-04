@@ -49,7 +49,7 @@ class WebClient extends Equatable {
           headers: headers,
         )
         .timeout(Duration(seconds: timeoutSeconds));
-    _throwIfNotSuccess(response.statusCode);
+    _throwIfNotSuccess(response.statusCode,endpoint: endpoint);
     return response;
   }
 
@@ -76,7 +76,7 @@ class WebClient extends Equatable {
 
     request.files.add(multipartFile);
     var response = await request.send();
-    _throwIfNotSuccess(response.statusCode);
+    _throwIfNotSuccess(response.statusCode,endpoint: endpoint);
     return response;
   }
 
@@ -97,19 +97,19 @@ class WebClient extends Equatable {
           headers: headers,
         )
         .timeout(Duration(seconds: timeoutSeconds));
-    _throwIfNotSuccess(response.statusCode);
+    _throwIfNotSuccess(response.statusCode,endpoint: endpoint);
     return response;
   }
 
-  void _throwIfNotSuccess(int statusCode) {
+  void _throwIfNotSuccess(int statusCode,{required String endpoint}) {
     if (statusCode == 403) {
-      throw AccessDeniedException();
+      throw AccessDeniedException(endpoint: endpoint);
     } else if (statusCode == 401) {
-      throw UnauthorizedException();
+      throw UnauthorizedException(endpoint: endpoint);
     } else if (statusCode == 404) {
-      throw NotFoundException();
+      throw NotFoundException(endpoint: endpoint);
     } else if (statusCode == 500) {
-      throw ServerException();
+      throw ServerException(endpoint: endpoint);
     }
   }
 }
