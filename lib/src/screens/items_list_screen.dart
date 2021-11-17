@@ -21,24 +21,18 @@ class ItemsListScreenState<T extends ItemsListScreen,TBloc extends ItemsManagerB
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: buildScaffoldBody(context),
-    );
+    return widget.useNestedScrollView
+        ? NestedScrollView(
+      controller: scrollController,
+      floatHeaderSlivers: widget.floatHeaderSlivers,
+      headerSliverBuilder: buildAppBarSlivers,
+      body: buildBody(context),
+    )
+        : buildBody(context);
   }
 
   List<Widget> buildAppBarSlivers(BuildContext context, innerBoxIsScrolled) {
     return [];
-  }
-
-  Widget buildScaffoldBody(BuildContext context) {
-    return widget.useNestedScrollView
-        ? NestedScrollView(
-            controller: scrollController,
-            floatHeaderSlivers: widget.floatHeaderSlivers,
-            headerSliverBuilder: buildAppBarSlivers,
-            body: buildBody(context),
-          )
-        : buildBody(context);
   }
 
 

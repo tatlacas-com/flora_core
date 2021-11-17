@@ -3,25 +3,37 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 
 class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
- final ItemsListState<TBloc> Function()? onCreateState;
-  const ItemsList({Key? key,this.onCreateState}) : super(key: key);
+  final ItemsListState<TBloc> Function()? onCreateState;
 
-  bool get buildSliversInSliverOverlapInjector => false;
+  const ItemsList({
+    Key? key,
+    this.onCreateState,
+    this.buildSliversInSliverOverlapInjector = false,
+    this.useFixedCrossAxisCount = false,
+    this.fixedCrossAxisCount = 1,
+    this.maxCrossAxisExtent = 200,
+    this.childAspectRatio = 1,
+    this.crossAxisSpacing = 16,
+    this.mainAxisSpacing = 16,
+  }) : super(key: key);
 
-  bool get useFixedCrossAxisCount => false;
+  final bool buildSliversInSliverOverlapInjector;
 
-  int get fixedCrossAxisCount => 1;
+  final bool useFixedCrossAxisCount;
 
-  double get maxCrossAxisExtent => 200;
+  final int fixedCrossAxisCount;
 
-  double get childAspectRatio => 1;
+  final double maxCrossAxisExtent;
 
-  double get crossAxisSpacing => 16;
+  final double childAspectRatio;
 
-  double get mainAxisSpacing => 16;
+  final double crossAxisSpacing;
+
+  final double mainAxisSpacing;
 
   @override
-  ItemsListState<TBloc> createState() => onCreateState?.call() ?? ItemsListState<TBloc>();
+  ItemsListState<TBloc> createState() =>
+      onCreateState?.call() ?? ItemsListState<TBloc>();
 }
 
 class ItemsListState<TBloc extends ItemsManagerBloc>
@@ -109,7 +121,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget buildSectionHeader(
       int section, BuildContext context, dynamic sectionHeader) {
     return SliverToBoxAdapter(
-      child: Text('Build section header'),
+      child: Text('Build section header here...'),
     );
   }
 
@@ -127,13 +139,27 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         child: GridView.builder(
           gridDelegate: _buildSliverGridDelegate(),
           itemBuilder: (context, index) {
-            return Text('Content here');
+            return buildListItem(
+              context: context,
+              section: section,
+              index: index,
+              item: sectionItems.items[index],
+            );
           },
           itemCount: sectionItems.totalItems(),
           scrollDirection: Axis.horizontal,
         ),
       ),
     );
+  }
+
+  Widget buildListItem({
+    required BuildContext context,
+    required int section,
+    required int index,
+    required dynamic item,
+  }) {
+    return Text('Build Content here...');
   }
 
   SliverGridDelegate _buildSliverGridDelegate() {
@@ -158,7 +184,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       gridDelegate: _buildSliverGridDelegate(),
       delegate: SliverChildBuilderDelegate(
         (context, index) {
-          return Text('Content here again');
+          return buildListItem(
+            context: context,
+            section: section,
+            index: index,
+            item: sectionItems.items[index],
+          );
         },
         childCount: sectionItems.totalItems(),
       ),
@@ -186,12 +217,11 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   ListView _buildHorizontalList(int section, Section sectionItems) {
     return ListView.builder(
       itemBuilder: (context, index) {
-        var item = sectionItems.items[index];
-        return buildHorizontalListItem(
+        return buildListItem(
           context: context,
-          item: item,
           section: section,
-          row: index,
+          index: index,
+          item: sectionItems.items[index],
         );
       },
       itemCount: sectionItems.totalItems(),
@@ -199,14 +229,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  Widget buildHorizontalListItem({
-    required BuildContext context,
-    required item,
-    required int section,
-    required int row,
-  }) {
-    return Text('buildHorizontalListItem');
-  }
 
   AnimatedList _buildHorizontalAnimatedList(int section, Section sectionItems) {
     if (!_animatedListKeys.containsKey(section)) {
@@ -233,12 +255,11 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: ValueKey('${section}sectionSliverList'),
       delegate: SliverChildBuilderDelegate(
         (context, index) {
-          var item = sectionItems.items[index];
-          return buildVerticalSliverListItem(
+          return buildListItem(
             context: context,
-            item: item,
             section: section,
-            row: index,
+            index: index,
+            item: sectionItems.items[index],
           );
         },
         childCount: sectionItems.totalItems(),
@@ -246,14 +267,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  Widget buildVerticalSliverListItem({
-    required BuildContext context,
-    required dynamic item,
-    required int section,
-    required int row,
-  }) {
-    return Text('buildVerticalSliverListItem');
-  }
 
   Widget _buildVerticalSliverAnimatedList(int section, Section sectionItems) {
     if (!_animatedListKeys.containsKey(section)) {
@@ -332,7 +345,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     animatedList.insertItem(row, duration: duration);
   }
 
-  Widget buildEmptyView(BuildContext context,{String? emptyMessage}) {
+  Widget buildEmptyView(BuildContext context, {String? emptyMessage}) {
     return Center(child: Text('Empty View'));
   }
 
