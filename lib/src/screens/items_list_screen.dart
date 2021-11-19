@@ -18,7 +18,6 @@ class ItemsListScreen<TBloc extends ItemsManagerBloc> extends StatefulWidget {
 class ItemsListScreenState<T extends ItemsListScreen,TBloc extends ItemsManagerBloc>
     extends State<T> {
   ScrollController scrollController = ScrollController();
-
   @override
   Widget build(BuildContext context) {
     return widget.useNestedScrollView
@@ -31,7 +30,7 @@ class ItemsListScreenState<T extends ItemsListScreen,TBloc extends ItemsManagerB
         : buildBody(context);
   }
 
-  List<Widget> buildAppBarSlivers(BuildContext context, innerBoxIsScrolled) {
+  List<Widget> buildAppBarSlivers(BuildContext context,bool innerBoxIsScrolled) {
     return [];
   }
 
