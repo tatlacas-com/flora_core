@@ -18,7 +18,7 @@ class WebClient extends Equatable {
           {String? baseUrl, String? accessToken, int? timeoutSeconds}) =>
       WebClient(
         baseUrl: baseUrl ?? this.baseUrl,
-        accessToken: accessToken ??this.accessToken,
+        accessToken: accessToken ?? this.accessToken,
         timeoutSeconds: timeoutSeconds ?? this.timeoutSeconds,
       );
 
@@ -49,7 +49,7 @@ class WebClient extends Equatable {
           headers: headers,
         )
         .timeout(Duration(seconds: timeoutSeconds));
-    _throwIfNotSuccess(response.statusCode,endpoint: endpoint);
+    _throwIfNotSuccess(response.statusCode, endpoint: endpoint);
     return response;
   }
 
@@ -76,32 +76,36 @@ class WebClient extends Equatable {
 
     request.files.add(multipartFile);
     var response = await request.send();
-    _throwIfNotSuccess(response.statusCode,endpoint: endpoint);
+    _throwIfNotSuccess(response.statusCode, endpoint: endpoint);
     return response;
   }
 
   Future<http.Response?> get(
-    String endpoint, {
+    dynamic endpoint, {
     String? baseUrl,
   }) async {
-    if (baseUrl == null) baseUrl = this.baseUrl;
     var headers = <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     };
     if (accessToken != null) {
       headers['Authorization'] = 'Bearer $accessToken';
     }
+    Uri uri;
+    if (endpoint is String) {
+      uri = Uri.parse('${baseUrl ?? this.baseUrl}$endpoint');
+    } else if (endpoint is Uri) {
+      uri = endpoint;
+    } else {
+      throw ArgumentError('Unsupported endpoint');
+    }
     final response = await http
-        .get(
-          Uri.parse('$baseUrl$endpoint'),
-          headers: headers,
-        )
+        .get(uri, headers: headers)
         .timeout(Duration(seconds: timeoutSeconds));
-    _throwIfNotSuccess(response.statusCode,endpoint: endpoint);
+    _throwIfNotSuccess(response.statusCode, endpoint: endpoint);
     return response;
   }
 
-  void _throwIfNotSuccess(int statusCode,{required String endpoint}) {
+  void _throwIfNotSuccess(int statusCode, {required String endpoint}) {
     if (statusCode == 403) {
       throw AccessDeniedException(endpoint: endpoint);
     } else if (statusCode == 401) {
