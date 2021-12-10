@@ -23,7 +23,7 @@ class WebClient extends Equatable {
       );
 
   @override
-  List<Object?> get props => [baseUrl];
+  List<Object?> get props => [baseUrl, accessToken];
 
   @override
   String toString() => 'WebClient {baseUrl:$baseUrl}';
