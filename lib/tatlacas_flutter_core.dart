@@ -18,3 +18,4 @@ export 'src/screens/items_list_widget.dart';
 export 'src/screens/app_screen.dart';
 
 export 'src/widgets/zero_height_app_bar.dart';
+export 'src/for_platform.dart';

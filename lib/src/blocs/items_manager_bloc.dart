@@ -19,7 +19,10 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepository>
 
   List<Section> get items => _items;
 
-  ItemsManagerBloc({required this.repository}) : super(ItemsLoading());
+  ItemsManagerBloc({required this.repository}) : super(ItemsLoading()){
+    on<LoadItemsRequested>(_onLoadItemsRequested);
+    on<ReloadItemsRequested>(_onReloadItemsRequested);
+  }
 
   int get totalSections => _items.length;
 
@@ -37,53 +40,45 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepository>
 
   dynamic sectionHeader(int section) => _items[section].sectionHeader;
 
-  @override
-  Stream<ItemsManagerState> mapEventToState(
-    ItemsManagerEvent event,
-  ) async* {
-    if (event is LoadItemsRequested) {
-      yield* _mapLoadItemsToState(event);
-    } else if (event is ReloadItemsRequested) {
-      yield* _mapReloadItemsToState(event);
-    }
-  }
 
-  Stream<ItemsManagerState> _mapReloadItemsToState(
-      ReloadItemsRequested event) async* {
+  FutureOr<void> _onReloadItemsRequested(
+      ReloadItemsRequested event,
+      Emitter<ItemsManagerState> emit) async {
     try {
-      yield ItemsLoading();
+      emit(ItemsLoading());
       if (event.fromCloud) {
         _items = await repository.loadItemsFromCloud();
         if (isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
-          yield ItemsLoaded();
+          emit(ItemsLoaded());
           return;
         }
-        yield ReloadFromCloudEmpty();
+        emit(ReloadFromCloudEmpty());
         _items = await repository.loadItemsFromLocalStorage();
-        yield ItemsLoaded();
+        emit(ItemsLoaded());
       } else {
         _items = await repository.loadItemsFromLocalStorage();
-        yield ItemsLoaded();
+        emit(ItemsLoaded());
       }
     } catch (e) {
       if (kDebugMode) print(e);
-      yield LoadItemsFailed();
+      emit(LoadItemsFailed());
     }
   }
 
-  Stream<ItemsManagerState> _mapLoadItemsToState(
-      LoadItemsRequested event) async* {
+  FutureOr<void> _onLoadItemsRequested(
+      LoadItemsRequested event,
+      Emitter<ItemsManagerState> emit) async {
     try {
       _items = await repository.loadItemsFromLocalStorage();
       if (isNotEmpty) {
-        yield ItemsLoaded();
+        emit(ItemsLoaded());
         return;
       }
       _items = await repository.loadItemsFromCloud();
-      yield ItemsLoaded();
+        emit(ItemsLoaded());
     } catch (e) {
       if (kDebugMode) print(e);
-      yield LoadItemsFailed();
+      emit(LoadItemsFailed());
     }
   }
 }
