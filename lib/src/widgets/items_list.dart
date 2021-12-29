@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 
 class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
-  final ItemsListState<TBloc> Function()? onCreateState;
+  final ItemsListState<TBloc> Function()? stateBuilder;
 
   const ItemsList({
     Key? key,
-    this.onCreateState,
+    this.stateBuilder,
     this.buildSliversInSliverOverlapInjector = false,
     this.useFixedCrossAxisCount = false,
     this.fixedCrossAxisCount = 1,
@@ -33,7 +33,7 @@ class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
 
   @override
   ItemsListState<TBloc> createState() =>
-      onCreateState?.call() ?? ItemsListState<TBloc>();
+      stateBuilder?.call() ?? ItemsListState<TBloc>();
 }
 
 class ItemsListState<TBloc extends ItemsManagerBloc>
@@ -94,7 +94,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
           sectionIndex < bloc.totalSections;
           sectionIndex++) {
         if (bloc.sectionHeader(sectionIndex) != null) {
-          sections.add(buildSectionHeader(
+          sections.add(buildSectionHeaderSliver(
               sectionIndex, context, bloc.sectionHeader(sectionIndex)));
         }
         double marginBottom = sectionIndex == bloc.totalSections - 1 ? 80 : 0;
@@ -118,11 +118,16 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return sections;
   }
 
-  Widget buildSectionHeader(
+  Widget buildSectionHeaderSliver(
       int section, BuildContext context, dynamic sectionHeader) {
     return SliverToBoxAdapter(
-      child: Text('Build section header here...'),
+      child: buildSectionHeader(section, context, sectionHeader),
     );
+  }
+
+  Widget buildSectionHeader(
+      int section, BuildContext context, dynamic sectionHeader) {
+    return Text('Build section header here...');
   }
 
   Widget sectionSliverGrid(int sectionIndex, BuildContext context,

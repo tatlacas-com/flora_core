@@ -16,8 +16,14 @@ class ItemsLoading extends ItemsManagerState implements ItemsBuildUi {
   String toString() => 'ItemsLoading';
 }
 class ItemsLoaded extends ItemsManagerState implements ItemsBuildUi {
+  final DateTime loadId;
+
+  ItemsLoaded({DateTime? loadId}):this.loadId = loadId ?? DateTime.now();
   @override
   String toString() => 'ItemsLoaded';
+
+  @override
+  List<Object> get props => [loadId];
 }
 
 class ReloadFromCloudEmpty extends ItemsManagerState{

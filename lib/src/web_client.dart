@@ -94,6 +94,7 @@ class WebClient extends Equatable {
     if (endpoint is String) {
       uri = Uri.parse('${baseUrl ?? this.baseUrl}$endpoint');
     } else if (endpoint is Uri) {
+      print('is Uri');
       uri = endpoint;
     } else {
       throw ArgumentError('Unsupported endpoint');
@@ -101,7 +102,7 @@ class WebClient extends Equatable {
     final response = await http
         .get(uri, headers: headers)
         .timeout(Duration(seconds: timeoutSeconds));
-    _throwIfNotSuccess(response.statusCode, endpoint: endpoint);
+    _throwIfNotSuccess(response.statusCode, endpoint: uri.toString());
     return response;
   }
 
