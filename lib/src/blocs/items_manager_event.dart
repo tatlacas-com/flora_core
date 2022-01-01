@@ -1,32 +1,49 @@
 part of 'items_manager_bloc.dart';
 
 abstract class ItemsManagerEvent extends Equatable {
-  const ItemsManagerEvent();
+  final DateTime requestId;
+
+  ItemsManagerEvent({DateTime? requestId})
+      : this.requestId = requestId ?? DateTime.now();
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [requestId];
 }
 
 class LoadItemsRequested extends ItemsManagerEvent {
+  final BuildContext context;
 
-  const LoadItemsRequested();
+  LoadItemsRequested({required this.context, DateTime? requestId});
 
   @override
   String toString() => 'LoadItemsRequested';
-
 }
 
-class ReloadItemsRequested extends ItemsManagerEvent{
+class ReloadItemsRequested extends ItemsManagerEvent {
   final bool fromCloud;
   final bool loadFromLocalIfCloudEmpty;
-const ReloadItemsRequested({this.fromCloud = true,this.loadFromLocalIfCloudEmpty = true});
+  final BuildContext context;
+
+  ReloadItemsRequested(
+      {required this.context,
+      this.fromCloud = true,
+      this.loadFromLocalIfCloudEmpty = true,
+      DateTime? requestId})
+      : super(requestId: requestId);
+
   @override
   String toString() => 'ReloadItemsRequested';
+
+  @override
+  List<Object?> get props => [fromCloud, loadFromLocalIfCloudEmpty, requestId];
 }
 
 class LoadItemsFromCloudRequested extends ItemsManagerEvent {
-  const LoadItemsFromCloudRequested();
+  LoadItemsFromCloudRequested({DateTime? requestId})
+      : super(requestId: requestId);
 
   @override
   String toString() => 'LoadItemsFromCloudRequested';
+
+
 }

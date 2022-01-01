@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, protected;
+import 'package:flutter/material.dart';
 import 'package:tatlacas_flutter_core/src/models/section.dart';
 
 import '../items_repository.dart';
@@ -30,7 +31,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepository>
 
   bool get isEmpty => items.isEmpty;
 
-  bool get isNotEmpty => items.isNotEmpty;
+  bool get isNotEmpty => !isEmpty;
 
   bool isSectionEmpty(int section) => items[section].items.isEmpty;
 
@@ -48,7 +49,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepository>
     try {
       emit(ItemsLoading());
       if (event.fromCloud) {
-        var _items = await repository.loadItemsFromCloud();
+        var _items = await repository.loadItemsFromCloud(event.context);
         items.clear();
         if (_items.isNotEmpty) items.addAll(_items);
         if (isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
@@ -56,12 +57,12 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepository>
           return;
         }
         emit(ReloadFromCloudEmpty());
-        _items = await repository.loadItemsFromLocalStorage();
+        _items = await repository.loadItemsFromLocalStorage(event.context);
         items.clear();
         if (_items.isNotEmpty) items.addAll(_items);
         emit(ItemsLoaded());
       } else {
-        var _items = await repository.loadItemsFromLocalStorage();
+        var _items = await repository.loadItemsFromLocalStorage(event.context);
         items.clear();
         if (_items.isNotEmpty) items.addAll(_items);
         emit(ItemsLoaded());
@@ -76,14 +77,14 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepository>
   FutureOr<void> onLoadItemsRequested(
       LoadItemsRequested event, Emitter<ItemsManagerState> emit) async {
     try {
-      var _items = await repository.loadItemsFromLocalStorage();
+      var _items = await repository.loadItemsFromLocalStorage(event.context);
       items.clear();
       if (_items.isNotEmpty) items.addAll(_items);
       if (isNotEmpty) {
         emit(ItemsLoaded());
         return;
       }
-      _items = await repository.loadItemsFromCloud();
+      _items = await repository.loadItemsFromCloud(event.context);
       items.clear();
       if (_items.isNotEmpty) items.addAll(_items);
       emit(ItemsLoaded());

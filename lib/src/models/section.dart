@@ -6,7 +6,9 @@ class Section extends Equatable {
   final bool usesGrid;
   final bool horizontalScroll;
   final double horizontalScrollHeight;
+  bool get isEmpty => items.isEmpty;
 
+  bool get isNotEmpty => !isEmpty;
   int totalItems() {
     return items.length;
   }

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tatlacas_flutter_core/src/blocs/items_manager_bloc.dart';
 import 'package:tatlacas_flutter_core/src/widgets/zero_height_app_bar.dart';
 
+import 'items_list.dart';
 import 'list_builder.dart';
 
 class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
@@ -10,6 +11,7 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
   final PreferredSizeWidget? appBar;
   final State<ListBuilder> Function() stateBuilder;
   final Widget Function(BuildContext)? listBuilder;
+  final ItemsListState<TBloc> Function()? listStateBuilder;
   final Key? listBuilderKey;
 
   const ListContainer({
@@ -18,8 +20,10 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
     required this.bloc,
     required this.stateBuilder,
     this.listBuilder,
+    this.listStateBuilder,
     this.appBar,
-  }) : super(key: key);
+  })  : assert(listBuilder == null || listStateBuilder == null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +31,16 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
       appBar: appBar ?? ZeroHeightAppBar(),
       backgroundColor: Theme.of(context).backgroundColor,
       body: BlocProvider(
-        create: (context) => this.bloc.call(context)..add(LoadItemsRequested()),
+        create: (context) => this.bloc.call(context)..add(LoadItemsRequested(context: context)),
         child: ListBuilder<TBloc>(
           key: listBuilderKey,
           stateBuilder: stateBuilder,
-          listBuilder: listBuilder,
+          listBuilder: listBuilder ??
+              (listStateBuilder == null
+                  ? null
+                  : (context) => ItemsList<TBloc>(
+                        stateBuilder: listStateBuilder,
+                      )),
         ),
       ),
     );

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
@@ -63,7 +65,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         : buildSections(context);
     return RefreshIndicator(
       onRefresh: () async {
-        bloc.add(ReloadItemsRequested());
+        bloc.add(ReloadItemsRequested(context: context));
       },
       child: CustomScrollView(
         key: PageStorageKey<String>(TBloc.runtimeType.toString()),
@@ -98,24 +100,41 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
               sectionIndex, context, bloc.sectionHeader(sectionIndex)));
         }
         double marginBottom = sectionIndex == bloc.totalSections - 1 ? 80 : 0;
-        sections.add(
-          bloc.usesGrid(sectionIndex)
-              ? sectionSliverGrid(sectionIndex, context,
-                  bloc.section(sectionIndex), marginBottom)
-              : sectionSliverList(sectionIndex, context,
-                  bloc.section(sectionIndex), marginBottom),
-        );
+        if (bloc.section(sectionIndex).isEmpty) {
+          sections.add(buildEmptySectionSliver(context));
+        } else {
+          sections.add(
+            bloc.usesGrid(sectionIndex)
+                ? sectionSliverGrid(sectionIndex, context,
+                    bloc.section(sectionIndex), marginBottom)
+                : sectionSliverList(sectionIndex, context,
+                    bloc.section(sectionIndex), marginBottom),
+          );
+        }
       }
     } else {
-      sections.add(SliverPadding(
-        padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-        sliver: SliverFillRemaining(
-          hasScrollBody: false,
-          child: buildEmptyView(context),
-        ),
-      ));
+      sections.add(buildEmptySliver(context));
     }
     return sections;
+  }
+
+  Widget buildEmptySectionSliver(BuildContext context) {
+    return SliverPadding(
+      padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      sliver: SliverToBoxAdapter(
+        child: buildEmptyView(context, emptyMessage: 'Empty Section View'),
+      ),
+    );
+  }
+
+  Widget buildEmptySliver(BuildContext context) {
+    return SliverPadding(
+      padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      sliver: SliverFillRemaining(
+        hasScrollBody: false,
+        child: buildEmptyView(context),
+      ),
+    );
   }
 
   Widget buildSectionHeaderSliver(
@@ -127,7 +146,15 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget buildSectionHeader(
       int section, BuildContext context, dynamic sectionHeader) {
-    return Text('Build section header here...');
+    if (sectionHeader is Widgetable) {
+      return sectionHeader.build(
+          onClick: () => onListHeaderClick(
+                context: context,
+                section: section,
+                item: sectionHeader,
+              ));
+    }
+    throw ArgumentError("unsupported list header item $sectionHeader");
   }
 
   Widget sectionSliverGrid(int sectionIndex, BuildContext context,
@@ -164,7 +191,33 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     required int index,
     required dynamic item,
   }) {
-    return Text('Build Content here...');
+    if (item is Widgetable) {
+      return item.build(
+          onClick: () => onListItemClick(
+                context: context,
+                item: item,
+                section: section,
+                index: index,
+              ));
+    }
+    throw ArgumentError('unsupported list item $item');
+  }
+
+  FutureOr<void> onListItemClick({
+    required BuildContext context,
+    required dynamic item,
+    required int section,
+    required int index,
+  }) {
+    print('List item clicked. Remember to handle this..');
+  }
+
+  FutureOr<void> onListHeaderClick({
+    required BuildContext context,
+    required int section,
+    required dynamic item,
+  }) {
+    print('Header item clicked. Remember to handle this..');
   }
 
   SliverGridDelegate _buildSliverGridDelegate() {
@@ -234,7 +287,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-
   AnimatedList _buildHorizontalAnimatedList(int section, Section sectionItems) {
     if (!_animatedListKeys.containsKey(section)) {
       _animatedListKeys[section] = GlobalKey<SliverAnimatedListState>();
@@ -271,7 +323,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       ),
     );
   }
-
 
   Widget _buildVerticalSliverAnimatedList(int section, Section sectionItems) {
     if (!_animatedListKeys.containsKey(section)) {
@@ -351,7 +402,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget buildEmptyView(BuildContext context, {String? emptyMessage}) {
-    return Center(child: Text('Empty View'));
+    return Center(child: Text(emptyMessage ?? 'Empty View'));
   }
 
   @override

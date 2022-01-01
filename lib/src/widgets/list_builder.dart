@@ -63,7 +63,7 @@ class ListBuilderState<T extends ListBuilder, TBloc extends ItemsManagerBloc>
     return RefreshIndicator(
       onRefresh: () async {
         var bloc = context.read<TBloc>();
-        bloc.add(ReloadItemsRequested());
+        bloc.add(ReloadItemsRequested(context: context));
       },
       child: CustomScrollView(
         key: PageStorageKey<String>(TBloc.runtimeType.toString()),
