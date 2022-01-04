@@ -20,3 +20,4 @@ export 'src/widgets/list_container.dart';
 export 'src/widgets/zero_height_app_bar.dart';
 export 'src/for_platform.dart';
 export 'src/models/widgetable.dart';
+export 'src/extensions.dart';
