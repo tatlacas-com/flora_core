@@ -6,42 +6,24 @@ import 'package:flutter/foundation.dart' show kDebugMode, protected;
 import 'package:flutter/material.dart';
 import 'package:tatlacas_flutter_core/src/models/section.dart';
 
-import '../items_repository.dart';
+import '../items_repo.dart';
 
 part 'items_manager_event.dart';
 
 part 'items_manager_state.dart';
 
-abstract class ItemsManagerBloc<TRepo extends ItemsRepository>
+abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     extends Bloc<ItemsManagerEvent, ItemsManagerState> {
-  final TRepo repository;
+  final TRepo repo;
 
-  List<Section> _items = [];
 
-  List<Section> get items => _items;
 
-  ItemsManagerBloc({required this.repository}) : super(ItemsLoading()) {
+  ItemsManagerBloc({required this.repo}) : super(ItemsLoading()) {
     on<LoadItemsRequested>(onLoadItemsRequested);
     on<ReloadItemsRequested>(onReloadItemsRequested);
   }
 
-  int get totalSections => items.length;
 
-  int totalSectionItems(int section) => items[section].items.length;
-
-  bool get isEmpty => items.isEmpty;
-
-  bool get isNotEmpty => !isEmpty;
-
-  bool isSectionEmpty(int section) => items[section].items.isEmpty;
-
-  bool isSectionNotEmpty(int section) => items[section].items.isNotEmpty;
-
-  Section section(int section) => items[section];
-
-  bool usesGrid(int section) => items[section].usesGrid;
-
-  dynamic sectionHeader(int section) => items[section].sectionHeader;
 
   @protected
   FutureOr<void> onReloadItemsRequested(
@@ -49,23 +31,17 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepository>
     try {
       emit(ItemsLoading());
       if (event.fromCloud) {
-        var _items = await repository.loadItemsFromCloud(event.context);
-        items.clear();
-        if (_items.isNotEmpty) items.addAll(_items);
-        if (isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
-          emit(ItemsLoaded());
+        var _items = await repo.loadItemsFromCloud(event.context);
+        if (_items.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
+          emit(ItemsLoaded(items: _items));
           return;
         }
         emit(ReloadFromCloudEmpty());
-        _items = await repository.loadItemsFromLocalStorage(event.context);
-        items.clear();
-        if (_items.isNotEmpty) items.addAll(_items);
-        emit(ItemsLoaded());
+        _items = await repo.loadItemsFromLocalStorage(event.context);
+        emit(ItemsLoaded(items: _items));
       } else {
-        var _items = await repository.loadItemsFromLocalStorage(event.context);
-        items.clear();
-        if (_items.isNotEmpty) items.addAll(_items);
-        emit(ItemsLoaded());
+        var _items = await repo.loadItemsFromLocalStorage(event.context);
+        emit(ItemsLoaded(items: _items));
       }
     } catch (e) {
       if (kDebugMode) print(e);
@@ -77,17 +53,13 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepository>
   FutureOr<void> onLoadItemsRequested(
       LoadItemsRequested event, Emitter<ItemsManagerState> emit) async {
     try {
-      var _items = await repository.loadItemsFromLocalStorage(event.context);
-      items.clear();
-      if (_items.isNotEmpty) items.addAll(_items);
-      if (isNotEmpty) {
-        emit(ItemsLoaded());
+      var _items = await repo.loadItemsFromLocalStorage(event.context);
+      if (_items.isNotEmpty) {
+        emit(ItemsLoaded(items: _items));
         return;
       }
-      _items = await repository.loadItemsFromCloud(event.context);
-      items.clear();
-      if (_items.isNotEmpty) items.addAll(_items);
-      emit(ItemsLoaded());
+      _items = await repo.loadItemsFromCloud(event.context);
+      emit(ItemsLoaded(items: _items));
     } catch (e) {
       if (kDebugMode) print(e);
       emit(LoadItemsFailed());

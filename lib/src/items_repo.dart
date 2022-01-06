@@ -4,11 +4,11 @@ import 'package:flutter/cupertino.dart';
 
 import 'models/section.dart';
 
-abstract class ItemsRepository {
+abstract class ItemsRepo {
   Future<List<Section>> loadItemsFromLocalStorage(BuildContext context) async =>
       [];
 
   Future<List<Section>> loadItemsFromCloud(BuildContext context) async => [];
 
-  const ItemsRepository();
+  const ItemsRepo();
 }

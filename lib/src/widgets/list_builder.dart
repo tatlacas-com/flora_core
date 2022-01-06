@@ -5,12 +5,15 @@ import 'package:tatlacas_flutter_core/src/widgets/items_list.dart';
 
 class ListBuilder<TBloc extends ItemsManagerBloc> extends StatefulWidget {
   final Widget Function(BuildContext)? listBuilder;
+  final ItemsListState<TBloc> Function()? listStateBuilder;
 
   const ListBuilder({
     Key? key,
     this.stateBuilder,
     this.listBuilder,
-  }) : super(key: key);
+    this.listStateBuilder,
+  })  : assert(listBuilder == null || listStateBuilder == null),
+        super(key: key);
 
   bool get useNestedScrollView => true;
 
@@ -19,11 +22,11 @@ class ListBuilder<TBloc extends ItemsManagerBloc> extends StatefulWidget {
 
   @override
   State<ListBuilder> createState() =>
-      stateBuilder?.call() ?? ListBuilderState<ListBuilder, TBloc>();
+      stateBuilder?.call() ?? ListBuilderState<ListBuilder<TBloc>, TBloc>();
 }
 
-class ListBuilderState<T extends ListBuilder, TBloc extends ItemsManagerBloc>
-    extends State<T> {
+class ListBuilderState<T extends ListBuilder<TBloc>,
+    TBloc extends ItemsManagerBloc> extends State<T> {
   ScrollController scrollController = ScrollController();
 
   @override
@@ -56,7 +59,11 @@ class ListBuilderState<T extends ListBuilder, TBloc extends ItemsManagerBloc>
   Widget buildOnStateChanged(ItemsManagerState state, BuildContext context) {
     if (state is ItemsLoading) return buildLoadingView(context);
     if (state is LoadItemsFailed) return _buildLoadingFailed(context);
-    return widget.listBuilder?.call(context) ?? ItemsList<TBloc>();
+    if (state is LoadItemsFailed) return _buildLoadingFailed(context);
+    if(state is ItemsLoaded)
+    return widget.listBuilder?.call(context) ??
+        ItemsList<TBloc>(stateBuilder: widget.listStateBuilder);
+    throw ArgumentError('Not supported state $state');
   }
 
   Widget _buildLoadingFailed(BuildContext context) {

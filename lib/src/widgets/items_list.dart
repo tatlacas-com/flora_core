@@ -102,27 +102,27 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   List<Widget> buildSections(BuildContext context) {
+    final state = bloc.state as LoadedItemsState;
     final List<Widget> sections = [];
-    if (bloc.isNotEmpty) {
+    if (state.isNotEmpty) {
       for (int sectionIndex = 0;
-      sectionIndex < bloc.totalSections;
+      sectionIndex < state.totalSections;
       sectionIndex++) {
-        if (bloc.sectionHeader(sectionIndex) != null) {
+        if (state.sectionHeader(sectionIndex) != null) {
           sections.add(buildSectionHeaderSliver(
-              sectionIndex, context, bloc.sectionHeader(sectionIndex)));
+              sectionIndex, context, state.sectionHeader(sectionIndex)));
         }
-        double marginBottom = sectionIndex == bloc.totalSections - 1 ? 80 : 0;
-        if (bloc
-            .section(sectionIndex)
+        double marginBottom = sectionIndex == state.totalSections - 1 ? 80 : 0;
+        if (state.section(sectionIndex)
             .isEmpty) {
           sections.add(buildEmptySectionSliver(context));
         } else {
           sections.add(
-            bloc.usesGrid(sectionIndex)
+            state.usesGrid(sectionIndex)
                 ? sectionSliverGrid(sectionIndex, context,
-                bloc.section(sectionIndex), marginBottom)
+                state.section(sectionIndex), marginBottom)
                 : sectionSliverList(sectionIndex, context,
-                bloc.section(sectionIndex), marginBottom),
+                state.section(sectionIndex), marginBottom),
           );
         }
       }

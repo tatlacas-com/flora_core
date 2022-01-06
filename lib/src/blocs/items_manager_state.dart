@@ -17,13 +17,37 @@ class ItemsLoading extends ItemsManagerState implements ItemsBuildUi {
   List<Object> get props => [requestId];
 }
 
-class ItemsLoaded extends ItemsManagerState implements ItemsBuildUi {
-  final DateTime loadId;
+abstract class LoadedItemsState extends ItemsManagerState {
+  final List<Section> items;
 
-  ItemsLoaded({DateTime? loadId}) : this.loadId = loadId ?? DateTime.now();
+
+  int get totalSections => items.length;
+
+  int totalSectionItems(int section) => items[section].items.length;
+
+  bool get isEmpty => items.isEmpty;
+
+  bool get isNotEmpty => !isEmpty;
+
+  bool isSectionEmpty(int section) => items[section].items.isEmpty;
+
+  bool isSectionNotEmpty(int section) => items[section].items.isNotEmpty;
+
+  Section section(int section) => items[section];
+
+  bool usesGrid(int section) => items[section].usesGrid;
+
+  dynamic sectionHeader(int section) => items[section].sectionHeader;
+
+  LoadedItemsState({required this.items});
 
   @override
-  List<Object> get props => [loadId];
+  List<Object> get props => [items];
+}
+
+class ItemsLoaded extends LoadedItemsState implements ItemsBuildUi {
+
+  ItemsLoaded({required List<Section> items}) : super(items: items);
 
   @override
   String toString() => 'ItemsLoaded';

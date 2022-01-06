@@ -35,12 +35,8 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
         child: ListBuilder<TBloc>(
           key: listBuilderKey,
           stateBuilder: stateBuilder,
-          listBuilder: listBuilder ??
-              (listStateBuilder == null
-                  ? null
-                  : (context) => ItemsList<TBloc>(
-                        stateBuilder: listStateBuilder,
-                      )),
+          listStateBuilder: listStateBuilder,
+          listBuilder: listBuilder,
         ),
       ),
     );
