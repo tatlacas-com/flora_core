@@ -19,6 +19,25 @@ class LoadItemsRequested extends ItemsManagerEvent {
   String toString() => 'LoadItemsRequested';
 }
 
+class ReplaceItem extends ItemsManagerEvent {
+  final BuildContext context;
+  final dynamic item;
+  final int section;
+  final int index;
+
+  ReplaceItem(
+      {required this.context,
+      required this.item,
+      required this.section,
+      required this.index});
+
+  @override
+  List<Object?> get props => [item, section, index];
+
+  @override
+  String toString() => 'LoadItemsRequested';
+}
+
 class ReloadItemsRequested extends ItemsManagerEvent {
   final bool fromCloud;
   final bool loadFromLocalIfCloudEmpty;
@@ -44,6 +63,4 @@ class LoadItemsFromCloudRequested extends ItemsManagerEvent {
 
   @override
   String toString() => 'LoadItemsFromCloudRequested';
-
-
 }

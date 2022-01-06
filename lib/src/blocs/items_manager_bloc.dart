@@ -16,14 +16,23 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     extends Bloc<ItemsManagerEvent, ItemsManagerState> {
   final TRepo repo;
 
-
-
   ItemsManagerBloc({required this.repo}) : super(ItemsLoading()) {
     on<LoadItemsRequested>(onLoadItemsRequested);
     on<ReloadItemsRequested>(onReloadItemsRequested);
+    on<ReplaceItem>(onReplaceItem);
   }
 
-
+  @protected
+  FutureOr<void> onReplaceItem(
+      ReplaceItem event, Emitter<ItemsManagerState> emit) async {
+    if (state is LoadedItemsState) {
+      final state = (this.state as LoadedItemsState);
+      state.section(event.section).items.removeAt(event.index);
+      state.section(event.section).items.insert(event.index, event.item);
+      emit(ReloadFromCloudEmpty());
+      emit(ItemsLoaded(items: state.items));
+    }
+  }
 
   @protected
   FutureOr<void> onReloadItemsRequested(
