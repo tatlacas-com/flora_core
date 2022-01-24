@@ -256,6 +256,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget buildVerticalSliverGridAnimated(int section, Section sectionItems) {
     return LiveSliverGrid(
       controller: scrollController,
+      reAnimateOnVisibility: false,
+      showItemInterval: Duration(milliseconds: 0),
+      showItemDuration: Duration(milliseconds: 150),
       key: Key("${section}sectionSliverGrid"),
       gridDelegate: _buildSliverGridDelegate(),
       itemBuilder: (context, index, animation) {

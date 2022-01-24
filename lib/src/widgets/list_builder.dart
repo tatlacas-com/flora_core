@@ -63,7 +63,7 @@ class ListBuilderState<T extends ListBuilder<TBloc>,
     if(state is ItemsLoaded)
     return widget.listBuilder?.call(context) ??
         ItemsList<TBloc>(stateBuilder: widget.listStateBuilder);
-    throw ArgumentError('Not supported state $state');
+    throw ArgumentError('buildOnStateChanged Not supported state $state');
   }
 
   Widget _buildLoadingFailed(BuildContext context) {

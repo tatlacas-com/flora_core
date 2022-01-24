@@ -9,12 +9,11 @@ abstract class ItemsManagerState extends Equatable {
 class ItemsLoading extends ItemsManagerState implements ItemsBuildUi {
   @override
   String toString() => 'ItemsLoading';
-  final DateTime requestId;
 
-  ItemsLoading({DateTime? loadId}) : this.requestId = loadId ?? DateTime.now();
+  const ItemsLoading({DateTime? loadId}) ;
 
   @override
-  List<Object> get props => [requestId];
+  List<Object> get props => [];
 }
 
 abstract class LoadedItemsState extends ItemsManagerState {

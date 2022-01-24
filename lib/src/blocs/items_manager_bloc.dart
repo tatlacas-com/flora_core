@@ -16,7 +16,10 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     extends Bloc<ItemsManagerEvent, ItemsManagerState> {
   final TRepo repo;
 
-  ItemsManagerBloc({required this.repo}) : super(ItemsLoading()) {
+  ItemsManagerBloc(
+      {required this.repo,
+      ItemsManagerState initialState = const ItemsLoading()})
+      : super(initialState) {
     on<LoadItemsRequested>(onLoadItemsRequested);
     on<ReloadItemsRequested>(onReloadItemsRequested);
     on<ReplaceItem>(onReplaceItem);
