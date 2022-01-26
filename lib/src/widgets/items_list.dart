@@ -45,6 +45,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   bool get hasRefreshIndicator => true;
   final scrollController = ScrollController();
+  bool get buildSliversInSliverOverlapInjector => false;
 
   final Map<int, GlobalKey<SliverAnimatedListState>> _animatedListKeys =
       Map<int, GlobalKey<SliverAnimatedListState>>();
@@ -79,7 +80,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget buildCustomScrollView(BuildContext context) {
-    var content = widget.buildSliversInSliverOverlapInjector
+    var content = widget.buildSliversInSliverOverlapInjector || buildSliversInSliverOverlapInjector
         ? buildSectionsWithOverlapInjector(context)
         : buildSections(context);
     return CustomScrollView(
