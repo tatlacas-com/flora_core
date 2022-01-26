@@ -44,7 +44,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   late TBloc bloc;
 
   bool get hasRefreshIndicator => true;
+  double get refreshIndicatorEdgeOffset => 56.0;
   final scrollController = ScrollController();
+
   bool get buildSliversInSliverOverlapInjector => false;
 
   final Map<int, GlobalKey<SliverAnimatedListState>> _animatedListKeys =
@@ -71,6 +73,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget buildScrollView(BuildContext context) {
     return hasRefreshIndicator
         ? RefreshIndicator(
+            edgeOffset: refreshIndicatorEdgeOffset,
             onRefresh: () async {
               bloc.add(ReloadItemsRequested(context: context));
             },
@@ -80,7 +83,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget buildCustomScrollView(BuildContext context) {
-    var content = widget.buildSliversInSliverOverlapInjector || buildSliversInSliverOverlapInjector
+    var content = widget.buildSliversInSliverOverlapInjector ||
+            buildSliversInSliverOverlapInjector
         ? buildSectionsWithOverlapInjector(context)
         : buildSections(context);
     return CustomScrollView(
@@ -256,12 +260,13 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       ),
     );
   }
+
   Widget buildVerticalSliverGridAnimated(int section, Section sectionItems) {
     return SliverGrid(
       key: Key("${section}sectionSliverGrid"),
       gridDelegate: _buildSliverGridDelegate(),
       delegate: SliverChildBuilderDelegate(
-            (context, index) {
+        (context, index) {
           return buildListItem(
             context: context,
             section: section,
