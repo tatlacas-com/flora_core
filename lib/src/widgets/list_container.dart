@@ -9,7 +9,7 @@ import 'list_builder.dart';
 class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
   final TBloc Function(BuildContext context) bloc;
   final PreferredSizeWidget? appBar;
-  final State<ListBuilder> Function() stateBuilder;
+  final State<ListBuilder<TBloc>> Function()? stateBuilder;
   final Widget Function(BuildContext)? listBuilder;
   final ItemsListState<TBloc> Function()? listStateBuilder;
   final Key? listBuilderKey;
@@ -18,7 +18,7 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
     Key? key,
     this.listBuilderKey,
     required this.bloc,
-    required this.stateBuilder,
+    this.stateBuilder,
     this.listBuilder,
     this.listStateBuilder,
     this.appBar,
@@ -31,10 +31,12 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
       appBar: appBar ?? ZeroHeightAppBar(),
       backgroundColor: Theme.of(context).backgroundColor,
       body: BlocProvider(
-        create: (context) => this.bloc.call(context)..add(LoadItemsRequested(context: context)),
+        create: (context) =>
+            this.bloc.call(context)..add(LoadItemsRequested(context: context)),
         child: ListBuilder<TBloc>(
           key: listBuilderKey,
-          stateBuilder: stateBuilder,
+          stateBuilder: stateBuilder ??
+              () => ListBuilderState<ListBuilder<TBloc>, TBloc>(),
           listStateBuilder: listStateBuilder,
           listBuilder: listBuilder,
         ),

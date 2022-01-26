@@ -15,7 +15,7 @@ class ListBuilder<TBloc extends ItemsManagerBloc> extends StatefulWidget {
   })  : assert(listBuilder == null || listStateBuilder == null),
         super(key: key);
 
-  bool get useNestedScrollView => true;
+  bool get useNestedScrollView => false;
 
   bool get floatHeaderSlivers => false;
   final State<ListBuilder> Function()? stateBuilder;

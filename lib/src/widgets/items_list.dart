@@ -40,15 +40,14 @@ class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
 }
 
 class ItemsListState<TBloc extends ItemsManagerBloc>
-    extends State<ItemsList<TBloc>>
-    with AutomaticKeepAliveClientMixin {
+    extends State<ItemsList<TBloc>> with AutomaticKeepAliveClientMixin {
   late TBloc bloc;
 
   bool get hasRefreshIndicator => true;
   final scrollController = ScrollController();
 
   final Map<int, GlobalKey<SliverAnimatedListState>> _animatedListKeys =
-  Map<int, GlobalKey<SliverAnimatedListState>>();
+      Map<int, GlobalKey<SliverAnimatedListState>>();
 
   @protected
   SliverAnimatedListState _animatedList(int section) =>
@@ -69,12 +68,14 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget buildScrollView(BuildContext context) {
-    return hasRefreshIndicator ? RefreshIndicator(
-      onRefresh: () async {
-        bloc.add(ReloadItemsRequested(context: context));
-      },
-      child: buildCustomScrollView(context),
-    ) : buildCustomScrollView(context);
+    return hasRefreshIndicator
+        ? RefreshIndicator(
+            onRefresh: () async {
+              bloc.add(ReloadItemsRequested(context: context));
+            },
+            child: buildCustomScrollView(context),
+          )
+        : buildCustomScrollView(context);
   }
 
   Widget buildCustomScrollView(BuildContext context) {
@@ -84,7 +85,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return CustomScrollView(
       controller: scrollController,
       key: PageStorageKey<String>(TBloc.runtimeType.toString()),
-      physics: BouncingScrollPhysics(),
+      physics:
+          const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      //needed for RefreshIndicator to work
       slivers: content,
     );
   }
@@ -104,28 +107,31 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return widgets;
   }
 
+  List<Widget> buildAppBarSlivers(BuildContext context) {
+    return [];
+  }
+
   List<Widget> buildSections(BuildContext context) {
     final state = bloc.state as LoadedItemsState;
-    final List<Widget> sections = [];
+    final List<Widget> sections = buildAppBarSlivers(context);
     if (state.isNotEmpty) {
       for (int sectionIndex = 0;
-      sectionIndex < state.totalSections;
-      sectionIndex++) {
+          sectionIndex < state.totalSections;
+          sectionIndex++) {
         if (state.sectionHeader(sectionIndex) != null) {
           sections.add(buildSectionHeaderSliver(
               sectionIndex, context, state.sectionHeader(sectionIndex)));
         }
         double marginBottom = sectionIndex == state.totalSections - 1 ? 80 : 0;
-        if (state.section(sectionIndex)
-            .isEmpty) {
+        if (state.section(sectionIndex).isEmpty) {
           sections.add(buildEmptySectionSliver(context));
         } else {
           sections.add(
             state.usesGrid(sectionIndex)
                 ? sectionSliverGrid(sectionIndex, context,
-                state.section(sectionIndex), marginBottom)
+                    state.section(sectionIndex), marginBottom)
                 : sectionSliverList(sectionIndex, context,
-                state.section(sectionIndex), marginBottom),
+                    state.section(sectionIndex), marginBottom),
           );
         }
       }
@@ -154,19 +160,18 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  Widget buildSectionHeaderSliver(int section, BuildContext context,
-      dynamic sectionHeader) {
+  Widget buildSectionHeaderSliver(
+      int section, BuildContext context, dynamic sectionHeader) {
     return SliverToBoxAdapter(
       child: buildSectionHeader(section, context, sectionHeader),
     );
   }
 
-  Widget buildSectionHeader(int section, BuildContext context,
-      dynamic sectionHeader) {
+  Widget buildSectionHeader(
+      int section, BuildContext context, dynamic sectionHeader) {
     if (sectionHeader is Widgetable) {
       return sectionHeader.build(
-          onClick: () =>
-              onListHeaderClick(
+          onClick: () => onListHeaderClick(
                 context: context,
                 section: section,
                 item: sectionHeader,
@@ -182,13 +187,13 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         : buildVerticalSliverGrid(sectionIndex, section);
   }
 
-
   Widget sectionSliverList(int section, BuildContext context,
       Section sectionItems, double marginBottom) {
     return sectionItems.horizontalScroll
         ? buildHorizontalSliverList(section, sectionItems)
         : buildVerticalSliverList(section, sectionItems);
   }
+
   Widget buildHorizontalSliverGrid(int section, Section sectionItems) {
     return SliverToBoxAdapter(
       child: Container(
@@ -216,8 +221,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         : buildVerticalSliverGridDefault(section, sectionItems);
   }
 
-
-
   Widget buildHorizontalSliverList(int section, Section sectionItems) {
     return SliverToBoxAdapter(
       child: Container(
@@ -229,7 +232,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-
   Widget buildVerticalSliverList(int section, Section sectionItems) {
     return useAnimatedList(section)
         ? _buildVerticalSliverAnimatedList(section, sectionItems)
@@ -237,6 +239,23 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   SliverGrid buildVerticalSliverGridDefault(int section, Section sectionItems) {
+    return SliverGrid(
+      key: Key("${section}sectionSliverGrid"),
+      gridDelegate: _buildSliverGridDelegate(),
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          return buildListItem(
+            context: context,
+            section: section,
+            index: index,
+            item: sectionItems.items[index],
+          );
+        },
+        childCount: sectionItems.totalItems(),
+      ),
+    );
+  }
+  Widget buildVerticalSliverGridAnimated(int section, Section sectionItems) {
     return SliverGrid(
       key: Key("${section}sectionSliverGrid"),
       gridDelegate: _buildSliverGridDelegate(),
@@ -252,31 +271,33 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         childCount: sectionItems.totalItems(),
       ),
     );
+    ;
   }
-  Widget buildVerticalSliverGridAnimated(int section, Section sectionItems) {
+
+  Widget buildVerticalSliverGridAnimated11(int section, Section sectionItems) {
     return LiveSliverGrid(
       controller: scrollController,
       reAnimateOnVisibility: false,
       showItemInterval: Duration(milliseconds: 0),
-      showItemDuration: Duration(milliseconds: 150),
+      showItemDuration: Duration(milliseconds: 0),
       key: Key("${section}sectionSliverGrid"),
       gridDelegate: _buildSliverGridDelegate(),
       itemBuilder: (context, index, animation) {
-          return FadeTransition(
-            opacity: Tween<double>(
-              begin: 0,
-              end: 1,
-            ).animate(animation),
-            child: buildListItem(
-              context: context,
-              section: section,
-              index: index,
-              item: sectionItems.items[index],
-            ),
-          );
-        },
-        itemCount: sectionItems.totalItems(),
-      );
+        return FadeTransition(
+          opacity: Tween<double>(
+            begin: 0,
+            end: 1,
+          ).animate(animation),
+          child: buildListItem(
+            context: context,
+            section: section,
+            index: index,
+            item: sectionItems.items[index],
+          ),
+        );
+      },
+      itemCount: sectionItems.totalItems(),
+    );
   }
 
   Widget buildListItem({
@@ -287,8 +308,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }) {
     if (item is Widgetable) {
       return item.build(
-          onClick: () =>
-              onListItemClick(
+          onClick: () => onListItemClick(
                 context: context,
                 item: item,
                 section: section,
@@ -297,7 +317,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     }
     throw ArgumentError('unsupported list item $item');
   }
-
 
   FutureOr<void> onListItemClick({
     required BuildContext context,
@@ -319,20 +338,18 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   SliverGridDelegate _buildSliverGridDelegate() {
     return widget.useFixedCrossAxisCount
         ? SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: widget.fixedCrossAxisCount,
-      childAspectRatio: widget.childAspectRatio,
-      crossAxisSpacing: widget.crossAxisSpacing,
-      mainAxisSpacing: widget.mainAxisSpacing,
-    )
+            crossAxisCount: widget.fixedCrossAxisCount,
+            childAspectRatio: widget.childAspectRatio,
+            crossAxisSpacing: widget.crossAxisSpacing,
+            mainAxisSpacing: widget.mainAxisSpacing,
+          )
         : SliverGridDelegateWithMaxCrossAxisExtent(
-      maxCrossAxisExtent: widget.maxCrossAxisExtent,
-      childAspectRatio: widget.childAspectRatio,
-      crossAxisSpacing: widget.crossAxisSpacing,
-      mainAxisSpacing: widget.mainAxisSpacing,
-    );
+            maxCrossAxisExtent: widget.maxCrossAxisExtent,
+            childAspectRatio: widget.childAspectRatio,
+            crossAxisSpacing: widget.crossAxisSpacing,
+            mainAxisSpacing: widget.mainAxisSpacing,
+          );
   }
-
-
 
   ListView _buildHorizontalList(int section, Section sectionItems) {
     return ListView.builder(
@@ -357,18 +374,18 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: _animatedListKeys[section],
       itemBuilder:
           (BuildContext context, int index, Animation<double> animation) =>
-          buildDefaultListItem(context, index, animation, section, sectionItems),
+              buildDefaultListItem(
+                  context, index, animation, section, sectionItems),
       initialItemCount: sectionItems.totalItems(),
       scrollDirection: Axis.horizontal,
     );
   }
 
-
   Widget buildVerticalSliverListDefault(int section, Section sectionItems) {
     return SliverList(
       key: ValueKey('${section}sectionSliverList'),
       delegate: SliverChildBuilderDelegate(
-            (context, index) {
+        (context, index) {
           return buildListItem(
             context: context,
             section: section,
@@ -376,7 +393,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
             item: sectionItems.items[index],
           );
         },
-
         childCount: sectionItems.totalItems(),
       ),
     );
@@ -390,14 +406,15 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: _animatedListKeys[section],
       itemBuilder:
           (BuildContext context, int index, Animation<double> animation) =>
-          buildDefaultListItem(context, index, animation, section, sectionItems),
+              buildDefaultListItem(
+                  context, index, animation, section, sectionItems),
       initialItemCount: sectionItems.totalItems(),
     );
   }
 
   @protected
   Widget buildDefaultListItem(BuildContext context, int index,
-      Animation<double> animation,int section, Section sectionItems) {
+      Animation<double> animation, int section, Section sectionItems) {
     return FadeTransition(
       opacity: Tween<double>(
         begin: 0,
@@ -418,7 +435,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return Text('buildRemovedListItem');
   }
 
-  void removeListItem(dynamic removedItem, {
+  void removeListItem(
+    dynamic removedItem, {
     required int section,
     required int row,
     Duration duration = const Duration(milliseconds: 300),
@@ -431,7 +449,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  void insertListItem(dynamic removedItem, {
+  void insertListItem(
+    dynamic removedItem, {
     required int section,
     required int row,
     Duration duration = const Duration(milliseconds: 300),
@@ -451,7 +470,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }) {
     animatedList.removeItem(
       row,
-          (context, animation) =>
+      (context, animation) =>
           buildRemovedListItem(removedItem, row, context, animation),
       duration: duration,
     );
