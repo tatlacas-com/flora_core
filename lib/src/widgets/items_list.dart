@@ -44,8 +44,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   late TBloc bloc;
 
   bool get hasRefreshIndicator => true;
-  double get refreshIndicatorEdgeOffset => 56.0;
-  final scrollController = ScrollController();
+
+  bool get floatHeaderSlivers => false;
+
+  bool get useNestedScrollView => true;
+
+  final ScrollController scrollController = ScrollController();
 
   bool get buildSliversInSliverOverlapInjector => false;
 
@@ -67,13 +71,21 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget build(BuildContext context) {
     super.build(context);
     bloc = context.read<TBloc>();
-    return buildScrollView(context);
+    return useNestedScrollView
+        ? NestedScrollView(
+            controller: scrollController,
+            floatHeaderSlivers: floatHeaderSlivers,
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return buildAppBarSlivers(context);
+            },
+            body: buildScrollView(context))
+        : buildScrollView(context);
   }
 
   Widget buildScrollView(BuildContext context) {
     return hasRefreshIndicator
         ? RefreshIndicator(
-            edgeOffset: refreshIndicatorEdgeOffset,
             onRefresh: () async {
               bloc.add(ReloadItemsRequested(context: context));
             },
@@ -83,17 +95,77 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget buildCustomScrollView(BuildContext context) {
-    var content = widget.buildSliversInSliverOverlapInjector ||
-            buildSliversInSliverOverlapInjector
-        ? buildSectionsWithOverlapInjector(context)
-        : buildSections(context);
+    return BlocBuilder<TBloc, ItemsManagerState>(
+      buildWhen: (prev, next) => next is ItemsBuildUi,
+      builder: (context, state) {
+        return buildOnStateChanged(context, state);
+      },
+    );
+  }
+
+  Widget buildOnStateChanged(
+    BuildContext context,
+    ItemsManagerState state,
+  ) {
+    if (state is ItemsLoading) return buildLoadingView(context);
+    if (state is LoadItemsFailed) return _buildLoadingFailed(context);
+    if (state is LoadItemsFailed) return _buildLoadingFailed(context);
+    if (state is ItemsLoaded) return _buildCustomScrollView(context);
+    throw ArgumentError('buildOnStateChanged Not supported state $state');
+  }
+
+  Widget _buildCustomScrollView(BuildContext context) {
+    var withInjector = widget.buildSliversInSliverOverlapInjector ||
+        buildSliversInSliverOverlapInjector;
     return CustomScrollView(
-      controller: scrollController,
       key: PageStorageKey<String>(TBloc.runtimeType.toString()),
       physics:
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       //needed for RefreshIndicator to work
-      slivers: content,
+      slivers: withInjector
+          ? buildSectionsWithOverlapInjector(context)
+          : buildSections(context),
+    );
+  }
+
+  Widget _buildLoadingFailed(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        var bloc = context.read<TBloc>();
+        bloc.add(ReloadItemsRequested(context: context));
+      },
+      child: CustomScrollView(
+        key: PageStorageKey<String>(TBloc.runtimeType.toString()),
+        slivers: buildLoadingFailedSlivers(context),
+      ),
+    );
+  }
+
+  List<Widget> buildLoadingFailedSlivers(BuildContext context) {
+    return [
+      SliverPadding(
+        padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+        sliver: SliverFillRemaining(
+          hasScrollBody: false,
+          child: buildLoadingFailedWidget(context),
+        ),
+      )
+    ];
+  }
+
+  Widget buildLoadingFailedWidget(BuildContext context) {
+    return Center(
+      child: Text('Show Screen Failed to load items widget here...'),
+    );
+  }
+
+  Widget buildLoadingView(BuildContext context) {
+    return Center(
+      child: SizedBox(
+        child: CircularProgressIndicator(),
+        width: 60,
+        height: 60,
+      ),
     );
   }
 
@@ -118,7 +190,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   List<Widget> buildSections(BuildContext context) {
     final state = bloc.state as LoadedItemsState;
-    final List<Widget> sections = buildAppBarSlivers(context);
+    final List<Widget> sections = []; //buildAppBarSlivers(context);
     if (state.isNotEmpty) {
       for (int sectionIndex = 0;
           sectionIndex < state.totalSections;
@@ -492,6 +564,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget buildEmptyView(BuildContext context, {String? emptyMessage}) {
     return Center(child: Text(emptyMessage ?? 'Empty View'));
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 
   @override
