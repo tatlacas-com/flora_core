@@ -10,7 +10,7 @@ class ItemsLoading extends ItemsManagerState implements ItemsBuildUi {
   @override
   String toString() => 'ItemsLoading';
 
-  const ItemsLoading({DateTime? loadId}) ;
+  const ItemsLoading({DateTime? loadId});
 
   @override
   List<Object> get props => [];
@@ -18,7 +18,6 @@ class ItemsLoading extends ItemsManagerState implements ItemsBuildUi {
 
 abstract class LoadedItemsState extends ItemsManagerState {
   final List<Section> items;
-
 
   int get totalSections => items.length;
 
@@ -45,11 +44,26 @@ abstract class LoadedItemsState extends ItemsManagerState {
 }
 
 class ItemsLoaded extends LoadedItemsState implements ItemsBuildUi {
-
   ItemsLoaded({required List<Section> items}) : super(items: items);
 
   @override
   String toString() => 'ItemsLoaded';
+}
+
+class ItemReplaced extends LoadedItemsState implements ItemsBuildUi {
+  final dynamic removedItem, insertedItem;
+  final int itemSection, itemIndex;
+
+  ItemReplaced(
+      {required this.itemSection,
+      required this.itemIndex,
+      required this.removedItem,
+      required this.insertedItem,
+      required List<Section> items})
+      : super(items: items);
+
+  @override
+  List<Object> get props => [removedItem, insertedItem, itemSection, itemIndex];
 }
 
 class ReloadFromCloudEmpty extends ItemsManagerState {
@@ -57,7 +71,8 @@ class ReloadFromCloudEmpty extends ItemsManagerState {
   String toString() => 'ReloadFromCloudEmpty';
   final DateTime loadId;
 
-  ReloadFromCloudEmpty({DateTime? loadId}) : this.loadId = loadId ?? DateTime.now();
+  ReloadFromCloudEmpty({DateTime? loadId})
+      : this.loadId = loadId ?? DateTime.now();
 
   @override
   List<Object> get props => [loadId];

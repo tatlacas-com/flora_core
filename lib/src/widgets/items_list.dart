@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:auto_animated/auto_animated.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
@@ -95,7 +94,11 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget buildCustomScrollView(BuildContext context) {
-    return BlocBuilder<TBloc, ItemsManagerState>(
+    return BlocConsumer<TBloc, ItemsManagerState>(
+      listener: (context, state) {
+
+      },
+      listenWhen: (prev, next) => next is! ItemsBuildUi,
       buildWhen: (prev, next) => next is ItemsBuildUi,
       builder: (context, state) {
         return buildOnStateChanged(context, state);
@@ -110,7 +113,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     if (state is ItemsLoading) return buildLoadingView(context);
     if (state is LoadItemsFailed) return _buildLoadingFailed(context);
     if (state is LoadItemsFailed) return _buildLoadingFailed(context);
-    if (state is ItemsLoaded) return _buildCustomScrollView(context);
+    if (state is ItemsLoaded || state is ItemReplaced) return _buildCustomScrollView(context);
     throw ArgumentError('buildOnStateChanged Not supported state $state');
   }
 
@@ -352,40 +355,18 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     ;
   }
 
-  Widget buildVerticalSliverGridAnimated11(int section, Section sectionItems) {
-    return LiveSliverGrid(
-      controller: scrollController,
-      reAnimateOnVisibility: false,
-      showItemInterval: Duration(milliseconds: 0),
-      showItemDuration: Duration(milliseconds: 0),
-      key: Key("${section}sectionSliverGrid"),
-      gridDelegate: _buildSliverGridDelegate(),
-      itemBuilder: (context, index, animation) {
-        return FadeTransition(
-          opacity: Tween<double>(
-            begin: 0,
-            end: 1,
-          ).animate(animation),
-          child: buildListItem(
-            context: context,
-            section: section,
-            index: index,
-            item: sectionItems.items[index],
-          ),
-        );
-      },
-      itemCount: sectionItems.totalItems(),
-    );
-  }
-
   Widget buildListItem({
     required BuildContext context,
     required int section,
     required int index,
     required dynamic item,
+    Animation<double>? animation,
+    bool isReplace = false,
+    bool isRemoved = false,
   }) {
     if (item is Widgetable) {
       return item.build(
+          animation: animation,
           onClick: () => onListItemClick(
                 context: context,
                 item: item,
@@ -452,8 +433,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: _animatedListKeys[section],
       itemBuilder:
           (BuildContext context, int index, Animation<double> animation) =>
-              buildDefaultListItem(
-                  context, index, animation, section, sectionItems),
+              buildAnimatedListItem(
+                  context: context,
+                  index: index,
+                  animation: animation,
+                  section: section,
+                  item: sectionItems.items[index]),
       initialItemCount: sectionItems.totalItems(),
       scrollDirection: Axis.horizontal,
     );
@@ -484,15 +469,33 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: _animatedListKeys[section],
       itemBuilder:
           (BuildContext context, int index, Animation<double> animation) =>
-              buildDefaultListItem(
-                  context, index, animation, section, sectionItems),
+              buildAnimatedListItem(
+                  context: context,
+                  index: index,
+                  animation: animation,
+                  section: section,
+                  item: sectionItems.items[index]),
       initialItemCount: sectionItems.totalItems(),
     );
   }
 
   @protected
-  Widget buildDefaultListItem(BuildContext context, int index,
-      Animation<double> animation, int section, Section sectionItems) {
+  Widget buildAnimatedListItem({
+    required BuildContext context,
+    required int index,
+    required Animation<double> animation,
+    required int section,
+    required dynamic item,
+  }) {
+    final isReplace =
+        bloc.isReplacingItem(section: section, index: index, item: item);
+    if (isReplace)
+      return buildAnimatedReplaceListItem(
+          context: context,
+          index: index,
+          animation: animation,
+          section: section,
+          item: item);
     return FadeTransition(
       opacity: Tween<double>(
         begin: 0,
@@ -502,64 +505,82 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         context: context,
         section: section,
         index: index,
-        item: sectionItems.items[index],
+        animation: animation,
+        item: item,
       ),
     );
   }
 
   @protected
-  Widget buildRemovedListItem(dynamic item, int row, BuildContext context,
-      Animation<double> animation) {
-    return Text('buildRemovedListItem');
+  Widget buildAnimatedReplaceListItem({
+    required BuildContext context,
+    required int index,
+    required Animation<double> animation,
+    required int section,
+    required dynamic item,
+  }) {
+    return buildListItem(
+        context: context,
+        section: section,
+        index: index,
+        animation: animation,
+        item: item,
+        isReplace: true);
+  }
+
+  @protected
+  Widget buildRemovedListItem(
+      {required dynamic item,
+      required int index,
+      required int section,
+      required BuildContext context,
+      required Animation<double> animation,
+      required bool isReplace}) {
+    if (isReplace)
+      return buildListItem(
+        context: context,
+        section: section,
+        index: index,
+        animation: animation,
+        item: item,
+        isRemoved: true,
+      );
+    return buildAnimatedListItem(
+        context: context,
+        index: index,
+        animation: animation,
+        section: section,
+        item: item);
   }
 
   void removeListItem(
     dynamic removedItem, {
     required int section,
-    required int row,
+    required int index,
     Duration duration = const Duration(milliseconds: 300),
+    bool isReplace = false,
   }) {
-    removeListItemAnimated(
-      animatedList: _animatedList(section),
-      removedItem: removedItem,
-      row: row,
+    _animatedList(section).removeItem(
+      index,
+      (context, animation) => buildRemovedListItem(
+          item: removedItem,
+          index: index,
+          section: section,
+          context: context,
+          animation: animation,
+          isReplace: isReplace),
       duration: duration,
     );
   }
 
   void insertListItem(
-    dynamic removedItem, {
+    dynamic insertedItem, {
     required int section,
-    required int row,
+    required int index,
+    required bool isReplace,
     Duration duration = const Duration(milliseconds: 300),
   }) {
-    insertListItemAnimated(
-      animatedList: _animatedList(section),
-      row: row,
-      duration: duration,
-    );
-  }
-
-  void removeListItemAnimated({
-    required SliverAnimatedListState animatedList,
-    required dynamic removedItem,
-    required int row,
-    Duration duration = const Duration(milliseconds: 300),
-  }) {
-    animatedList.removeItem(
-      row,
-      (context, animation) =>
-          buildRemovedListItem(removedItem, row, context, animation),
-      duration: duration,
-    );
-  }
-
-  void insertListItemAnimated({
-    required SliverAnimatedListState animatedList,
-    required int row,
-    Duration duration = const Duration(milliseconds: 300),
-  }) {
-    animatedList.insertItem(row, duration: duration);
+    _animatedList(section).insertItem(index, duration: duration);
   }
 
   Widget buildEmptyView(BuildContext context, {String? emptyMessage}) {

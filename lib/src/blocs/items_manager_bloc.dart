@@ -25,15 +25,26 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     on<ReplaceItem>(onReplaceItem);
   }
 
+  bool isReplacingItem({required int section, required int index, required dynamic item}){
+    if(state is! ItemReplaced)return false;
+    final _st = state as ItemReplaced;
+    return _st.itemSection == section && _st.itemIndex == index && _st.insertedItem == item;
+  }
+
   @protected
   FutureOr<void> onReplaceItem(
       ReplaceItem event, Emitter<ItemsManagerState> emit) async {
     if (state is LoadedItemsState) {
       final state = (this.state as LoadedItemsState);
-      state.section(event.section).items.removeAt(event.index);
+      final removedItem =
+          state.section(event.section).items.removeAt(event.index);
       state.section(event.section).items.insert(event.index, event.item);
-      emit(ReloadFromCloudEmpty());
-      emit(ItemsLoaded(items: state.items));
+      emit(ItemReplaced(
+          itemSection: event.section,
+          itemIndex: event.index,
+          removedItem: removedItem,
+          insertedItem: event.item,
+          items: state.items));
     }
   }
 
