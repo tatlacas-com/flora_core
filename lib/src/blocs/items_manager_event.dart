@@ -19,13 +19,13 @@ class LoadItemsRequested extends ItemsManagerEvent {
   String toString() => 'LoadItemsRequested';
 }
 
-class ReplaceItem extends ItemsManagerEvent {
+abstract class ChangeItem extends ItemsManagerEvent {
   final BuildContext context;
   final dynamic item;
   final int section;
   final int index;
 
-  ReplaceItem(
+  ChangeItem(
       {required this.context,
       required this.item,
       required this.section,
@@ -33,9 +33,33 @@ class ReplaceItem extends ItemsManagerEvent {
 
   @override
   List<Object?> get props => [item, section, index];
+}
 
-  @override
-  String toString() => 'LoadItemsRequested';
+class ReplaceItem extends ChangeItem {
+  ReplaceItem({
+    required BuildContext context,
+    required dynamic item,
+    required int section,
+    required int index,
+  }) : super(context: context, item: item, section: section, index: index);
+}
+
+class RemoveItem extends ChangeItem {
+  RemoveItem({
+    required BuildContext context,
+    required dynamic item,
+    required int section,
+    required int index,
+  }) : super(context: context, item: item, section: section, index: index);
+}
+
+class InsertItem extends ChangeItem {
+  InsertItem({
+    required BuildContext context,
+    required dynamic item,
+    required int section,
+    required int index,
+  }) : super(context: context, item: item, section: section, index: index);
 }
 
 class ReloadItemsRequested extends ItemsManagerEvent {

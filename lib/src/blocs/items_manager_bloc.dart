@@ -23,12 +23,17 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     on<LoadItemsRequested>(onLoadItemsRequested);
     on<ReloadItemsRequested>(onReloadItemsRequested);
     on<ReplaceItem>(onReplaceItem);
+    on<InsertItem>(onInsertItem);
+    on<RemoveItem>(onRemoveItem);
   }
 
-  bool isReplacingItem({required int section, required int index, required dynamic item}){
-    if(state is! ItemReplaced)return false;
+  bool isReplacingItem(
+      {required int section, required int index, required dynamic item}) {
+    if (state is! ItemReplaced) return false;
     final _st = state as ItemReplaced;
-    return _st.itemSection == section && _st.itemIndex == index && _st.insertedItem == item;
+    return _st.itemSection == section &&
+        _st.itemIndex == index &&
+        _st.insertedItem == item;
   }
 
   @protected
@@ -44,6 +49,36 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           itemIndex: event.index,
           removedItem: removedItem,
           insertedItem: event.item,
+          items: state.items));
+    }
+  }
+
+  @protected
+  FutureOr<void> onInsertItem(
+      InsertItem event, Emitter<ItemsManagerState> emit) async {
+    if (state is LoadedItemsState) {
+      final state = (this.state as LoadedItemsState);
+      state.section(event.section).items.insert(event.index, event.item);
+
+      emit(ItemInserted(
+          itemSection: event.section,
+          itemIndex: event.index,
+          insertedItem: event.item,
+          items: state.items));
+    }
+  }
+
+  @protected
+  FutureOr<void> onRemoveItem(
+      RemoveItem event, Emitter<ItemsManagerState> emit) async {
+    if (state is LoadedItemsState) {
+      final state = (this.state as LoadedItemsState);
+      final removedItem =
+          state.section(event.section).items.removeAt(event.index);
+      emit(ItemRemoved(
+          itemSection: event.section,
+          itemIndex: event.index,
+          removedItem: removedItem,
           items: state.items));
     }
   }

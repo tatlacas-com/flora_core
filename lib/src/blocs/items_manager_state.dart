@@ -40,7 +40,7 @@ abstract class LoadedItemsState extends ItemsManagerState {
   LoadedItemsState({required this.items});
 
   @override
-  List<Object> get props => [items];
+  List<Object?> get props => [items];
 }
 
 class ItemsLoaded extends LoadedItemsState implements ItemsBuildUi {
@@ -50,20 +50,64 @@ class ItemsLoaded extends LoadedItemsState implements ItemsBuildUi {
   String toString() => 'ItemsLoaded';
 }
 
-class ItemReplaced extends LoadedItemsState implements ItemsBuildUi {
+class ItemReplaced extends ItemChanged implements ItemsBuildUi {
+  ItemReplaced(
+      {required int itemSection,
+      required int itemIndex,
+      required dynamic removedItem,
+      required dynamic insertedItem,
+      required List<Section> items})
+      : super(
+          itemIndex: itemIndex,
+          itemSection: itemSection,
+          items: items,
+          removedItem: removedItem,
+          insertedItem: insertedItem,
+        );
+}
+
+class ItemRemoved extends ItemChanged  {
+  ItemRemoved(
+      {required int itemSection,
+      required int itemIndex,
+      required dynamic removedItem,
+      required List<Section> items})
+      : super(
+          itemIndex: itemIndex,
+          itemSection: itemSection,
+          items: items,
+          removedItem: removedItem,
+        );
+}
+
+class ItemInserted extends ItemChanged {
+  ItemInserted(
+      {required int itemSection,
+      required int itemIndex,
+      required dynamic insertedItem,
+      required List<Section> items})
+      : super(
+          itemIndex: itemIndex,
+          itemSection: itemSection,
+          items: items,
+          insertedItem: insertedItem,
+        );
+}
+
+class ItemChanged extends LoadedItemsState {
   final dynamic removedItem, insertedItem;
   final int itemSection, itemIndex;
 
-  ItemReplaced(
+  ItemChanged(
       {required this.itemSection,
       required this.itemIndex,
-      required this.removedItem,
-      required this.insertedItem,
+      this.removedItem,
+      this.insertedItem,
       required List<Section> items})
       : super(items: items);
 
   @override
-  List<Object> get props => [removedItem, insertedItem, itemSection, itemIndex];
+  List<Object?> get props => [removedItem, insertedItem, itemSection, itemIndex];
 }
 
 class ReloadFromCloudEmpty extends ItemsManagerState {
