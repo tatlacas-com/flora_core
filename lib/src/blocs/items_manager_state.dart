@@ -6,17 +6,17 @@ abstract class ItemsManagerState extends Equatable {
   const ItemsManagerState();
 }
 
-class ItemsLoading extends ItemsManagerState implements ItemsBuildUi {
+class ItemsLoadingState extends ItemsManagerState implements ItemsBuildUi {
   @override
   String toString() => 'ItemsLoading';
 
-  const ItemsLoading({DateTime? loadId});
+  const ItemsLoadingState({DateTime? loadId});
 
   @override
   List<Object> get props => [];
 }
 
-abstract class LoadedItemsState extends ItemsManagerState {
+abstract class LoadedState extends ItemsManagerState {
   final List<Section> items;
 
   int get totalSections => items.length;
@@ -37,21 +37,21 @@ abstract class LoadedItemsState extends ItemsManagerState {
 
   dynamic sectionHeader(int section) => items[section].sectionHeader;
 
-  LoadedItemsState({required this.items});
+  LoadedState({required this.items});
 
   @override
   List<Object?> get props => [items];
 }
 
-class ItemsLoaded extends LoadedItemsState implements ItemsBuildUi {
-  ItemsLoaded({required List<Section> items}) : super(items: items);
+class ItemsRetrievedState extends LoadedState implements ItemsBuildUi {
+  ItemsRetrievedState({required List<Section> items}) : super(items: items);
 
   @override
   String toString() => 'ItemsLoaded';
 }
 
-class ItemReplaced extends ItemChanged implements ItemsBuildUi {
-  ItemReplaced(
+class ItemReplacedState extends ItemChangedState implements ItemsBuildUi {
+  ItemReplacedState(
       {required int itemSection,
       required int itemIndex,
       required dynamic removedItem,
@@ -66,8 +66,8 @@ class ItemReplaced extends ItemChanged implements ItemsBuildUi {
         );
 }
 
-class ItemRemoved extends ItemChanged  {
-  ItemRemoved(
+class ItemRemovedState extends ItemChangedState  {
+  ItemRemovedState(
       {required int itemSection,
       required int itemIndex,
       required dynamic removedItem,
@@ -80,8 +80,8 @@ class ItemRemoved extends ItemChanged  {
         );
 }
 
-class ItemInserted extends ItemChanged {
-  ItemInserted(
+class ItemInsertedState extends ItemChangedState {
+  ItemInsertedState(
       {required int itemSection,
       required int itemIndex,
       required dynamic insertedItem,
@@ -94,11 +94,11 @@ class ItemInserted extends ItemChanged {
         );
 }
 
-class ItemChanged extends LoadedItemsState {
+class ItemChangedState extends LoadedState {
   final dynamic removedItem, insertedItem;
   final int itemSection, itemIndex;
 
-  ItemChanged(
+  ItemChangedState(
       {required this.itemSection,
       required this.itemIndex,
       this.removedItem,
@@ -110,24 +110,24 @@ class ItemChanged extends LoadedItemsState {
   List<Object?> get props => [removedItem, insertedItem, itemSection, itemIndex];
 }
 
-class ReloadFromCloudEmpty extends ItemsManagerState {
+class ReloadFromCloudEmptyState extends ItemsManagerState {
   @override
   String toString() => 'ReloadFromCloudEmpty';
   final DateTime loadId;
 
-  ReloadFromCloudEmpty({DateTime? loadId})
+  ReloadFromCloudEmptyState({DateTime? loadId})
       : this.loadId = loadId ?? DateTime.now();
 
   @override
   List<Object> get props => [loadId];
 }
 
-class LoadItemsFailed extends ItemsManagerState implements ItemsBuildUi {
+class LoadItemsFailedState extends ItemsManagerState implements ItemsBuildUi {
   @override
   String toString() => 'LoadItemsFailed';
   final DateTime loadId;
 
-  LoadItemsFailed({DateTime? loadId}) : this.loadId = loadId ?? DateTime.now();
+  LoadItemsFailedState({DateTime? loadId}) : this.loadId = loadId ?? DateTime.now();
 
   @override
   List<Object> get props => [loadId];

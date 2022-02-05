@@ -18,19 +18,19 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   ItemsManagerBloc(
       {required this.repo,
-      ItemsManagerState initialState = const ItemsLoading()})
+      ItemsManagerState initialState = const ItemsLoadingState()})
       : super(initialState) {
-    on<LoadItemsRequested>(onLoadItemsRequested);
-    on<ReloadItemsRequested>(onReloadItemsRequested);
-    on<ReplaceItem>(onReplaceItem);
-    on<InsertItem>(onInsertItem);
-    on<RemoveItem>(onRemoveItem);
+    on<LoadItemsEvent>(onLoadItemsRequested);
+    on<ReloadItemsEvent>(onReloadItemsRequested);
+    on<ReplaceItemEvent>(onReplaceItem);
+    on<InsertItemEvent>(onInsertItem);
+    on<RemoveItemEvent>(onRemoveItem);
   }
 
   bool isReplacingItem(
       {required int section, required int index, required dynamic item}) {
-    if (state is! ItemReplaced) return false;
-    final _st = state as ItemReplaced;
+    if (state is! ItemReplacedState) return false;
+    final _st = state as ItemReplacedState;
     return _st.itemSection == section &&
         _st.itemIndex == index &&
         _st.insertedItem == item;
@@ -38,13 +38,13 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   @protected
   FutureOr<void> onReplaceItem(
-      ReplaceItem event, Emitter<ItemsManagerState> emit) async {
-    if (state is LoadedItemsState) {
-      final state = (this.state as LoadedItemsState);
+      ReplaceItemEvent event, Emitter<ItemsManagerState> emit) async {
+    if (state is LoadedState) {
+      final state = (this.state as LoadedState);
       final removedItem =
           state.section(event.section).items.removeAt(event.index);
       state.section(event.section).items.insert(event.index, event.item);
-      emit(ItemReplaced(
+      emit(ItemReplacedState(
           itemSection: event.section,
           itemIndex: event.index,
           removedItem: removedItem,
@@ -55,12 +55,12 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   @protected
   FutureOr<void> onInsertItem(
-      InsertItem event, Emitter<ItemsManagerState> emit) async {
-    if (state is LoadedItemsState) {
-      final state = (this.state as LoadedItemsState);
+      InsertItemEvent event, Emitter<ItemsManagerState> emit) async {
+    if (state is LoadedState) {
+      final state = (this.state as LoadedState);
       state.section(event.section).items.insert(event.index, event.item);
 
-      emit(ItemInserted(
+      emit(ItemInsertedState(
           itemSection: event.section,
           itemIndex: event.index,
           insertedItem: event.item,
@@ -70,12 +70,12 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   @protected
   FutureOr<void> onRemoveItem(
-      RemoveItem event, Emitter<ItemsManagerState> emit) async {
-    if (state is LoadedItemsState) {
-      final state = (this.state as LoadedItemsState);
+      RemoveItemEvent event, Emitter<ItemsManagerState> emit) async {
+    if (state is LoadedState) {
+      final state = (this.state as LoadedState);
       final removedItem =
           state.section(event.section).items.removeAt(event.index);
-      emit(ItemRemoved(
+      emit(ItemRemovedState(
           itemSection: event.section,
           itemIndex: event.index,
           removedItem: removedItem,
@@ -85,42 +85,42 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   @protected
   FutureOr<void> onReloadItemsRequested(
-      ReloadItemsRequested event, Emitter<ItemsManagerState> emit) async {
+      ReloadItemsEvent event, Emitter<ItemsManagerState> emit) async {
     try {
-      emit(ItemsLoading());
+      emit(ItemsLoadingState());
       if (event.fromCloud) {
         var _items = await repo.loadItemsFromCloud(event.context);
         if (_items.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
-          emit(ItemsLoaded(items: _items));
+          emit(ItemsRetrievedState(items: _items));
           return;
         }
-        emit(ReloadFromCloudEmpty());
+        emit(ReloadFromCloudEmptyState());
         _items = await repo.loadItemsFromLocalStorage(event.context);
-        emit(ItemsLoaded(items: _items));
+        emit(ItemsRetrievedState(items: _items));
       } else {
         var _items = await repo.loadItemsFromLocalStorage(event.context);
-        emit(ItemsLoaded(items: _items));
+        emit(ItemsRetrievedState(items: _items));
       }
     } catch (e) {
       if (kDebugMode) print(e);
-      emit(LoadItemsFailed());
+      emit(LoadItemsFailedState());
     }
   }
 
   @protected
   FutureOr<void> onLoadItemsRequested(
-      LoadItemsRequested event, Emitter<ItemsManagerState> emit) async {
+      LoadItemsEvent event, Emitter<ItemsManagerState> emit) async {
     try {
       var _items = await repo.loadItemsFromLocalStorage(event.context);
       if (_items.isNotEmpty) {
-        emit(ItemsLoaded(items: _items));
+        emit(ItemsRetrievedState(items: _items));
         return;
       }
       _items = await repo.loadItemsFromCloud(event.context);
-      emit(ItemsLoaded(items: _items));
+      emit(ItemsRetrievedState(items: _items));
     } catch (e) {
       if (kDebugMode) print(e);
-      emit(LoadItemsFailed());
+      emit(LoadItemsFailedState());
     }
   }
 }

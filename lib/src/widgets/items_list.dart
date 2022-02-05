@@ -91,7 +91,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return pullToRefresh
         ? RefreshIndicator(
       onRefresh: () async {
-        bloc.add(ReloadItemsRequested(context: context));
+        bloc.add(ReloadItemsEvent(context: context));
       },
       child: buildCustomScrollView(context),
     )
@@ -101,17 +101,17 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget buildCustomScrollView(BuildContext context) {
     return BlocConsumer<TBloc, ItemsManagerState>(
       listener: (context, state) {
-        if (state is ItemRemoved) {
+        if (state is ItemRemovedState) {
           removeListItem(state.removedItem,
               section: state.itemSection, index: state.itemIndex);
-        } else if (state is ItemInserted) {
+        } else if (state is ItemInsertedState) {
           insertListItem(state.insertedItem,
               section: state.itemSection,
               index: state.itemIndex,
               isReplace: false);
         }
       },
-      listenWhen: (prev, next) => next is ItemChanged,
+      listenWhen: (prev, next) => next is ItemChangedState,
       buildWhen: (prev, next) => next is ItemsBuildUi,
       builder: (context, state) {
         return buildOnStateChanged(context, state);
@@ -121,10 +121,10 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget buildOnStateChanged(BuildContext context,
       ItemsManagerState state,) {
-    if (state is ItemsLoading) return buildLoadingView(context);
-    if (state is LoadItemsFailed) return _buildLoadingFailed(context);
-    if (state is LoadItemsFailed) return _buildLoadingFailed(context);
-    if (state is ItemsLoaded || state is ItemChanged) {
+    if (state is ItemsLoadingState) return buildLoadingView(context);
+    if (state is LoadItemsFailedState) return _buildLoadingFailed(context);
+    if (state is LoadItemsFailedState) return _buildLoadingFailed(context);
+    if (state is ItemsRetrievedState || state is ItemChangedState) {
       return _buildCustomScrollView(context);
     }
     throw ArgumentError('buildOnStateChanged Not supported state $state');
@@ -148,7 +148,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return RefreshIndicator(
       onRefresh: () async {
         var bloc = context.read<TBloc>();
-        bloc.add(ReloadItemsRequested(context: context));
+        bloc.add(ReloadItemsEvent(context: context));
       },
       child: CustomScrollView(
         key: PageStorageKey<String>(TBloc.runtimeType.toString()),
@@ -205,7 +205,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   List<Widget> buildSections(BuildContext context) {
-    final state = bloc.state as LoadedItemsState;
+    final state = bloc.state as LoadedState;
     final List<Widget> sections = []; //buildAppBarSlivers(context);
     if (state.isNotEmpty) {
       for (int sectionIndex = 0;

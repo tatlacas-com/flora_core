@@ -26,7 +26,7 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
       backgroundColor: Theme.of(context).backgroundColor,
       body: BlocProvider(
         create: (context) =>
-            this.bloc.call(context)..add(LoadItemsRequested(context: context)),
+            this.bloc.call(context)..add(LoadItemsEvent(context: context)),
         child: ItemsList<TBloc>(key: listBuilderKey, stateBuilder: listStateBuilder),
       ),
     );

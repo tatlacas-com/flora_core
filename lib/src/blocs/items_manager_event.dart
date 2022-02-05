@@ -10,22 +10,22 @@ abstract class ItemsManagerEvent extends Equatable {
   List<Object?> get props => [requestId];
 }
 
-class LoadItemsRequested extends ItemsManagerEvent {
+class LoadItemsEvent extends ItemsManagerEvent {
   final BuildContext context;
 
-  LoadItemsRequested({required this.context, DateTime? requestId});
+  LoadItemsEvent({required this.context, DateTime? requestId});
 
   @override
   String toString() => 'LoadItemsRequested';
 }
 
-abstract class ChangeItem extends ItemsManagerEvent {
+abstract class ChangeItemEvent extends ItemsManagerEvent {
   final BuildContext context;
   final dynamic item;
   final int section;
   final int index;
 
-  ChangeItem(
+  ChangeItemEvent(
       {required this.context,
       required this.item,
       required this.section,
@@ -35,8 +35,8 @@ abstract class ChangeItem extends ItemsManagerEvent {
   List<Object?> get props => [item, section, index];
 }
 
-class ReplaceItem extends ChangeItem {
-  ReplaceItem({
+class ReplaceItemEvent extends ChangeItemEvent {
+  ReplaceItemEvent({
     required BuildContext context,
     required dynamic item,
     required int section,
@@ -44,8 +44,8 @@ class ReplaceItem extends ChangeItem {
   }) : super(context: context, item: item, section: section, index: index);
 }
 
-class RemoveItem extends ChangeItem {
-  RemoveItem({
+class RemoveItemEvent extends ChangeItemEvent {
+  RemoveItemEvent({
     required BuildContext context,
     required dynamic item,
     required int section,
@@ -53,8 +53,8 @@ class RemoveItem extends ChangeItem {
   }) : super(context: context, item: item, section: section, index: index);
 }
 
-class InsertItem extends ChangeItem {
-  InsertItem({
+class InsertItemEvent extends ChangeItemEvent {
+  InsertItemEvent({
     required BuildContext context,
     required dynamic item,
     required int section,
@@ -62,12 +62,12 @@ class InsertItem extends ChangeItem {
   }) : super(context: context, item: item, section: section, index: index);
 }
 
-class ReloadItemsRequested extends ItemsManagerEvent {
+class ReloadItemsEvent extends ItemsManagerEvent {
   final bool fromCloud;
   final bool loadFromLocalIfCloudEmpty;
   final BuildContext context;
 
-  ReloadItemsRequested(
+  ReloadItemsEvent(
       {required this.context,
       this.fromCloud = true,
       this.loadFromLocalIfCloudEmpty = true,
@@ -81,8 +81,8 @@ class ReloadItemsRequested extends ItemsManagerEvent {
   List<Object?> get props => [fromCloud, loadFromLocalIfCloudEmpty, requestId];
 }
 
-class LoadItemsFromCloudRequested extends ItemsManagerEvent {
-  LoadItemsFromCloudRequested({DateTime? requestId})
+class LoadItemsFromCloudEvent extends ItemsManagerEvent {
+  LoadItemsFromCloudEvent({DateTime? requestId})
       : super(requestId: requestId);
 
   @override
