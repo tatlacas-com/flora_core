@@ -15,6 +15,7 @@ dependencies:
   bloc: ^8.0.2
   flutter_bloc: ^8.0.1
   auto_animated: ^3.0.1
+  flutter_lints: ^1.0.4
 
 dev_dependencies:
   flutter_test:

@@ -43,7 +43,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     with AutomaticKeepAliveClientMixin {
   late TBloc bloc;
 
-  bool get hasRefreshIndicator => true;
+  bool get pullToRefresh => true;
 
   bool get floatHeaderSlivers => false;
 
@@ -58,8 +58,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   @protected
   SliverAnimatedListState _animatedList(int section) {
-    if (_animatedListKeys[section] == null)
+    if (_animatedListKeys[section] == null) {
       resetAnimatedListKey(section);
+    }
     return _animatedListKeys[section]!.currentState!;
   }
 
@@ -67,7 +68,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   void resetAnimatedListKey(dynamic section) {
     assert(section is int);
     if (!useAnimatedList(section)) return;
-    _animatedListKeys[section] = new GlobalKey<SliverAnimatedListState>();
+    _animatedListKeys[section] = GlobalKey<SliverAnimatedListState>();
   }
 
   @override
@@ -87,7 +88,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget buildScrollView(BuildContext context) {
-    return hasRefreshIndicator
+    return pullToRefresh
         ? RefreshIndicator(
       onRefresh: () async {
         bloc.add(ReloadItemsRequested(context: context));
@@ -123,8 +124,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     if (state is ItemsLoading) return buildLoadingView(context);
     if (state is LoadItemsFailed) return _buildLoadingFailed(context);
     if (state is LoadItemsFailed) return _buildLoadingFailed(context);
-    if (state is ItemsLoaded || state is ItemReplaced)
+    if (state is ItemsLoaded || state is ItemChanged) {
       return _buildCustomScrollView(context);
+    }
     throw ArgumentError('buildOnStateChanged Not supported state $state');
   }
 
@@ -158,7 +160,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   List<Widget> buildLoadingFailedSlivers(BuildContext context) {
     return [
       SliverPadding(
-        padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
         sliver: SliverFillRemaining(
           hasScrollBody: false,
           child: buildLoadingFailedWidget(context),
@@ -168,13 +170,13 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget buildLoadingFailedWidget(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Show Screen Failed to load items widget here...'),
     );
   }
 
   Widget buildLoadingView(BuildContext context) {
-    return Center(
+    return const Center(
       child: SizedBox(
         child: CircularProgressIndicator(),
         width: 60,
@@ -236,7 +238,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget buildEmptySectionSliver(BuildContext context) {
     return SliverPadding(
-      padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
       sliver: SliverToBoxAdapter(
         child: buildEmptyView(context, emptyMessage: 'Empty Section View'),
       ),
@@ -245,7 +247,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget buildEmptySliver(BuildContext context) {
     return SliverPadding(
-      padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
       sliver: SliverFillRemaining(
         hasScrollBody: false,
         child: buildEmptyView(context),
@@ -290,7 +292,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget buildHorizontalSliverGrid(int section, Section sectionItems) {
     return SliverToBoxAdapter(
-      child: Container(
+      child: SizedBox(
         height: sectionItems.horizontalScrollHeight,
         child: GridView.builder(
           gridDelegate: _buildSliverGridDelegate(),
@@ -317,7 +319,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget buildHorizontalSliverList(int section, Section sectionItems) {
     return SliverToBoxAdapter(
-      child: Container(
+      child: SizedBox(
         height: sectionItems.horizontalScrollHeight,
         child: useAnimatedList(section)
             ? _buildHorizontalAnimatedList(section, sectionItems)
@@ -504,13 +506,14 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }) {
     final isReplace =
     bloc.isReplacingItem(section: section, index: index, item: item);
-    if (isReplace)
+    if (isReplace) {
       return buildAnimatedReplaceListItem(
           context: context,
           index: index,
           animation: animation,
           section: section,
           item: item);
+    }
     return FadeTransition(
       opacity: Tween<double>(
         begin: 0,
@@ -550,7 +553,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     required BuildContext context,
     required Animation<double> animation,
     required bool isReplace}) {
-    if (isReplace)
+    if (isReplace) {
       return buildListItem(
         context: context,
         section: section,
@@ -559,6 +562,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         item: item,
         isRemoved: true,
       );
+    }
     return buildAnimatedListItem(
         context: context,
         index: index,
