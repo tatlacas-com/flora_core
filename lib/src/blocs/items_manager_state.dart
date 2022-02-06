@@ -56,11 +56,11 @@ class ItemReplacedState extends ItemChangedState implements ItemsBuildUi {
       required int itemIndex,
       required dynamic removedItem,
       required dynamic insertedItem,
-      required List<Section> items})
+      required List<Section> sections})
       : super(
           itemIndex: itemIndex,
           itemSection: itemSection,
-          items: items,
+          sections: sections,
           removedItem: removedItem,
           insertedItem: insertedItem,
         );
@@ -71,11 +71,11 @@ class ItemRemovedState extends ItemChangedState  {
       {required int itemSection,
       required int itemIndex,
       required dynamic removedItem,
-      required List<Section> items})
+      required List<Section> sections})
       : super(
           itemIndex: itemIndex,
           itemSection: itemSection,
-          items: items,
+          sections: sections,
           removedItem: removedItem,
         );
 }
@@ -85,11 +85,11 @@ class ItemInsertedState extends ItemChangedState {
       {required int itemSection,
       required int itemIndex,
       required dynamic insertedItem,
-      required List<Section> items})
+      required List<Section> sections})
       : super(
           itemIndex: itemIndex,
           itemSection: itemSection,
-          items: items,
+          sections: sections,
           insertedItem: insertedItem,
         );
 }
@@ -103,8 +103,8 @@ class ItemChangedState extends LoadedState {
       required this.itemIndex,
       this.removedItem,
       this.insertedItem,
-      required List<Section> items})
-      : super(sections: items);
+      required List<Section> sections})
+      : super(sections: sections);
 
   @override
   List<Object?> get props => [removedItem, insertedItem, itemSection, itemIndex];
@@ -116,7 +116,7 @@ class ReloadFromCloudEmptyState extends ItemsManagerState {
   final DateTime loadId;
 
   ReloadFromCloudEmptyState({DateTime? loadId})
-      : this.loadId = loadId ?? DateTime.now();
+      : loadId = loadId ?? DateTime.now();
 
   @override
   List<Object> get props => [loadId];
@@ -127,7 +127,7 @@ class LoadItemsFailedState extends ItemsManagerState implements ItemsBuildUi {
   String toString() => 'LoadItemsFailed';
   final DateTime loadId;
 
-  LoadItemsFailedState({DateTime? loadId}) : this.loadId = loadId ?? DateTime.now();
+  LoadItemsFailedState({DateTime? loadId}) : loadId = loadId ?? DateTime.now();
 
   @override
   List<Object> get props => [loadId];
