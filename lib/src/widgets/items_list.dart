@@ -54,7 +54,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   bool get buildSliversInSliverOverlapInjector => false;
 
   final Map<int, GlobalKey<SliverAnimatedListState>> _animatedListKeys =
-  Map<int, GlobalKey<SliverAnimatedListState>>();
+  <int, GlobalKey<SliverAnimatedListState>>{};
 
   @protected
   SliverAnimatedListState _animatedList(int section) {

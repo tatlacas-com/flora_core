@@ -49,7 +49,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           itemIndex: event.index,
           removedItem: removedItem,
           insertedItem: event.item,
-          items: state.items));
+          items: state.sections));
     }
   }
 
@@ -64,7 +64,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           itemSection: event.section,
           itemIndex: event.index,
           insertedItem: event.item,
-          items: state.items));
+          items: state.sections));
     }
   }
 
@@ -79,7 +79,12 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           itemSection: event.section,
           itemIndex: event.index,
           removedItem: removedItem,
-          items: state.items));
+          items: state.sections));
+      if (state.section(event.section).isEmpty) {
+        await Future.delayed(const Duration(milliseconds: 500));
+        state.sections.removeAt(event.section);
+        emit(ItemsRetrievedState(items: state.sections));
+      }
     }
   }
 
@@ -87,7 +92,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   FutureOr<void> onReloadItemsRequested(
       ReloadItemsEvent event, Emitter<ItemsManagerState> emit) async {
     try {
-      emit(ItemsLoadingState());
+      emit(const ItemsLoadingState());
       if (event.fromCloud) {
         var _items = await repo.loadItemsFromCloud(event.context);
         if (_items.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {

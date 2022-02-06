@@ -17,34 +17,34 @@ class ItemsLoadingState extends ItemsManagerState implements ItemsBuildUi {
 }
 
 abstract class LoadedState extends ItemsManagerState {
-  final List<Section> items;
+  final List<Section> sections;
 
-  int get totalSections => items.length;
+  int get totalSections => sections.length;
 
-  int totalSectionItems(int section) => items[section].items.length;
+  int totalSectionItems(int section) => sections[section].items.length;
 
-  bool get isEmpty => items.isEmpty;
+  bool get isEmpty => sections.isEmpty;
 
   bool get isNotEmpty => !isEmpty;
 
-  bool isSectionEmpty(int section) => items[section].items.isEmpty;
+  bool isSectionEmpty(int section) => sections[section].items.isEmpty;
 
-  bool isSectionNotEmpty(int section) => items[section].items.isNotEmpty;
+  bool isSectionNotEmpty(int section) => sections[section].items.isNotEmpty;
 
-  Section section(int section) => items[section];
+  Section section(int section) => sections[section];
 
-  bool usesGrid(int section) => items[section].usesGrid;
+  bool usesGrid(int section) => sections[section].usesGrid;
 
-  dynamic sectionHeader(int section) => items[section].sectionHeader;
+  dynamic sectionHeader(int section) => sections[section].sectionHeader;
 
-  LoadedState({required this.items});
+  LoadedState({required this.sections});
 
   @override
-  List<Object?> get props => [items];
+  List<Object?> get props => [sections];
 }
 
 class ItemsRetrievedState extends LoadedState implements ItemsBuildUi {
-  ItemsRetrievedState({required List<Section> items}) : super(items: items);
+  ItemsRetrievedState({required List<Section> items}) : super(sections: items);
 
   @override
   String toString() => 'ItemsLoaded';
@@ -104,7 +104,7 @@ class ItemChangedState extends LoadedState {
       this.removedItem,
       this.insertedItem,
       required List<Section> items})
-      : super(items: items);
+      : super(sections: items);
 
   @override
   List<Object?> get props => [removedItem, insertedItem, itemSection, itemIndex];
