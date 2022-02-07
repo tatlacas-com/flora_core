@@ -7,8 +7,6 @@ abstract class ItemsManagerState extends Equatable {
 }
 
 class ItemsLoadingState extends ItemsManagerState implements ItemsBuildUi {
-  @override
-  String toString() => 'ItemsLoading';
 
   const ItemsLoadingState({DateTime? loadId});
 
@@ -37,17 +35,15 @@ abstract class LoadedState extends ItemsManagerState {
 
   dynamic sectionHeader(int section) => sections[section].sectionHeader;
 
-  LoadedState({required this.sections});
+  const LoadedState({required this.sections});
 
   @override
   List<Object?> get props => [sections];
 }
 
 class ItemsRetrievedState extends LoadedState implements ItemsBuildUi {
-  ItemsRetrievedState({required List<Section> items}) : super(sections: items);
+  const ItemsRetrievedState({required List<Section> items}) : super(sections: items);
 
-  @override
-  String toString() => 'ItemsLoaded';
 }
 
 class ItemReplacedState extends ItemChangedState implements ItemsBuildUi {
@@ -98,7 +94,7 @@ class ItemChangedState extends LoadedState {
   final dynamic removedItem, insertedItem;
   final int itemSection, itemIndex;
 
-  ItemChangedState(
+  const ItemChangedState(
       {required this.itemSection,
       required this.itemIndex,
       this.removedItem,
@@ -111,8 +107,7 @@ class ItemChangedState extends LoadedState {
 }
 
 class ReloadFromCloudEmptyState extends ItemsManagerState {
-  @override
-  String toString() => 'ReloadFromCloudEmpty';
+
   final DateTime loadId;
 
   ReloadFromCloudEmptyState({DateTime? loadId})
@@ -123,8 +118,7 @@ class ReloadFromCloudEmptyState extends ItemsManagerState {
 }
 
 class LoadItemsFailedState extends ItemsManagerState implements ItemsBuildUi {
-  @override
-  String toString() => 'LoadItemsFailed';
+
   final DateTime loadId;
 
   LoadItemsFailedState({DateTime? loadId}) : loadId = loadId ?? DateTime.now();

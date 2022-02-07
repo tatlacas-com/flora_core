@@ -319,12 +319,16 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget buildHorizontalSliverList(int section, Section sectionItems) {
     return SliverToBoxAdapter(
-      child: SizedBox(
-        height: sectionItems.horizontalScrollHeight,
-        child: useAnimatedList(section)
-            ? _buildHorizontalAnimatedList(section, sectionItems)
-            : _buildHorizontalList(section, sectionItems),
-      ),
+      child: buildHorizontalSliverListContents(section, sectionItems),
+    );
+  }
+
+  Widget buildHorizontalSliverListContents(int section, Section sectionItems) {
+    return SizedBox(
+      height: sectionItems.horizontalScrollHeight,
+      child: useAnimatedList(section)
+          ? _buildHorizontalAnimatedList(section, sectionItems)
+          : _buildHorizontalList(section, sectionItems),
     );
   }
 
