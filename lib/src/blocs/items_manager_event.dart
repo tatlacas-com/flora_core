@@ -15,8 +15,6 @@ class LoadItemsEvent extends ItemsManagerEvent {
 
   LoadItemsEvent({required this.context, DateTime? requestId});
 
-  @override
-  String toString() => 'LoadItemsRequested';
 }
 
 abstract class ChangeItemEvent extends ItemsManagerEvent {
@@ -75,16 +73,9 @@ class ReloadItemsEvent extends ItemsManagerEvent {
       : super(requestId: requestId);
 
   @override
-  String toString() => 'ReloadItemsRequested';
-
-  @override
   List<Object?> get props => [fromCloud, loadFromLocalIfCloudEmpty, requestId];
 }
 
 class LoadItemsFromCloudEvent extends ItemsManagerEvent {
-  LoadItemsFromCloudEvent({DateTime? requestId})
-      : super(requestId: requestId);
-
-  @override
-  String toString() => 'LoadItemsFromCloudRequested';
+  LoadItemsFromCloudEvent({DateTime? requestId}) : super(requestId: requestId);
 }
