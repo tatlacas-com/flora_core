@@ -34,7 +34,7 @@ class WebClient extends Equatable {
     String? baseUrl,
     bool jsonEncodedPayload = false,
   }) async {
-    if (baseUrl == null) baseUrl = this.baseUrl;
+    baseUrl ??= this.baseUrl;
     var headers = <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     };
@@ -62,16 +62,16 @@ class WebClient extends Equatable {
     var file = File(filePath);
     final stream = http.ByteStream(file.openRead());
     var length = await file.length();
-    if (baseUrl == null) baseUrl = this.baseUrl;
+    baseUrl ??= this.baseUrl;
 
     var uri = Uri.parse('$baseUrl$endpoint');
 
-    var request = new http.MultipartRequest("POST", uri);
+    var request = http.MultipartRequest("POST", uri);
     if (accessToken != null) {
       request.headers[HttpHeaders.authorizationHeader] = "Bearer $accessToken";
     }
     var multipartFile =
-        new http.MultipartFile('file', stream, length, filename: fileName);
+        http.MultipartFile('file', stream, length, filename: fileName);
     //contentType: new MediaType('image', 'png'));
 
     request.files.add(multipartFile);
