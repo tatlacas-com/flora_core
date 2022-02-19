@@ -266,6 +266,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       dynamic sectionHeader) {
     if (sectionHeader is Widgetable) {
       return sectionHeader.build(
+        section: section,
+          index: -1,
           onClick: () =>
               onListHeaderClick(
                 context: context,
@@ -386,6 +388,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }) {
     if (item is Widgetable) {
       return item.build(
+        section: section,
+          index: index,
           animation: animation,
           onClick: () =>
               onListItemClick(
