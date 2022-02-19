@@ -47,7 +47,7 @@ class ItemsRetrievedState extends LoadedState implements ItemsBuildUi {
 }
 
 class ItemReplacedState extends ItemChangedState implements ItemsBuildUi {
-  ItemReplacedState(
+  const ItemReplacedState(
       {required int itemSection,
       required int itemIndex,
       required dynamic removedItem,
@@ -63,7 +63,7 @@ class ItemReplacedState extends ItemChangedState implements ItemsBuildUi {
 }
 
 class ItemRemovedState extends ItemChangedState  {
-  ItemRemovedState(
+  const ItemRemovedState(
       {required int itemSection,
       required int itemIndex,
       required dynamic removedItem,
@@ -77,7 +77,7 @@ class ItemRemovedState extends ItemChangedState  {
 }
 
 class ItemInsertedState extends ItemChangedState {
-  ItemInsertedState(
+  const ItemInsertedState(
       {required int itemSection,
       required int itemIndex,
       required dynamic insertedItem,

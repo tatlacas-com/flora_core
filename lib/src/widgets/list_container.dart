@@ -23,7 +23,6 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar ?? ZeroHeightAppBar(),
-      backgroundColor: Theme.of(context).backgroundColor,
       body: BlocProvider(
         create: (context) =>
             bloc.call(context)..add(LoadItemsEvent(context: context)),
