@@ -374,7 +374,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         childCount: sectionItems.totalItems(),
       ),
     );
-    ;
   }
 
   Widget buildListItem({
