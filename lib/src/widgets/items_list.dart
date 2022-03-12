@@ -39,8 +39,7 @@ class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
 }
 
 class ItemsListState<TBloc extends ItemsManagerBloc>
-    extends State<ItemsList<TBloc>>
-    with AutomaticKeepAliveClientMixin {
+    extends State<ItemsList<TBloc>> with AutomaticKeepAliveClientMixin {
   late TBloc bloc;
 
   bool get pullToRefresh => true;
@@ -54,7 +53,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   bool get buildSliversInSliverOverlapInjector => false;
 
   final Map<int, GlobalKey<SliverAnimatedListState>> _animatedListKeys =
-  <int, GlobalKey<SliverAnimatedListState>>{};
+      <int, GlobalKey<SliverAnimatedListState>>{};
 
   @protected
   SliverAnimatedListState _animatedList(int section) {
@@ -77,24 +76,24 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     bloc = context.read<TBloc>();
     return useNestedScrollView
         ? NestedScrollView(
-        controller: scrollController,
-        floatHeaderSlivers: floatHeaderSlivers,
-        headerSliverBuilder:
-            (BuildContext context, bool innerBoxIsScrolled) {
-          return buildAppBarSlivers(context);
-        },
-        body: buildScrollView(context))
+            controller: scrollController,
+            floatHeaderSlivers: floatHeaderSlivers,
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return buildAppBarSlivers(context);
+            },
+            body: buildScrollView(context))
         : buildScrollView(context);
   }
 
   Widget buildScrollView(BuildContext context) {
     return pullToRefresh
         ? RefreshIndicator(
-      onRefresh: () async {
-        bloc.add(ReloadItemsEvent(context: context));
-      },
-      child: buildCustomScrollView(context),
-    )
+            onRefresh: () async {
+              bloc.add(ReloadItemsEvent(context: context));
+            },
+            child: buildCustomScrollView(context),
+          )
         : buildCustomScrollView(context);
   }
 
@@ -119,8 +118,10 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  Widget buildOnStateChanged(BuildContext context,
-      ItemsManagerState state,) {
+  Widget buildOnStateChanged(
+    BuildContext context,
+    ItemsManagerState state,
+  ) {
     if (state is ItemsLoadingState) return buildLoadingView(context);
     if (state is LoadItemsFailedState) return _buildLoadingFailed(context);
     if (state is LoadItemsFailedState) return _buildLoadingFailed(context);
@@ -136,7 +137,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return CustomScrollView(
       key: PageStorageKey<String>(TBloc.runtimeType.toString()),
       physics:
-      const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       //needed for RefreshIndicator to work
       slivers: withInjector
           ? buildSectionsWithOverlapInjector(context)
@@ -209,24 +210,22 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     final List<Widget> sections = []; //buildAppBarSlivers(context);
     if (state.isNotEmpty) {
       for (int sectionIndex = 0;
-      sectionIndex < state.totalSections;
-      sectionIndex++) {
+          sectionIndex < state.totalSections;
+          sectionIndex++) {
         if (state.sectionHeader(sectionIndex) != null) {
           sections.add(buildSectionHeaderSliver(
               sectionIndex, context, state.sectionHeader(sectionIndex)));
         }
         double marginBottom = sectionIndex == state.totalSections - 1 ? 80 : 0;
-        if (state
-            .section(sectionIndex)
-            .isEmpty) {
+        if (state.section(sectionIndex).isEmpty) {
           sections.add(buildEmptySectionSliver(context));
         } else {
           sections.add(
             state.usesGrid(sectionIndex)
                 ? sectionSliverGrid(sectionIndex, context,
-                state.section(sectionIndex), marginBottom)
+                    state.section(sectionIndex), marginBottom)
                 : sectionSliverList(sectionIndex, context,
-                state.section(sectionIndex), marginBottom),
+                    state.section(sectionIndex), marginBottom),
           );
         }
       }
@@ -255,21 +254,20 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  Widget buildSectionHeaderSliver(int section, BuildContext context,
-      dynamic sectionHeader) {
+  Widget buildSectionHeaderSliver(
+      int section, BuildContext context, dynamic sectionHeader) {
     return SliverToBoxAdapter(
       child: buildSectionHeader(section, context, sectionHeader),
     );
   }
 
-  Widget buildSectionHeader(int section, BuildContext context,
-      dynamic sectionHeader) {
+  Widget buildSectionHeader(
+      int section, BuildContext context, dynamic sectionHeader) {
     if (sectionHeader is Widgetable) {
       return sectionHeader.build(
-        section: section,
+          section: section,
           index: -1,
-          onClick: () =>
-              onListHeaderClick(
+          onClick: () => onListHeaderClick(
                 context: context,
                 section: section,
                 item: sectionHeader,
@@ -345,7 +343,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: Key("${section}sectionSliverGrid"),
       gridDelegate: _buildSliverGridDelegate(),
       delegate: SliverChildBuilderDelegate(
-            (context, index) {
+        (context, index) {
           return buildListItem(
             context: context,
             section: section,
@@ -363,7 +361,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: Key("${section}sectionSliverGrid"),
       gridDelegate: _buildSliverGridDelegate(),
       delegate: SliverChildBuilderDelegate(
-            (context, index) {
+        (context, index) {
           return buildListItem(
             context: context,
             section: section,
@@ -387,11 +385,10 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }) {
     if (item is Widgetable) {
       return item.build(
-        section: section,
+          section: section,
           index: index,
           animation: animation,
-          onClick: () =>
-              onListItemClick(
+          onClick: () => onListItemClick(
                 context: context,
                 item: item,
                 section: section,
@@ -421,17 +418,17 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   SliverGridDelegate _buildSliverGridDelegate() {
     return widget.useFixedCrossAxisCount
         ? SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: widget.fixedCrossAxisCount,
-      childAspectRatio: widget.childAspectRatio,
-      crossAxisSpacing: widget.crossAxisSpacing,
-      mainAxisSpacing: widget.mainAxisSpacing,
-    )
+            crossAxisCount: widget.fixedCrossAxisCount,
+            childAspectRatio: widget.childAspectRatio,
+            crossAxisSpacing: widget.crossAxisSpacing,
+            mainAxisSpacing: widget.mainAxisSpacing,
+          )
         : SliverGridDelegateWithMaxCrossAxisExtent(
-      maxCrossAxisExtent: widget.maxCrossAxisExtent,
-      childAspectRatio: widget.childAspectRatio,
-      crossAxisSpacing: widget.crossAxisSpacing,
-      mainAxisSpacing: widget.mainAxisSpacing,
-    );
+            maxCrossAxisExtent: widget.maxCrossAxisExtent,
+            childAspectRatio: widget.childAspectRatio,
+            crossAxisSpacing: widget.crossAxisSpacing,
+            mainAxisSpacing: widget.mainAxisSpacing,
+          );
   }
 
   ListView _buildHorizontalList(int section, Section sectionItems) {
@@ -457,12 +454,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: _animatedListKeys[section],
       itemBuilder:
           (BuildContext context, int index, Animation<double> animation) =>
-          buildAnimatedListItem(
-              context: context,
-              index: index,
-              animation: animation,
-              section: section,
-              item: sectionItems.items[index]),
+              buildAnimatedListItem(
+                  context: context,
+                  index: index,
+                  animation: animation,
+                  section: section,
+                  item: sectionItems.items[index]),
       initialItemCount: sectionItems.totalItems(),
       scrollDirection: Axis.horizontal,
     );
@@ -472,7 +469,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return SliverList(
       key: ValueKey('${section}sectionSliverList'),
       delegate: SliverChildBuilderDelegate(
-            (context, index) {
+        (context, index) {
           return buildListItem(
             context: context,
             section: section,
@@ -493,12 +490,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: _animatedListKeys[section],
       itemBuilder:
           (BuildContext context, int index, Animation<double> animation) =>
-          buildAnimatedListItem(
-              context: context,
-              index: index,
-              animation: animation,
-              section: section,
-              item: sectionItems.items[index]),
+              buildAnimatedListItem(
+                  context: context,
+                  index: index,
+                  animation: animation,
+                  section: section,
+                  item: sectionItems.items[index]),
       initialItemCount: sectionItems.totalItems(),
     );
   }
@@ -512,7 +509,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     required dynamic item,
   }) {
     final isReplace =
-    bloc.isReplacingItem(section: section, index: index, item: item);
+        bloc.isReplacingItem(section: section, index: index, item: item);
     if (isReplace) {
       return buildAnimatedReplaceListItem(
           context: context,
@@ -554,12 +551,13 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   @protected
-  Widget buildRemovedListItem({required dynamic item,
-    required int index,
-    required int section,
-    required BuildContext context,
-    required Animation<double> animation,
-    required bool isReplace}) {
+  Widget buildRemovedListItem(
+      {required dynamic item,
+      required int index,
+      required int section,
+      required BuildContext context,
+      required Animation<double> animation,
+      required bool isReplace}) {
     if (isReplace) {
       return buildListItem(
         context: context,
@@ -578,7 +576,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         item: item);
   }
 
-  void removeListItem(dynamic removedItem, {
+  void removeListItem(
+    dynamic removedItem, {
     required int section,
     required int index,
     Duration duration = const Duration(milliseconds: 300),
@@ -586,19 +585,19 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }) {
     _animatedList(section).removeItem(
       index,
-          (context, animation) =>
-          buildRemovedListItem(
-              item: removedItem,
-              index: index,
-              section: section,
-              context: context,
-              animation: animation,
-              isReplace: isReplace),
+      (context, animation) => buildRemovedListItem(
+          item: removedItem,
+          index: index,
+          section: section,
+          context: context,
+          animation: animation,
+          isReplace: isReplace),
       duration: duration,
     );
   }
 
-  void insertListItem(dynamic insertedItem, {
+  void insertListItem(
+    dynamic insertedItem, {
     required int section,
     required int index,
     required bool isReplace,
@@ -607,7 +606,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     _animatedList(section).insertItem(index, duration: duration);
   }
 
-  Widget buildEmptyView(BuildContext context, {String? emptyMessage}) {
+  Widget buildEmptyView(BuildContext context,
+      {String? emptyMessage, String? title}) {
     return Center(child: Text(emptyMessage ?? 'Empty View'));
   }
 
