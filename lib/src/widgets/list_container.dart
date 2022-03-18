@@ -9,10 +9,12 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
   final PreferredSizeWidget? appBar;
   final ItemsListState<TBloc> Function() listStateBuilder;
   final Key? listBuilderKey;
+  final bool buildInBase;
 
   const ListContainer({
     Key? key,
     this.listBuilderKey,
+    this.buildInBase = true,
     required this.listStateBuilder,
     this.appBar,
   }) : super(key: key);
@@ -23,6 +25,7 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
     if (bloc.state is ItemsLoadingState) {
       bloc.add(LoadItemsEvent(context: context));
     }
+    if(!buildInBase) return SizedBox();
     return Scaffold(
       appBar: appBar ?? ZeroHeightAppBar(),
       body:
