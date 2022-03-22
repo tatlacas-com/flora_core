@@ -11,27 +11,9 @@ class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
     Key? key,
     this.stateBuilder,
     this.buildSliversInSliverOverlapInjector = false,
-    this.useFixedCrossAxisCount = false,
-    this.fixedCrossAxisCount = 1,
-    this.maxCrossAxisExtent = 200,
-    this.childAspectRatio = 1,
-    this.crossAxisSpacing = 16,
-    this.mainAxisSpacing = 16,
   }) : super(key: key);
 
   final bool buildSliversInSliverOverlapInjector;
-
-  final bool useFixedCrossAxisCount;
-
-  final int fixedCrossAxisCount;
-
-  final double maxCrossAxisExtent;
-
-  final double childAspectRatio;
-
-  final double crossAxisSpacing;
-
-  final double mainAxisSpacing;
 
   @override
   ItemsListState<TBloc> createState() =>
@@ -51,6 +33,20 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   final ScrollController scrollController = ScrollController();
 
   bool get buildSliversInSliverOverlapInjector => false;
+
+
+
+  bool useFixedCrossAxisCount(int section) => false;
+
+  int fixedCrossAxisCount(int section) => 1;
+
+  double maxCrossAxisExtent(int section) => 200;
+
+  double childAspectRatio(int section) => 1;
+
+  double crossAxisSpacing(int section) => 16;
+
+  double mainAxisSpacing(int section) => 16;
 
   final Map<int, GlobalKey<SliverAnimatedListState>> _animatedListKeys =
       <int, GlobalKey<SliverAnimatedListState>>{};
@@ -295,7 +291,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       child: SizedBox(
         height: sectionItems.horizontalScrollHeight,
         child: GridView.builder(
-          gridDelegate: _buildSliverGridDelegate(),
+          gridDelegate: _buildSliverGridDelegate(section),
           itemBuilder: (context, index) {
             return buildListItem(
               context: context,
@@ -341,7 +337,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   SliverGrid buildVerticalSliverGridDefault(int section, Section sectionItems) {
     return SliverGrid(
       key: Key("${section}sectionSliverGrid"),
-      gridDelegate: _buildSliverGridDelegate(),
+      gridDelegate: _buildSliverGridDelegate(section),
       delegate: SliverChildBuilderDelegate(
         (context, index) {
           return buildListItem(
@@ -359,7 +355,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget buildVerticalSliverGridAnimated(int section, Section sectionItems) {
     return SliverGrid(
       key: Key("${section}sectionSliverGrid"),
-      gridDelegate: _buildSliverGridDelegate(),
+      gridDelegate: _buildSliverGridDelegate(section),
       delegate: SliverChildBuilderDelegate(
         (context, index) {
           return buildListItem(
@@ -415,19 +411,19 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     print('Header item clicked. Remember to handle this..');
   }
 
-  SliverGridDelegate _buildSliverGridDelegate() {
-    return widget.useFixedCrossAxisCount
+  SliverGridDelegate _buildSliverGridDelegate(int section) {
+    return useFixedCrossAxisCount(section)
         ? SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: widget.fixedCrossAxisCount,
-            childAspectRatio: widget.childAspectRatio,
-            crossAxisSpacing: widget.crossAxisSpacing,
-            mainAxisSpacing: widget.mainAxisSpacing,
+            crossAxisCount: fixedCrossAxisCount(section),
+            childAspectRatio: childAspectRatio(section),
+            crossAxisSpacing: crossAxisSpacing(section),
+            mainAxisSpacing: mainAxisSpacing(section),
           )
         : SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: widget.maxCrossAxisExtent,
-            childAspectRatio: widget.childAspectRatio,
-            crossAxisSpacing: widget.crossAxisSpacing,
-            mainAxisSpacing: widget.mainAxisSpacing,
+            maxCrossAxisExtent: maxCrossAxisExtent(section),
+            childAspectRatio: childAspectRatio(section),
+            crossAxisSpacing: crossAxisSpacing(section),
+            mainAxisSpacing: mainAxisSpacing(section),
           );
   }
 
