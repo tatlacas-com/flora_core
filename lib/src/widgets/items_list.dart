@@ -75,7 +75,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
             controller: scrollController,
             floatHeaderSlivers: floatHeaderSlivers,
             headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
+                (BuildContext cnxt, bool innerBoxIsScrolled) {
               return buildAppBarSlivers(context);
             },
             body: buildScrollView(context))
