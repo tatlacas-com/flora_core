@@ -10,11 +10,13 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
   final ItemsListState<TBloc> Function() listStateBuilder;
   final Key? listBuilderKey;
   final bool buildInBase;
+  final bool useScaffold;
 
   const ListContainer({
     Key? key,
     this.listBuilderKey,
     this.buildInBase = true,
+    this.useScaffold = true,
     required this.listStateBuilder,
     this.appBar,
   }) : super(key: key);
@@ -26,10 +28,14 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
       bloc.add(LoadItemsEvent(context: context));
     }
     if(!buildInBase) return SizedBox();
-    return Scaffold(
-      appBar: appBar ?? ZeroHeightAppBar(),
-      body:
-          ItemsList<TBloc>(key: listBuilderKey, stateBuilder: listStateBuilder),
-    );
+    if(useScaffold) {
+      return Scaffold(
+        appBar: appBar ?? ZeroHeightAppBar(),
+        body:
+        ItemsList<TBloc>(key: listBuilderKey, stateBuilder: listStateBuilder),
+      );
+    }else{
+      return ItemsList<TBloc>(key: listBuilderKey, stateBuilder: listStateBuilder);
+    }
   }
 }
