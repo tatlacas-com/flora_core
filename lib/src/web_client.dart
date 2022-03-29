@@ -10,9 +10,14 @@ class WebClient extends Equatable {
   final String baseUrl;
   final String? accessToken;
   final int timeoutSeconds;
+  final Map<String, dynamic> params;
 
-  const WebClient(
-      {required this.baseUrl, this.accessToken, this.timeoutSeconds = 15});
+  const WebClient({
+    required this.baseUrl,
+    this.accessToken,
+    this.timeoutSeconds = 15,
+    this.params = const {},
+  });
 
   WebClient copyWith(
           {String? baseUrl, String? accessToken, int? timeoutSeconds}) =>
@@ -23,7 +28,7 @@ class WebClient extends Equatable {
       );
 
   @override
-  List<Object?> get props => [baseUrl, accessToken];
+  List<Object?> get props => [baseUrl, accessToken, params];
 
   @override
   String toString() => 'WebClient {baseUrl:$baseUrl}';
