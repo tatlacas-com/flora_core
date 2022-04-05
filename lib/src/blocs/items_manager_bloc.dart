@@ -96,20 +96,24 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       if (event.fromCloud) {
         var _items = await repo.loadItemsFromCloud(event.context);
         if (_items.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
-          emit(ItemsRetrievedState(items: _items));
+          await emitItemsRetrieved(emit, _items);
           return;
         }
         emit(ReloadFromCloudEmptyState());
         _items = await repo.loadItemsFromLocalStorage(event.context);
-        emit(ItemsRetrievedState(items: _items));
+        await emitItemsRetrieved(emit, _items);
       } else {
         var _items = await repo.loadItemsFromLocalStorage(event.context);
-        emit(ItemsRetrievedState(items: _items));
+        await emitItemsRetrieved(emit, _items);
       }
     } catch (e) {
       if (kDebugMode) print(e);
       emit(LoadItemsFailedState());
     }
+  }
+
+  FutureOr<void> emitItemsRetrieved(Emitter<ItemsManagerState> emit, List<Section> _items) async {
+     emit(ItemsRetrievedState(items: _items));
   }
 
   @protected
@@ -118,11 +122,11 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     try {
       var _items = await repo.loadItemsFromLocalStorage(event.context);
       if (_items.isNotEmpty) {
-        emit(ItemsRetrievedState(items: _items));
+        await emitItemsRetrieved(emit, _items);
         return;
       }
       _items = await repo.loadItemsFromCloud(event.context);
-      emit(ItemsRetrievedState(items: _items));
+      await emitItemsRetrieved(emit, _items);
     } catch (e) {
       if (kDebugMode) print(e);
       emit(LoadItemsFailedState());
