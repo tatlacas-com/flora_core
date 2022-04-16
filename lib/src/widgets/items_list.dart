@@ -1,9 +1,9 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
 
 class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
   final ItemsListState<TBloc> Function()? stateBuilder;
@@ -34,8 +34,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   final ScrollController scrollController = ScrollController();
 
   bool get buildSliversInSliverOverlapInjector => false;
-
-
 
   bool useFixedCrossAxisCount(int section) => false;
 
@@ -75,8 +73,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         ? NestedScrollView(
             controller: scrollController,
             floatHeaderSlivers: floatHeaderSlivers,
-            headerSliverBuilder:
-                (BuildContext cnxt, bool innerBoxIsScrolled) {
+            headerSliverBuilder: (BuildContext cnxt, bool innerBoxIsScrolled) {
               return buildAppBarSlivers(context);
             },
             body: buildScrollView(context))
@@ -120,12 +117,17 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     ItemsManagerState state,
   ) {
     if (state is ItemsLoadingState) return buildLoadingView(context);
-    if (state is LoadItemsFailedState) return _buildLoadingFailed(context);
+    if (state is LoadItemsFailedState) {
+      return _buildLoadingFailed(state, context);
+    }
     if (state is ItemsRetrievedState || state is ItemChangedState) {
       return _buildCustomScrollView(context);
     }
     throw ArgumentError('buildOnStateChanged Not supported state $state');
   }
+
+  @protected
+  void onLoadItemsFailedState(LoadItemsFailedState state) {}
 
   Widget _buildCustomScrollView(BuildContext context) {
     var withInjector = widget.buildSliversInSliverOverlapInjector ||
@@ -141,7 +143,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  Widget _buildLoadingFailed(BuildContext context) {
+  Widget _buildLoadingFailed(LoadItemsFailedState state, BuildContext context) {
+    onLoadItemsFailedState(state);
     return RefreshIndicator(
       onRefresh: () async {
         var bloc = context.read<TBloc>();
@@ -400,7 +403,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     required int section,
     required int index,
   }) {
-    if (kDebugMode)print('List item clicked. Remember to handle this..');
+    if (kDebugMode) print('List item clicked. Remember to handle this..');
   }
 
   FutureOr<void> onListHeaderClick({
@@ -408,7 +411,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     required int section,
     required dynamic item,
   }) {
-    if (kDebugMode)print('Header item clicked. Remember to handle this..');
+    if (kDebugMode) print('Header item clicked. Remember to handle this..');
   }
 
   SliverGridDelegate _buildSliverGridDelegate(int section) {
