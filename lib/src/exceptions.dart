@@ -1,51 +1,64 @@
-class AccessDeniedException implements Exception {
+import 'package:equatable/equatable.dart';
+
+enum NetworkExceptionType {
+  accessDenied,
+  unauthorized,
+  notFound,
+  noContent,
+  serverError,
+}
+
+abstract class NetworkException extends Equatable implements Exception {
   final String? message;
   final String endpoint;
+  final NetworkExceptionType exceptionType;
 
-  const AccessDeniedException({required this.endpoint,this.message});
+  const NetworkException({
+    this.message,
+    required this.endpoint,
+    required this.exceptionType,
+  });
 
   @override
-  String toString() {
-    return 'AccessDeniedException {endpoint:$endpoint, message:$message}';
-  }
+  List<Object?> get props => [message, endpoint, exceptionType];
 }
 
-class UnauthorizedException implements Exception {
-  final String endpoint;
-  const UnauthorizedException({required this.endpoint});
-
-  @override
-  String toString() {
-    return 'UnauthorizedException {endpoint:$endpoint}';
-  }
+class AccessDeniedException extends NetworkException {
+  const AccessDeniedException({required String endpoint, String? message})
+      : super(
+            endpoint: endpoint,
+            message: message,
+            exceptionType: NetworkExceptionType.accessDenied);
 }
 
-class NotFoundException implements Exception {
-  final String endpoint;
-  const NotFoundException({required this.endpoint});
-
-  @override
-  String toString() {
-    return 'NotFoundException {endpoint:$endpoint}';
-  }
+class UnauthorizedException extends NetworkException {
+  const UnauthorizedException({required String endpoint, String? message})
+      : super(
+            endpoint: endpoint,
+            message: message,
+            exceptionType: NetworkExceptionType.unauthorized);
 }
 
-class NoContentException implements Exception {
-  final String endpoint;
-  const NoContentException({required this.endpoint});
-
-  @override
-  String toString() {
-    return 'NoContentException {endpoint:$endpoint}';
-  }
+class NotFoundException extends NetworkException {
+  const NotFoundException({required String endpoint, String? message})
+      : super(
+            endpoint: endpoint,
+            message: message,
+            exceptionType: NetworkExceptionType.notFound);
 }
 
-class ServerException implements Exception {
-  final String endpoint;
-  const ServerException({required this.endpoint});
+class NoContentException extends NetworkException {
+  const NoContentException({required String endpoint, String? message})
+      : super(
+            endpoint: endpoint,
+            message: message,
+            exceptionType: NetworkExceptionType.noContent);
+}
 
-  @override
-  String toString() {
-    return 'ServerException {endpoint:$endpoint}';
-  }
+class ServerException extends NetworkException {
+  const ServerException({required String endpoint, String? message})
+      : super(
+            endpoint: endpoint,
+            message: message,
+            exceptionType: NetworkExceptionType.serverError);
 }
