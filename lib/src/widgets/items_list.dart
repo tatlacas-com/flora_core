@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 
 class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
   final ItemsListState<TBloc> Function()? stateBuilder;
@@ -400,7 +401,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     required int section,
     required int index,
   }) {
-    print('List item clicked. Remember to handle this..');
+    if (kDebugMode)print('List item clicked. Remember to handle this..');
   }
 
   FutureOr<void> onListHeaderClick({
@@ -408,7 +409,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     required int section,
     required dynamic item,
   }) {
-    print('Header item clicked. Remember to handle this..');
+    if (kDebugMode)print('Header item clicked. Remember to handle this..');
   }
 
   SliverGridDelegate _buildSliverGridDelegate(int section) {

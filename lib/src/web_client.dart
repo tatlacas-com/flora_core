@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:tatlacas_flutter_core/src/copy_with.dart';
 
 import 'exceptions.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 
 class WebClient extends Equatable {
   final String baseUrl;
@@ -102,9 +103,9 @@ class WebClient extends Equatable {
     if (endpoint is String) {
       uri = Uri.parse('${baseUrl ?? this.baseUrl}$endpoint');
     } else if (endpoint is Uri) {
-      print('is Uri');
       uri = endpoint;
     } else {
+      if (kDebugMode) print("Unsupported endpoint: $endpoint");
       throw ArgumentError('Unsupported endpoint');
     }
     final response = await http
@@ -116,12 +117,16 @@ class WebClient extends Equatable {
 
   void _throwIfNotSuccess(int statusCode, {required String endpoint}) {
     if (statusCode == 403) {
+      if (kDebugMode) print("AccessDeniedException: $endpoint");
       throw AccessDeniedException(endpoint: endpoint);
     } else if (statusCode == 401) {
+      if (kDebugMode) print("UnauthorizedException: $endpoint");
       throw UnauthorizedException(endpoint: endpoint);
     } else if (statusCode == 404) {
+      if (kDebugMode) print("NotFoundException: $endpoint");
       throw NotFoundException(endpoint: endpoint);
     } else if (statusCode == 500) {
+      if (kDebugMode) print("ServerException: $endpoint");
       throw ServerException(endpoint: endpoint);
     }
   }
