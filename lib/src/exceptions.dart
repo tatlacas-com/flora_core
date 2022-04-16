@@ -6,6 +6,7 @@ enum NetworkExceptionType {
   notFound,
   noContent,
   serverError,
+  unknown,
 }
 
 abstract class NetworkException extends Equatable implements Exception {
