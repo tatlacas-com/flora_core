@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, protected;
 import 'package:flutter/material.dart';
+import 'package:tatlacas_flutter_core/src/exceptions.dart';
 import 'package:tatlacas_flutter_core/src/models/section.dart';
 
 import '../items_repo.dart';
@@ -108,7 +109,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       }
     } catch (e) {
       if (kDebugMode) print(e);
-      emit(LoadItemsFailedState());
+      emit(LoadItemsFailedState(exceptionType: e is NetworkException? e.exceptionType: NetworkExceptionType.unknown));
     }
   }
 
@@ -129,7 +130,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       await emitItemsRetrieved(emit, _items);
     } catch (e) {
       if (kDebugMode) print(e);
-      emit(LoadItemsFailedState());
+      emit(LoadItemsFailedState(exceptionType: e is NetworkException? e.exceptionType: NetworkExceptionType.unknown));
     }
   }
 }

@@ -121,7 +121,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   ) {
     if (state is ItemsLoadingState) return buildLoadingView(context);
     if (state is LoadItemsFailedState) return _buildLoadingFailed(context);
-    if (state is LoadItemsFailedState) return _buildLoadingFailed(context);
     if (state is ItemsRetrievedState || state is ItemChangedState) {
       return _buildCustomScrollView(context);
     }

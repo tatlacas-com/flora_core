@@ -7,7 +7,6 @@ abstract class ItemsManagerState extends Equatable {
 }
 
 class ItemsLoadingState extends ItemsManagerState implements ItemsBuildUi {
-
   const ItemsLoadingState({DateTime? loadId});
 
   @override
@@ -42,8 +41,8 @@ abstract class LoadedState extends ItemsManagerState {
 }
 
 class ItemsRetrievedState extends LoadedState implements ItemsBuildUi {
-  const ItemsRetrievedState({required List<Section> items}) : super(sections: items);
-
+  const ItemsRetrievedState({required List<Section> items})
+      : super(sections: items);
 }
 
 class ItemReplacedState extends ItemChangedState implements ItemsBuildUi {
@@ -62,7 +61,7 @@ class ItemReplacedState extends ItemChangedState implements ItemsBuildUi {
         );
 }
 
-class ItemRemovedState extends ItemChangedState  {
+class ItemRemovedState extends ItemChangedState {
   const ItemRemovedState(
       {required int itemSection,
       required int itemIndex,
@@ -103,11 +102,11 @@ class ItemChangedState extends LoadedState {
       : super(sections: sections);
 
   @override
-  List<Object?> get props => [removedItem, insertedItem, itemSection, itemIndex];
+  List<Object?> get props =>
+      [removedItem, insertedItem, itemSection, itemIndex];
 }
 
 class ReloadFromCloudEmptyState extends ItemsManagerState {
-
   final DateTime loadId;
 
   ReloadFromCloudEmptyState({DateTime? loadId})
@@ -118,11 +117,14 @@ class ReloadFromCloudEmptyState extends ItemsManagerState {
 }
 
 class LoadItemsFailedState extends ItemsManagerState implements ItemsBuildUi {
-
   final DateTime loadId;
+  final NetworkExceptionType exceptionType;
 
-  LoadItemsFailedState({DateTime? loadId}) : loadId = loadId ?? DateTime.now();
+  LoadItemsFailedState({
+    DateTime? loadId,
+    required this.exceptionType,
+  }) : loadId = loadId ?? DateTime.now();
 
   @override
-  List<Object> get props => [loadId];
+  List<Object> get props => [loadId,exceptionType];
 }
