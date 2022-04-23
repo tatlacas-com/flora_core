@@ -30,12 +30,14 @@ abstract class WebClient extends Equatable {
     String endpoint,
     dynamic payload, {
     String? baseUrl,
+    String? accessToken,
     bool jsonEncodedPayload = false,
   }) async {
     baseUrl ??= this.baseUrl;
     var headers = <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     };
+    accessToken = accessToken ?? this.accessToken;
     if (accessToken != null) {
       headers[HttpHeaders.authorizationHeader] = "Bearer $accessToken";
     }
@@ -56,6 +58,7 @@ abstract class WebClient extends Equatable {
     required String filePath,
     required String fileName,
     String? baseUrl,
+    String? accessToken,
   }) async {
     var file = File(filePath);
     final stream = http.ByteStream(file.openRead());
@@ -65,6 +68,7 @@ abstract class WebClient extends Equatable {
     var uri = Uri.parse('$baseUrl$endpoint');
 
     var request = http.MultipartRequest("POST", uri);
+    accessToken = accessToken ?? this.accessToken;
     if (accessToken != null) {
       request.headers[HttpHeaders.authorizationHeader] = "Bearer $accessToken";
     }
@@ -81,10 +85,12 @@ abstract class WebClient extends Equatable {
   Future<http.Response?> get(
     dynamic endpoint, {
     String? baseUrl,
+    String? accessToken,
   }) async {
     var headers = <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     };
+    accessToken = accessToken ?? this.accessToken;
     if (accessToken != null) {
       headers['Authorization'] = 'Bearer $accessToken';
     }
