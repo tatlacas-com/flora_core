@@ -3,12 +3,11 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart' as http;
-import 'package:tatlacas_flutter_core/src/copy_with.dart';
 
 import 'exceptions.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 
-class WebClient extends Equatable {
+abstract class WebClient extends Equatable {
   final String baseUrl;
   final String? accessToken;
   final int timeoutSeconds;
@@ -20,16 +19,6 @@ class WebClient extends Equatable {
     this.timeoutSeconds = 15,
     this.params = const {},
   });
-
-  WebClient copyWith(
-          {String? baseUrl,
-          CopyWith<String?>? accessToken,
-          int? timeoutSeconds}) =>
-      WebClient(
-        baseUrl: baseUrl ?? this.baseUrl,
-        accessToken: accessToken != null ? accessToken.value : this.accessToken,
-        timeoutSeconds: timeoutSeconds ?? this.timeoutSeconds,
-      );
 
   @override
   List<Object?> get props => [baseUrl, accessToken, params];
