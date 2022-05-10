@@ -124,7 +124,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   FutureOr<void> emitMoreItemsRetrieved(
-      Emitter<ItemsManagerState> emit, List<Section> _items) async {}
+      Emitter<ItemsManagerState> emit, List<dynamic> _items) async {}
 
   @protected
   FutureOr<void> onLoadItemsRequested(
@@ -145,7 +145,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
               : NetworkExceptionType.unknown));
     }
   }
-  Future<List<Section>> loadMoreItems(LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async => [];
+  Future<List<dynamic>> loadMoreItems(LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async => [];
 
   @protected
   FutureOr<void> onLoadMoreItemsEvent(
