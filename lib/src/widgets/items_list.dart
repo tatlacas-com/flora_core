@@ -129,17 +129,25 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   @protected
   void onLoadItemsFailedState(LoadItemsFailedState state) {}
 
+  void onScrollNotification(ScrollNotification scrollInfo) {}
+
   Widget _buildCustomScrollView(BuildContext context) {
     var withInjector = widget.buildSliversInSliverOverlapInjector ||
         buildSliversInSliverOverlapInjector;
-    return CustomScrollView(
-      key: PageStorageKey<String>(TBloc.runtimeType.toString()),
-      physics:
-          const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-      //needed for RefreshIndicator to work
-      slivers: withInjector
-          ? buildSectionsWithOverlapInjector(context)
-          : buildSections(context),
+    return NotificationListener<ScrollNotification>(
+      onNotification: (ScrollNotification scrollInfo) {
+        onScrollNotification(scrollInfo);
+        return true;
+      },
+      child: CustomScrollView(
+        key: PageStorageKey<String>(TBloc.runtimeType.toString()),
+        physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics()),
+        //needed for RefreshIndicator to work
+        slivers: withInjector
+            ? buildSectionsWithOverlapInjector(context)
+            : buildSections(context),
+      ),
     );
   }
 
