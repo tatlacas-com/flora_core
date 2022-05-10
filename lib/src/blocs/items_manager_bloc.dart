@@ -145,6 +145,9 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
               : NetworkExceptionType.unknown));
     }
   }
+  Future<List<Section>> loadMoreItems(LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async{
+    return await repo.loadMoreItems(event.context);
+  }
 
   @protected
   FutureOr<void> onLoadMoreItemsEvent(
@@ -158,7 +161,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           sections: loadedState.sections,
         ),
       );
-      var items = await repo.loadMoreItems(event.context);
+      var items = await loadMoreItems(event, emit);
       await emitMoreItemsRetrieved(emit, items);
     } catch (e) {
       if (kDebugMode) print(e);
