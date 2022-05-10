@@ -134,7 +134,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   void onScrollNotification(ScrollNotification scrollInfo) {
     var diff = scrollInfo.metrics.maxScrollExtent - scrollInfo.metrics.pixels;
     if (diff < reloadThresholdPixels) {
-      bloc.add(LoadItemsFromCloudEvent(context: context));
+      bloc.add(LoadMoreItemsEvent(context: context));
     }
   }
 

@@ -26,7 +26,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     on<ReplaceItemEvent>(onReplaceItem);
     on<InsertItemEvent>(onInsertItem);
     on<RemoveItemEvent>(onRemoveItem);
-    on<LoadItemsFromCloudEvent>(onLoadItemsFromCloudEvent);
+    on<LoadMoreItemsEvent>(onLoadMoreItemsEvent);
   }
 
   bool isReplacingItem(
@@ -78,10 +78,11 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       final removedItem =
           state.section(event.section).items.removeAt(event.index);
       emit(ItemRemovedState(
-          itemSection: event.section,
-          itemIndex: event.index,
-          removedItem: removedItem,
-          sections: state.sections));
+        itemSection: event.section,
+        itemIndex: event.index,
+        removedItem: removedItem,
+        sections: state.sections,
+      ));
       if (state.section(event.section).isEmpty) {
         await Future.delayed(const Duration(milliseconds: 500));
         state.sections.removeAt(event.section);
@@ -122,6 +123,9 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     emit(ItemsRetrievedState(items: _items));
   }
 
+  FutureOr<void> emitMoreItemsRetrieved(
+      Emitter<ItemsManagerState> emit, List<Section> _items) async {}
+
   @protected
   FutureOr<void> onLoadItemsRequested(
       LoadItemsEvent event, Emitter<ItemsManagerState> emit) async {
@@ -143,14 +147,24 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   @protected
-  FutureOr<void> onLoadItemsFromCloudEvent(
-      LoadItemsFromCloudEvent event, Emitter<ItemsManagerState> emit) async {
+  FutureOr<void> onLoadMoreItemsEvent(
+      LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async {
+    if (state is LoadingMoreItemsState) return;
+    if (state is! LoadedState) return;
+    var loadedState = state as LoadedState;
     try {
-      await repo.loadMoreItems(event.context);
+      emit(
+        LoadingMoreItemsState(
+          sections: loadedState.sections,
+        ),
+      );
+      var items = await repo.loadMoreItems(event.context);
+      await emitMoreItemsRetrieved(emit, items);
     } catch (e) {
       if (kDebugMode) print(e);
       emit(
         LoadMoreItemsFailedState(
+          sections: loadedState.sections,
           exceptionType: e is NetworkException
               ? e.exceptionType
               : NetworkExceptionType.unknown,

@@ -9,7 +9,7 @@ abstract class ItemsRepo {
       [];
 
   Future<List<Section>> loadItemsFromCloud(BuildContext context) async => [];
-  Future<void> loadMoreItems(BuildContext context) async => [];
+  Future<List<Section>> loadMoreItems(BuildContext context) async => [];
 
   const ItemsRepo();
 }

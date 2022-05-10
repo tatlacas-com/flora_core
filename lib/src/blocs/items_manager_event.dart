@@ -75,10 +75,10 @@ class ReloadItemsEvent extends ItemsManagerEvent {
   List<Object?> get props => [fromCloud, loadFromLocalIfCloudEmpty, requestId];
 }
 
-class LoadItemsFromCloudEvent extends ItemsManagerEvent {
+class LoadMoreItemsEvent extends ItemsManagerEvent {
   final BuildContext context;
 
-  LoadItemsFromCloudEvent({
+  LoadMoreItemsEvent({
     DateTime? requestId,
     required this.context,
   }) : super(requestId: requestId);

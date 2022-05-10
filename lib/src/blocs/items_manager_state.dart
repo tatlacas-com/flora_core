@@ -46,59 +46,55 @@ class ItemsRetrievedState extends LoadedState implements ItemsBuildUi {
 }
 
 class ItemReplacedState extends ItemChangedState implements ItemsBuildUi {
-  const ItemReplacedState(
-      {required int itemSection,
-      required int itemIndex,
-      required dynamic removedItem,
-      required dynamic insertedItem,
-      required List<Section> sections})
+  const ItemReplacedState({required int itemSection,
+    required int itemIndex,
+    required dynamic removedItem,
+    required dynamic insertedItem,
+    required List<Section> sections})
       : super(
-          itemIndex: itemIndex,
-          itemSection: itemSection,
-          sections: sections,
-          removedItem: removedItem,
-          insertedItem: insertedItem,
-        );
+    itemIndex: itemIndex,
+    itemSection: itemSection,
+    sections: sections,
+    removedItem: removedItem,
+    insertedItem: insertedItem,
+  );
 }
 
 class ItemRemovedState extends ItemChangedState {
-  const ItemRemovedState(
-      {required int itemSection,
-      required int itemIndex,
-      required dynamic removedItem,
-      required List<Section> sections})
+  const ItemRemovedState({required int itemSection,
+    required int itemIndex,
+    required dynamic removedItem,
+    required List<Section> sections})
       : super(
-          itemIndex: itemIndex,
-          itemSection: itemSection,
-          sections: sections,
-          removedItem: removedItem,
-        );
+    itemIndex: itemIndex,
+    itemSection: itemSection,
+    sections: sections,
+    removedItem: removedItem,
+  );
 }
 
 class ItemInsertedState extends ItemChangedState {
-  const ItemInsertedState(
-      {required int itemSection,
-      required int itemIndex,
-      required dynamic insertedItem,
-      required List<Section> sections})
+  const ItemInsertedState({required int itemSection,
+    required int itemIndex,
+    required dynamic insertedItem,
+    required List<Section> sections})
       : super(
-          itemIndex: itemIndex,
-          itemSection: itemSection,
-          sections: sections,
-          insertedItem: insertedItem,
-        );
+    itemIndex: itemIndex,
+    itemSection: itemSection,
+    sections: sections,
+    insertedItem: insertedItem,
+  );
 }
 
 class ItemChangedState extends LoadedState {
   final dynamic removedItem, insertedItem;
   final int itemSection, itemIndex;
 
-  const ItemChangedState(
-      {required this.itemSection,
-      required this.itemIndex,
-      this.removedItem,
-      this.insertedItem,
-      required List<Section> sections})
+  const ItemChangedState({required this.itemSection,
+    required this.itemIndex,
+    this.removedItem,
+    this.insertedItem,
+    required List<Section> sections,})
       : super(sections: sections);
 
   @override
@@ -129,15 +125,32 @@ class LoadItemsFailedState extends ItemsManagerState implements ItemsBuildUi {
   List<Object> get props => [loadId, exceptionType];
 }
 
-class LoadMoreItemsFailedState extends ItemsManagerState {
+class LoadMoreItemsFailedState extends LoadedState {
   final DateTime loadId;
   final NetworkExceptionType exceptionType;
 
   LoadMoreItemsFailedState({
     DateTime? loadId,
     required this.exceptionType,
-  }) : loadId = loadId ?? DateTime.now();
+    required List<Section> sections,
+  })
+      : loadId = loadId ?? DateTime.now(),
+        super(sections: sections);
 
   @override
   List<Object> get props => [loadId, exceptionType];
+}
+
+class LoadingMoreItemsState extends LoadedState {
+  final DateTime loadId;
+
+  LoadingMoreItemsState({
+    DateTime? loadId,
+    required List<Section> sections,
+  })
+      : loadId = loadId ?? DateTime.now(),
+        super(sections: sections);
+
+  @override
+  List<Object> get props => [loadId];
 }
