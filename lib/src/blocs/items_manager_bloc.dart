@@ -126,8 +126,6 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     emit(ItemsRetrievedState(items: _items));
   }
 
-  FutureOr<void> emitMoreItemsRetrieved(
-      Emitter<ItemsManagerState> emit, List<dynamic> _items) async {}
 
   @protected
   FutureOr<void> onLoadItemsRequested(
@@ -149,9 +147,70 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
   }
 
-  Future<List<dynamic>> loadMoreItems(
-          LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async =>
-      [];
+
+  dynamic loadingMoreItem(int section) => null;
+
+  int get pageSize => 20;
+
+  Future<List<dynamic>> prepareLoadMoreItems(
+      LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async {
+    var loadedState = state as LoadedState;
+    var lastSection = loadedState.sections.length - 1;
+    var lastItemIndex = loadedState.sections[lastSection].items.length;
+    var insertedItem = loadingMoreItem(lastSection);
+    if (insertedItem != null) {
+      loadedState.sections[lastSection].items.add(insertedItem);
+      emit(
+        ItemInsertedState(
+          itemSection: lastSection,
+          reachedBottom: loadedState.reachedBottom,
+          itemIndex: lastItemIndex,
+          insertedItem: insertedItem,
+          sections: loadedState.sections,
+        ),
+      );
+    }
+    return await loadMoreItems(event, emit, lastItemIndex + 1);
+  }
+
+  Future<List<dynamic>> loadMoreItems(LoadMoreItemsEvent event,
+      Emitter<ItemsManagerState> emit, int lastItemIndex) async => [];
+
+  bool hasReachedBottom(int section, List<dynamic> items) =>
+      items.length < pageSize;
+
+  FutureOr<void> emitMoreItemsRetrieved(
+      Emitter<ItemsManagerState> emit, List<dynamic> _items) async {
+    var loadedState = state as LoadedState;
+    var indx = 0;
+    var lastSection = loadedState.sections.length - 1;
+
+    var removed = loadedState.sections[lastSection].items.removeLast();
+    var reachedBottom = hasReachedBottom(lastSection, _items);
+    if (loadingMoreItem(lastSection) != null) {
+      emit(
+        ItemRemovedState(
+          itemSection: lastSection,
+          reachedBottom: reachedBottom,
+          itemIndex: loadedState.sections[lastSection].items.length,
+          removedItem: removed,
+          sections: loadedState.sections,
+        ),
+      );
+    }
+    for (var item in _items) {
+      loadedState.sections[lastSection].items.add(item);
+      emit(
+        ItemInsertedState(
+          reachedBottom: reachedBottom,
+          itemSection: lastSection,
+          itemIndex: indx++,
+          insertedItem: item,
+          sections: loadedState.sections,
+        ),
+      );
+    }
+  }
 
   @protected
   FutureOr<void> onLoadMoreItemsEvent(
@@ -167,7 +226,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           reachedBottom: false,
         ),
       );
-      var items = await loadMoreItems(event, emit);
+      var items = await prepareLoadMoreItems(event, emit);
       await emitMoreItemsRetrieved(emit, items);
     } catch (e) {
       if (kDebugMode) print(e);
