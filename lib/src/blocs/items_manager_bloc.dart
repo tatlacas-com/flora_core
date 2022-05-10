@@ -47,6 +47,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           state.section(event.section).items.removeAt(event.index);
       state.section(event.section).items.insert(event.index, event.item);
       emit(ItemReplacedState(
+          reachedBottom: state.reachedBottom,
           itemSection: event.section,
           itemIndex: event.index,
           removedItem: removedItem,
@@ -63,6 +64,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       state.section(event.section).items.insert(event.index, event.item);
 
       emit(ItemInsertedState(
+          reachedBottom: state.reachedBottom,
           itemSection: event.section,
           itemIndex: event.index,
           insertedItem: event.item,
@@ -79,6 +81,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           state.section(event.section).items.removeAt(event.index);
       emit(ItemRemovedState(
         itemSection: event.section,
+        reachedBottom: state.reachedBottom,
         itemIndex: event.index,
         removedItem: removedItem,
         sections: state.sections,
@@ -145,7 +148,10 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
               : NetworkExceptionType.unknown));
     }
   }
-  Future<List<dynamic>> loadMoreItems(LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async => [];
+
+  Future<List<dynamic>> loadMoreItems(
+          LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async =>
+      [];
 
   @protected
   FutureOr<void> onLoadMoreItemsEvent(
@@ -153,10 +159,12 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     if (state is LoadingMoreItemsState) return;
     if (state is! LoadedState) return;
     var loadedState = state as LoadedState;
+    if (loadedState.reachedBottom) return;
     try {
       emit(
         LoadingMoreItemsState(
           sections: loadedState.sections,
+          reachedBottom: false,
         ),
       );
       var items = await loadMoreItems(event, emit);
@@ -165,6 +173,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       if (kDebugMode) print(e);
       emit(
         LoadMoreItemsFailedState(
+          reachedBottom: false,
           sections: loadedState.sections,
           exceptionType: e is NetworkException
               ? e.exceptionType
