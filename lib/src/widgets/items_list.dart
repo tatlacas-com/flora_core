@@ -129,19 +129,25 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   @protected
   void onLoadItemsFailedState(LoadItemsFailedState state) {}
 
-  void onScrollNotification(ScrollNotification scrollInfo, int section) {}
+  void onScrollNotification(ScrollNotification scrollInfo) {}
 
   Widget _buildCustomScrollView(BuildContext context) {
     var withInjector = widget.buildSliversInSliverOverlapInjector ||
         buildSliversInSliverOverlapInjector;
-    return CustomScrollView(
-      key: PageStorageKey<String>(TBloc.runtimeType.toString()),
-      physics: const AlwaysScrollableScrollPhysics(
-          parent: BouncingScrollPhysics()),
-      //needed for RefreshIndicator to work
-      slivers: withInjector
-          ? buildSectionsWithOverlapInjector(context)
-          : buildSections(context),
+    return NotificationListener<ScrollNotification>(
+      onNotification: (ScrollNotification scrollInfo) {
+        onScrollNotification(scrollInfo);
+        return true;
+      },
+      child: CustomScrollView(
+        key: PageStorageKey<String>(TBloc.runtimeType.toString()),
+        physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics()),
+        //needed for RefreshIndicator to work
+        slivers: withInjector
+            ? buildSectionsWithOverlapInjector(context)
+            : buildSections(context),
+      ),
     );
   }
 
@@ -279,28 +285,16 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget sectionSliverGrid(int sectionIndex, BuildContext context,
       Section section, double marginBottom) {
-    return NotificationListener<ScrollNotification>(
-        onNotification: (ScrollNotification scrollInfo) {
-          onScrollNotification(scrollInfo, sectionIndex);
-          return true;
-        },
-      child: section.horizontalScroll
-          ? buildHorizontalSliverGrid(sectionIndex, section)
-          : buildVerticalSliverGrid(sectionIndex, section),
-    );
+    return section.horizontalScroll
+        ? buildHorizontalSliverGrid(sectionIndex, section)
+        : buildVerticalSliverGrid(sectionIndex, section);
   }
 
   Widget sectionSliverList(int section, BuildContext context,
       Section sectionItems, double marginBottom) {
-    return NotificationListener<ScrollNotification>(
-      onNotification: (ScrollNotification scrollInfo) {
-        onScrollNotification(scrollInfo, section);
-        return true;
-      },
-      child: sectionItems.horizontalScroll
-          ? buildHorizontalSliverList(section, sectionItems)
-          : buildVerticalSliverList(section, sectionItems),
-    );
+    return sectionItems.horizontalScroll
+        ? buildHorizontalSliverList(section, sectionItems)
+        : buildVerticalSliverList(section, sectionItems);
   }
 
   Widget buildHorizontalSliverGrid(int section, Section sectionItems) {
