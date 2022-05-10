@@ -25,6 +25,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     extends State<ItemsList<TBloc>> with AutomaticKeepAliveClientMixin {
   late TBloc bloc;
 
+  double get reloadThresholdPixels => 250;
+
   bool get pullToRefresh => true;
 
   bool get floatHeaderSlivers => false;
@@ -129,7 +131,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   @protected
   void onLoadItemsFailedState(LoadItemsFailedState state) {}
 
-  void onScrollNotification(ScrollNotification scrollInfo) {}
+  void onScrollNotification(ScrollNotification scrollInfo) {
+    var diff = scrollInfo.metrics.maxScrollExtent - scrollInfo.metrics.pixels;
+    if (diff < reloadThresholdPixels) {
+      bloc.add(LoadItemsFromCloudEvent(context: context));
+    }
+  }
 
   Widget _buildCustomScrollView(BuildContext context) {
     var withInjector = widget.buildSliversInSliverOverlapInjector ||

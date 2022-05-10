@@ -26,6 +26,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     on<ReplaceItemEvent>(onReplaceItem);
     on<InsertItemEvent>(onInsertItem);
     on<RemoveItemEvent>(onRemoveItem);
+    on<LoadItemsFromCloudEvent>(onLoadItemsFromCloudEvent);
   }
 
   bool isReplacingItem(
@@ -109,12 +110,16 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       }
     } catch (e) {
       if (kDebugMode) print(e);
-      emit(LoadItemsFailedState(exceptionType: e is NetworkException? e.exceptionType: NetworkExceptionType.unknown));
+      emit(LoadItemsFailedState(
+          exceptionType: e is NetworkException
+              ? e.exceptionType
+              : NetworkExceptionType.unknown));
     }
   }
 
-  FutureOr<void> emitItemsRetrieved(Emitter<ItemsManagerState> emit, List<Section> _items) async {
-     emit(ItemsRetrievedState(items: _items));
+  FutureOr<void> emitItemsRetrieved(
+      Emitter<ItemsManagerState> emit, List<Section> _items) async {
+    emit(ItemsRetrievedState(items: _items));
   }
 
   @protected
@@ -130,7 +135,27 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       await emitItemsRetrieved(emit, _items);
     } catch (e) {
       if (kDebugMode) print(e);
-      emit(LoadItemsFailedState(exceptionType: e is NetworkException? e.exceptionType: NetworkExceptionType.unknown));
+      emit(LoadItemsFailedState(
+          exceptionType: e is NetworkException
+              ? e.exceptionType
+              : NetworkExceptionType.unknown));
+    }
+  }
+
+  @protected
+  FutureOr<void> onLoadItemsFromCloudEvent(
+      LoadItemsFromCloudEvent event, Emitter<ItemsManagerState> emit) async {
+    try {
+      await repo.loadMoreItems(event.context);
+    } catch (e) {
+      if (kDebugMode) print(e);
+      emit(
+        LoadMoreItemsFailedState(
+          exceptionType: e is NetworkException
+              ? e.exceptionType
+              : NetworkExceptionType.unknown,
+        ),
+      );
     }
   }
 }

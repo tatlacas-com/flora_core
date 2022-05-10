@@ -126,5 +126,18 @@ class LoadItemsFailedState extends ItemsManagerState implements ItemsBuildUi {
   }) : loadId = loadId ?? DateTime.now();
 
   @override
-  List<Object> get props => [loadId,exceptionType];
+  List<Object> get props => [loadId, exceptionType];
+}
+
+class LoadMoreItemsFailedState extends ItemsManagerState {
+  final DateTime loadId;
+  final NetworkExceptionType exceptionType;
+
+  LoadMoreItemsFailedState({
+    DateTime? loadId,
+    required this.exceptionType,
+  }) : loadId = loadId ?? DateTime.now();
+
+  @override
+  List<Object> get props => [loadId, exceptionType];
 }

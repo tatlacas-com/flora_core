@@ -14,7 +14,6 @@ class LoadItemsEvent extends ItemsManagerEvent {
   final BuildContext context;
 
   LoadItemsEvent({required this.context, DateTime? requestId});
-
 }
 
 abstract class ChangeItemEvent extends ItemsManagerEvent {
@@ -77,5 +76,10 @@ class ReloadItemsEvent extends ItemsManagerEvent {
 }
 
 class LoadItemsFromCloudEvent extends ItemsManagerEvent {
-  LoadItemsFromCloudEvent({DateTime? requestId}) : super(requestId: requestId);
+  final BuildContext context;
+
+  LoadItemsFromCloudEvent({
+    DateTime? requestId,
+    required this.context,
+  }) : super(requestId: requestId);
 }
