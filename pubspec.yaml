@@ -4,7 +4,7 @@ version: 0.0.1
 publish_to: none
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.12.0 <=3.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
@@ -15,7 +15,7 @@ dependencies:
   bloc: ^8.0.2
   flutter_bloc: ^8.0.1
   auto_animated: ^3.0.1
-  flutter_lints: ^1.0.4
+  flutter_lints: ^2.0.1
   universal_platform: ^1.0.0+1
 
 dev_dependencies:

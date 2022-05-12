@@ -7,6 +7,7 @@ class Section extends Equatable {
   final bool horizontalScroll;
   final double horizontalScrollHeight;
   bool get isEmpty => items.isEmpty;
+  final dynamic emptyEntity;
 
   bool get isNotEmpty => !isEmpty;
   int totalItems() {
@@ -15,6 +16,7 @@ class Section extends Equatable {
 
   Section({
     this.sectionHeader,
+    this.emptyEntity,
     this.usesGrid = false,
     this.horizontalScroll = false,
     this.items = const [],

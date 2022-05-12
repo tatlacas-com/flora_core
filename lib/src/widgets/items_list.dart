@@ -232,7 +232,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         }
         double marginBottom = sectionIndex == state.totalSections - 1 ? 80 : 0;
         if (state.section(sectionIndex).isEmpty) {
-          sections.add(buildEmptySectionSliver(context));
+          sections.add(buildEmptySectionSliver(
+              context, sectionIndex, state.section(sectionIndex).emptyEntity));
         } else {
           sections.add(
             state.usesGrid(sectionIndex)
@@ -249,11 +250,14 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return sections;
   }
 
-  Widget buildEmptySectionSliver(BuildContext context) {
+  Widget buildEmptySectionSliver(
+      BuildContext context, int sectionIndex, dynamic emptyEntity) {
     return SliverPadding(
       padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
       sliver: SliverToBoxAdapter(
-        child: buildEmptyView(context, emptyMessage: 'Empty Section View'),
+        child: emptyEntity != null
+            ? buildSectionEmptyView(sectionIndex, context, emptyEntity)
+            : buildEmptyView(context),
       ),
     );
   }
@@ -287,7 +291,20 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
                 item: sectionHeader,
               ));
     }
-    throw ArgumentError("unsupported list header item $sectionHeader");
+    throw ArgumentError(
+        "unsupported list header item $sectionHeader. Either override buildSectionHeader() in your UI or make item implement Widgetable");
+  }
+
+  Widget buildSectionEmptyView(
+      int section, BuildContext context, dynamic emptyEntity) {
+    if (emptyEntity is Widgetable) {
+      return emptyEntity.build(
+        section: section,
+        index: -1,
+      );
+    }
+    throw ArgumentError(
+        "unsupported section empty view item $emptyEntity. Either override buildSectionEmptyView() in your UI or make item implement Widgetable");
   }
 
   Widget sectionSliverGrid(int sectionIndex, BuildContext context,
@@ -620,9 +637,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     _animatedList(section).insertItem(index, duration: duration);
   }
 
-  Widget buildEmptyView(BuildContext context,
-      {String? emptyMessage, String? title}) {
-    return Center(child: Text(emptyMessage ?? 'Empty View'));
+  Widget buildEmptyView(BuildContext context) {
+    return Center(child: Text('Empty View'));
   }
 
   @override
