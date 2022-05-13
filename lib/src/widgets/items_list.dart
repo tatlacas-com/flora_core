@@ -83,14 +83,20 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget buildScrollView(BuildContext context) {
-    return pullToRefresh
-        ? RefreshIndicator(
-            onRefresh: () async {
-              bloc.add(ReloadItemsEvent(context: context));
-            },
-            child: buildCustomScrollView(context),
-          )
-        : buildCustomScrollView(context);
+    return NotificationListener<ScrollNotification>(
+      onNotification: (ScrollNotification scrollInfo) {
+        onScrollNotification(scrollInfo);
+        return true;
+      },
+      child: pullToRefresh
+          ? RefreshIndicator(
+              onRefresh: () async {
+                bloc.add(ReloadItemsEvent(context: context));
+              },
+              child: buildCustomScrollView(context),
+            )
+          : buildCustomScrollView(context),
+    );
   }
 
   Widget buildCustomScrollView(BuildContext context) {
@@ -141,20 +147,14 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget _buildCustomScrollView(BuildContext context) {
     var withInjector = widget.buildSliversInSliverOverlapInjector ||
         buildSliversInSliverOverlapInjector;
-    return NotificationListener<ScrollNotification>(
-      onNotification: (ScrollNotification scrollInfo) {
-        onScrollNotification(scrollInfo);
-        return true;
-      },
-      child: CustomScrollView(
-        key: PageStorageKey<String>(TBloc.runtimeType.toString()),
-        physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics()),
-        //needed for RefreshIndicator to work
-        slivers: withInjector
-            ? buildSectionsWithOverlapInjector(context)
-            : buildSections(context),
-      ),
+    return CustomScrollView(
+      key: PageStorageKey<String>(TBloc.runtimeType.toString()),
+      physics:
+          const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      //needed for RefreshIndicator to work
+      slivers: withInjector
+          ? buildSectionsWithOverlapInjector(context)
+          : buildSections(context),
     );
   }
 
