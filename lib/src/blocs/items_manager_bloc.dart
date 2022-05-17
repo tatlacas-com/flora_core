@@ -103,7 +103,6 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       var section = loadedState.sections[x];
       for (var i = section.items.length - 1; i >= 0; i--) {
         var removed = section.items.removeAt(i);
-        debugPrint('## Removing section $x index $i');
         emit(
           ItemRemovedState(
             itemSection: x,
@@ -120,15 +119,15 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       if (event.fromCloud) {
         var loadedItems = await repo.loadItemsFromCloud(event.context);
         if (loadedItems.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
-          await emitItemsRetrieved(emit, loadedItems);
+          await emitItemsReloadRetrieved(emit, loadedItems);
           return;
         }
         emit(ReloadFromCloudEmptyState());
         loadedItems = await repo.loadItemsFromLocalStorage(event.context);
-        await emitItemsRetrieved(emit, loadedItems);
+        await emitItemsReloadRetrieved(emit, loadedItems);
       } else {
         var loadedItems = await repo.loadItemsFromLocalStorage(event.context);
-        await emitItemsRetrieved(emit, loadedItems);
+        await emitItemsReloadRetrieved(emit, loadedItems);
       }
     } catch (e) {
       if (kDebugMode) print(e);
@@ -140,8 +139,30 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   FutureOr<void> emitItemsRetrieved(
-      Emitter<ItemsManagerState> emit, List<Section> _items) async {
-    emit(ItemsRetrievedState(items: _items));
+      Emitter<ItemsManagerState> emit, List<Section> items) async {
+    emit(ItemsRetrievedState(items: items));
+  }
+
+  FutureOr<void> emitItemsReloadRetrieved(
+      Emitter<ItemsManagerState> emit, List<Section> items) async {
+    final totalSections = items.length - 1;
+    List<Section> sections = [];
+    for (var x = 0; x < items.length; x++) {
+      var section = items[x];
+      sections.add(Section(items: []));
+      for (var i = 0; i < section.items.length; i++) {
+        var isLastItem = x == totalSections && i == section.items.length - 1;
+        sections[x].items.add(section.items[i]);
+        emit(
+          ItemInsertedState(
+              itemSection: x,
+              reachedBottom: !isLastItem,
+              itemIndex: i,
+              insertedItem: section.items[i],
+              sections: sections),
+        );
+      }
+    }
   }
 
   @protected

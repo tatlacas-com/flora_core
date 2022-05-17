@@ -181,3 +181,19 @@ class LoadingMoreItemsState extends LoadedState {
   @override
   List<Object> get props => [loadId];
 }
+class ItemsReloadedState extends LoadedState {
+  final DateTime loadId;
+
+  ItemsReloadedState({
+    DateTime? loadId,
+    required bool reachedBottom,
+    required List<Section> sections,
+  })  : loadId = loadId ?? DateTime.now(),
+        super(
+          sections: sections,
+          reachedBottom: reachedBottom,
+        );
+
+  @override
+  List<Object> get props => [loadId];
+}
