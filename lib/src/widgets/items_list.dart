@@ -66,11 +66,11 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   final Map<int, SliverKeyState> _animatedListKeys = <int, SliverKeyState>{};
 
   @protected
-  SliverAnimatedListState _animatedList(int section) {
+  SliverAnimatedListState? _animatedList(int section) {
     if (_animatedListKeys[section] == null) {
       resetAnimatedListKey(section);
     }
-    return _animatedListKeys[section]!.state.currentState!;
+    return _animatedListKeys[section]!.state.currentState;
   }
 
   @protected
@@ -537,7 +537,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget _buildVerticalSliverAnimatedList(int section, Section sectionItems) {
     if (!_animatedListKeys.containsKey(section)) {
-      _animatedListKeys[section] =SliverKeyState(
+      _animatedListKeys[section] = SliverKeyState(
         state: GlobalKey<SliverAnimatedListState>(),
         key: DateTime.now().toIso8601String(),
       );
@@ -646,7 +646,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     Duration duration = const Duration(milliseconds: 300),
     bool isReplace = false,
   }) {
-    _animatedList(section).removeItem(
+    final sc = _animatedList(section);
+    if (sc == null) {
+      debugPrint(
+          '##### couldnt find animatedList for section $section while trying to removeListItem');
+    }
+    sc?.removeItem(
       index,
       (context, animation) => buildRemovedListItem(
           item: removedItem,
@@ -666,7 +671,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     required bool isReplace,
     Duration duration = const Duration(milliseconds: 300),
   }) {
-    _animatedList(section).insertItem(index, duration: duration);
+    final sc = _animatedList(section);
+    if (sc == null) {
+      debugPrint(
+          '##### couldnt find animatedList for section $section while trying to insertListItem');
+    }
+    sc?.insertItem(index, duration: duration);
   }
 
   Widget buildEmptyView(BuildContext context) {
