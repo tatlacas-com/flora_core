@@ -103,6 +103,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       var section = loadedState.sections[x];
       for (var i = section.items.length - 1; i >= 0; i--) {
         var removed = section.items.removeAt(i);
+        debugPrint('## Removing section $x index $i');
         emit(
           ItemRemovedState(
             itemSection: x,
