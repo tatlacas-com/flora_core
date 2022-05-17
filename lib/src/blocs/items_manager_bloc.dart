@@ -97,20 +97,37 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   @protected
   FutureOr<void> onReloadItemsRequested(
       ReloadItemsEvent event, Emitter<ItemsManagerState> emit) async {
+    if (state is! LoadedState) return;
+    var loadedState = state as LoadedState;
+    for (var x = loadedState.sections.length - 1; x >= 0; x--) {
+      var section = loadedState.sections[x];
+      for (var i = section.items.length - 1; i >= 0; i--) {
+        var removed = section.items.removeAt(i);
+        emit(
+          ItemRemovedState(
+            itemSection: x,
+            reachedBottom: loadedState.reachedBottom,
+            itemIndex: i,
+            removedItem: removed,
+            sections: loadedState.sections,
+          ),
+        );
+      }
+    }
     try {
       emit(const ItemsLoadingState());
       if (event.fromCloud) {
-        var _items = await repo.loadItemsFromCloud(event.context);
-        if (_items.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
-          await emitItemsRetrieved(emit, _items);
+        var loadedItems = await repo.loadItemsFromCloud(event.context);
+        if (loadedItems.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
+          await emitItemsRetrieved(emit, loadedItems);
           return;
         }
         emit(ReloadFromCloudEmptyState());
-        _items = await repo.loadItemsFromLocalStorage(event.context);
-        await emitItemsRetrieved(emit, _items);
+        loadedItems = await repo.loadItemsFromLocalStorage(event.context);
+        await emitItemsRetrieved(emit, loadedItems);
       } else {
-        var _items = await repo.loadItemsFromLocalStorage(event.context);
-        await emitItemsRetrieved(emit, _items);
+        var loadedItems = await repo.loadItemsFromLocalStorage(event.context);
+        await emitItemsRetrieved(emit, loadedItems);
       }
     } catch (e) {
       if (kDebugMode) print(e);
@@ -126,18 +143,17 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     emit(ItemsRetrievedState(items: _items));
   }
 
-
   @protected
   FutureOr<void> onLoadItemsRequested(
       LoadItemsEvent event, Emitter<ItemsManagerState> emit) async {
     try {
-      var _items = await repo.loadItemsFromLocalStorage(event.context);
-      if (_items.isNotEmpty) {
-        await emitItemsRetrieved(emit, _items);
+      var loadedItems = await repo.loadItemsFromLocalStorage(event.context);
+      if (loadedItems.isNotEmpty) {
+        await emitItemsRetrieved(emit, loadedItems);
         return;
       }
-      _items = await repo.loadItemsFromCloud(event.context);
-      await emitItemsRetrieved(emit, _items);
+      loadedItems = await repo.loadItemsFromCloud(event.context);
+      await emitItemsRetrieved(emit, loadedItems);
     } catch (e) {
       if (kDebugMode) print(e);
       emit(LoadItemsFailedState(
@@ -146,7 +162,6 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
               : NetworkExceptionType.unknown));
     }
   }
-
 
   dynamic loadingMoreItem(int section) => null;
 
@@ -174,7 +189,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   Future<List<dynamic>> loadMoreItems(LoadMoreItemsEvent event,
-      Emitter<ItemsManagerState> emit, int lastItemIndex) async => [];
+          Emitter<ItemsManagerState> emit, int lastItemIndex) async =>
+      [];
 
   bool hasReachedBottom(int section, List<dynamic> items) =>
       items.length < pageSize;

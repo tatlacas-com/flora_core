@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,19 +19,6 @@ class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
   @override
   ItemsListState<TBloc> createState() =>
       stateBuilder?.call() ?? ItemsListState<TBloc>();
-}
-
-class SliverKeyState extends Equatable {
-  final GlobalKey<SliverAnimatedListState> state;
-  final String key;
-
-  const SliverKeyState({
-    required this.state,
-    required this.key,
-  });
-
-  @override
-  List<Object> get props => [key];
 }
 
 class ItemsListState<TBloc extends ItemsManagerBloc>
@@ -63,24 +49,22 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   double mainAxisSpacing(int section) => 16;
 
-  final Map<int, SliverKeyState> _animatedListKeys = <int, SliverKeyState>{};
+  final Map<int, GlobalKey<SliverAnimatedListState>> _animatedListKeys =
+      <int, GlobalKey<SliverAnimatedListState>>{};
 
   @protected
-  SliverAnimatedListState? _animatedList(int section) {
+  SliverAnimatedListState _animatedList(int section) {
     if (_animatedListKeys[section] == null) {
       resetAnimatedListKey(section);
     }
-    return _animatedListKeys[section]!.state.currentState;
+    return _animatedListKeys[section]!.currentState!;
   }
 
   @protected
   void resetAnimatedListKey(dynamic section) {
     assert(section is int);
     if (!useAnimatedList(section)) return;
-    _animatedListKeys[section] = SliverKeyState(
-      state: GlobalKey<SliverAnimatedListState>(),
-      key: DateTime.now().toIso8601String(),
-    );
+    _animatedListKeys[section] = GlobalKey<SliverAnimatedListState>();
   }
 
   @override
@@ -141,7 +125,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     ItemsManagerState state,
   ) {
     if (state is ItemsLoadingState) {
-      _animatedListKeys.clear();
       return buildLoadingView(context);
     }
     if (state is LoadItemsFailedState) {
@@ -498,13 +481,10 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget _buildHorizontalAnimatedList(int section, Section sectionItems) {
     if (!_animatedListKeys.containsKey(section)) {
-      _animatedListKeys[section] = SliverKeyState(
-        state: GlobalKey<SliverAnimatedListState>(),
-        key: DateTime.now().toIso8601String(),
-      );
+      _animatedListKeys[section] = GlobalKey<SliverAnimatedListState>();
     }
     return AnimatedList(
-      key: ValueKey(_animatedListKeys[section]!.key),
+      key: _animatedListKeys[section],
       itemBuilder:
           (BuildContext context, int index, Animation<double> animation) =>
               buildAnimatedListItem(
@@ -537,25 +517,23 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget _buildVerticalSliverAnimatedList(int section, Section sectionItems) {
     if (!_animatedListKeys.containsKey(section)) {
-      _animatedListKeys[section] = SliverKeyState(
-        state: GlobalKey<SliverAnimatedListState>(),
-        key: DateTime.now().toIso8601String(),
-      );
+      _animatedListKeys[section] = GlobalKey<SliverAnimatedListState>();
     }
     return SliverAnimatedList(
-      key: ValueKey(_animatedListKeys[section]!.key),
+      key: _animatedListKeys[section],
       itemBuilder:
-          (BuildContext context, int index, Animation<double> animation) {
-        try {
+          (BuildContext context, int index, Animation<double> animation)
+          {
+        try{
           return buildAnimatedListItem(
               context: context,
               index: index,
               animation: animation,
               section: section,
               item: sectionItems.items[index]);
-        } catch (e) {
-          debugPrint(
-              'Error building section: $section index:$index totalItemsInSection: ${sectionItems.totalItems()}/${sectionItems.items.length} -- $e');
+        }catch(e){
+          debugPrint('Error building section: $section index:$index totalItemsInSection: ${sectionItems
+              .totalItems()}/${sectionItems.items.length} -- $e');
         }
         return const SizedBox();
       },
@@ -646,12 +624,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     Duration duration = const Duration(milliseconds: 300),
     bool isReplace = false,
   }) {
-    final sc = _animatedList(section);
-    if (sc == null) {
-      debugPrint(
-          '##### couldnt find animatedList for section $section while trying to removeListItem');
-    }
-    sc?.removeItem(
+    _animatedList(section).removeItem(
       index,
       (context, animation) => buildRemovedListItem(
           item: removedItem,
@@ -671,12 +644,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     required bool isReplace,
     Duration duration = const Duration(milliseconds: 300),
   }) {
-    final sc = _animatedList(section);
-    if (sc == null) {
-      debugPrint(
-          '##### couldnt find animatedList for section $section while trying to insertListItem');
-    }
-    sc?.insertItem(index, duration: duration);
+    _animatedList(section).insertItem(index, duration: duration);
   }
 
   Widget buildEmptyView(BuildContext context) {
