@@ -536,6 +536,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
           debugPrint('Error building section: $section index:$index totalItemsInSection: ${sectionItems
               .totalItems()}/${sectionItems.items.length} -- $e');
         }
+        return const SizedBox();
       },
       initialItemCount: sectionItems.totalItems(),
     );
