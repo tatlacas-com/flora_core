@@ -147,6 +147,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       Emitter<ItemsManagerState> emit, List<Section> items) async {
     final totalSections = items.length - 1;
     List<Section> sections = [];
+    emit(const ItemsRetrievedState(items: []));
     for (var x = 0; x < items.length; x++) {
       var section = items[x];
       sections.add(Section(items: []));
