@@ -196,9 +196,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget buildLoadingView(BuildContext context) {
     return const Center(
       child: SizedBox(
-        child: CircularProgressIndicator(),
         width: 60,
         height: 60,
+        child: CircularProgressIndicator(),
       ),
     );
   }
@@ -523,13 +523,20 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return SliverAnimatedList(
       key: _animatedListKeys[section],
       itemBuilder:
-          (BuildContext context, int index, Animation<double> animation) =>
-              buildAnimatedListItem(
-                  context: context,
-                  index: index,
-                  animation: animation,
-                  section: section,
-                  item: sectionItems.items[index]),
+          (BuildContext context, int index, Animation<double> animation)
+          {
+        try{
+          return buildAnimatedListItem(
+              context: context,
+              index: index,
+              animation: animation,
+              section: section,
+              item: sectionItems.items[index]);
+        }catch(e){
+          debugPrint('Error building section: $section index:$index totalItemsInSection: ${sectionItems
+              .totalItems()}/${sectionItems.items.length} -- $e');
+        }
+      },
       initialItemCount: sectionItems.totalItems(),
     );
   }
@@ -641,7 +648,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget buildEmptyView(BuildContext context) {
-    return Center(child: Text('Empty View'));
+    return const Center(
+      child: Text('Empty View'),
+    );
   }
 
   @override
