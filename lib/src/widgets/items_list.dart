@@ -124,7 +124,10 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     BuildContext context,
     ItemsManagerState state,
   ) {
-    if (state is ItemsLoadingState) return buildLoadingView(context);
+    if (state is ItemsLoadingState) {
+      _animatedListKeys.clear();
+      return buildLoadingView(context);
+    }
     if (state is LoadItemsFailedState) {
       return _buildLoadingFailed(state, context);
     }
