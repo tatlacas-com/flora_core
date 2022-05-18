@@ -131,7 +131,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       }
     } catch (e) {
       if (kDebugMode) print(e);
-      onLoadItemsException(emit, e);
+      await onLoadItemsException(emit, e);
     }
   }
 
