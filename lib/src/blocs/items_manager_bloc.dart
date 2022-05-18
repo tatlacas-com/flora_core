@@ -114,10 +114,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       }
     } catch (e) {
       if (kDebugMode) print(e);
-      emit(LoadItemsFailedState(
-          exceptionType: e is NetworkException
-              ? e.exceptionType
-              : NetworkExceptionType.unknown));
+      onLoadItemsException(emit, e);
     }
   }
 
@@ -140,11 +137,15 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       await emitItemsRetrieved(emit, _items);
     } catch (e) {
       if (kDebugMode) print(e);
-      emit(LoadItemsFailedState(
-          exceptionType: e is NetworkException
-              ? e.exceptionType
-              : NetworkExceptionType.unknown));
+      onLoadItemsException(emit, e);
     }
+  }
+
+  void onLoadItemsException(Emitter<ItemsManagerState> emit, Object e) {
+    emit(LoadItemsFailedState(
+        exceptionType: e is NetworkException
+            ? e.exceptionType
+            : NetworkExceptionType.unknown));
   }
 
 
@@ -230,15 +231,19 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       await emitMoreItemsRetrieved(emit, items);
     } catch (e) {
       if (kDebugMode) print(e);
-      emit(
-        LoadMoreItemsFailedState(
-          reachedBottom: false,
-          sections: loadedState.sections,
-          exceptionType: e is NetworkException
-              ? e.exceptionType
-              : NetworkExceptionType.unknown,
-        ),
-      );
+      onLoadMoreItemsException(emit, loadedState, e);
     }
+  }
+
+  void onLoadMoreItemsException(Emitter<ItemsManagerState> emit, LoadedState loadedState, Object e) {
+    emit(
+      LoadMoreItemsFailedState(
+        reachedBottom: false,
+        sections: loadedState.sections,
+        exceptionType: e is NetworkException
+            ? e.exceptionType
+            : NetworkExceptionType.unknown,
+      ),
+    );
   }
 }
