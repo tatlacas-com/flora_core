@@ -176,11 +176,11 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       await emitItemsRetrieved(emit, loadedItems);
     } catch (e) {
       if (kDebugMode) print(e);
-      onLoadItemsException(emit, e);
+      await onLoadItemsException(emit, e);
     }
   }
 
-  void onLoadItemsException(Emitter<ItemsManagerState> emit, Object e) {
+  Future onLoadItemsException(Emitter<ItemsManagerState> emit, dynamic e) async {
     emit(LoadItemsFailedState(
         exceptionType: e is NetworkException
             ? e.exceptionType
@@ -271,11 +271,11 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       await emitMoreItemsRetrieved(emit, items);
     } catch (e) {
       if (kDebugMode) print(e);
-      onLoadMoreItemsException(emit, loadedState, e);
+      await onLoadMoreItemsException(emit, loadedState, e);
     }
   }
 
-  void onLoadMoreItemsException(Emitter<ItemsManagerState> emit, LoadedState loadedState, Object e) {
+  Future onLoadMoreItemsException(Emitter<ItemsManagerState> emit, LoadedState loadedState, dynamic e) async {
     emit(
       LoadMoreItemsFailedState(
         reachedBottom: false,
