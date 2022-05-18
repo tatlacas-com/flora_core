@@ -53,11 +53,11 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       <int, GlobalKey<SliverAnimatedListState>>{};
 
   @protected
-  SliverAnimatedListState _animatedList(int section) {
+  SliverAnimatedListState? _animatedList(int section) {
     if (_animatedListKeys[section] == null) {
       resetAnimatedListKey(section);
     }
-    return _animatedListKeys[section]!.currentState!;
+    return _animatedListKeys[section]?.currentState;
   }
 
   @protected
@@ -522,18 +522,17 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return SliverAnimatedList(
       key: _animatedListKeys[section],
       itemBuilder:
-          (BuildContext context, int index, Animation<double> animation)
-          {
-        try{
+          (BuildContext context, int index, Animation<double> animation) {
+        try {
           return buildAnimatedListItem(
               context: context,
               index: index,
               animation: animation,
               section: section,
               item: sectionItems.items[index]);
-        }catch(e){
-          debugPrint('Error building section: $section index:$index totalItemsInSection: ${sectionItems
-              .totalItems()}/${sectionItems.items.length} -- $e');
+        } catch (e) {
+          debugPrint(
+              'Error building section: $section index:$index totalItemsInSection: ${sectionItems.totalItems()}/${sectionItems.items.length} -- $e');
         }
         return const SizedBox();
       },
@@ -624,7 +623,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     Duration duration = const Duration(milliseconds: 300),
     bool isReplace = false,
   }) {
-    _animatedList(section).removeItem(
+    final animState = _animatedList(section);
+    if (animState == null) {
+      debugPrint(
+          'Tried to access null animateListState for section $section $index in removeListItem');
+    }
+    animState?.removeItem(
       index,
       (context, animation) => buildRemovedListItem(
           item: removedItem,
@@ -644,7 +648,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     required bool isReplace,
     Duration duration = const Duration(milliseconds: 300),
   }) {
-    _animatedList(section).insertItem(index, duration: duration);
+    final animState = _animatedList(section);
+    if (animState == null) {
+      debugPrint(
+          'Tried to access null animateListState for section $section $index in insertListItem');
+    }
+    animState?.insertItem(index, duration: duration);
   }
 
   Widget buildEmptyView(BuildContext context) {
