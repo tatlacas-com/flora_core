@@ -169,24 +169,24 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       },
       child: CustomScrollView(
         key: PageStorageKey<String>(TBloc.runtimeType.toString()),
-        slivers: buildLoadingFailedSlivers(context),
+        slivers: buildLoadingFailedSlivers(context, state),
       ),
     );
   }
 
-  List<Widget> buildLoadingFailedSlivers(BuildContext context) {
+  List<Widget> buildLoadingFailedSlivers(BuildContext context, LoadItemsFailedState state) {
     return [
       SliverPadding(
         padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
         sliver: SliverFillRemaining(
           hasScrollBody: false,
-          child: buildLoadingFailedWidget(context),
+          child: buildLoadingFailedWidget(context, state),
         ),
       )
     ];
   }
 
-  Widget buildLoadingFailedWidget(BuildContext context) {
+  Widget buildLoadingFailedWidget(BuildContext context, LoadItemsFailedState state) {
     return const Center(
       child: Text('Show Screen Failed to load items widget here...'),
     );
