@@ -31,4 +31,23 @@ class Section extends Equatable {
         horizontalScroll,
         horizontalScrollHeight,
       ];
+
+  Section copyWith({
+    List<dynamic>? items,
+    dynamic sectionHeader,
+    bool? usesGrid,
+    bool? horizontalScroll,
+    double? horizontalScrollHeight,
+    dynamic? emptyEntity,
+  }) {
+    return Section(
+      items: items ?? this.items,
+      sectionHeader: sectionHeader ?? this.sectionHeader,
+      usesGrid: usesGrid ?? this.usesGrid,
+      horizontalScroll: horizontalScroll ?? this.horizontalScroll,
+      horizontalScrollHeight:
+          horizontalScrollHeight ?? this.horizontalScrollHeight,
+      emptyEntity: emptyEntity ?? this.emptyEntity,
+    );
+  }
 }

@@ -150,7 +150,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     emit(const ItemsRetrievedState(items: []));
     for (var x = 0; x < items.length; x++) {
       var section = items[x];
-      sections.add(Section(items: []));
+      sections.add(section.copyWith(items: []));
       for (var i = 0; i < section.items.length; i++) {
         var isLastItem = x == totalSections && i == section.items.length - 1;
         sections[x].items.add(section.items[i]);
