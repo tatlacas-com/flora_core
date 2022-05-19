@@ -78,8 +78,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
             headerSliverBuilder: (BuildContext cnxt, bool innerBoxIsScrolled) {
               return buildAppBarSlivers(context);
             },
-            body: buildScrollView(context))
-        : buildScrollView(context);
+            body: buildScrollViewWithListeners(context))
+        : buildScrollViewWithListeners(context);
   }
 
   List<BlocListener> blocListeners(BuildContext context) => [];
@@ -97,11 +97,21 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
                 onRefresh: () async {
                   bloc.add(ReloadItemsEvent(context: context));
                 },
-                child: buildCustomScrollView(context),
+                child: buildScrollViewWithListeners(context),
               )
-            : buildCustomScrollView(context),
+            : buildScrollViewWithListeners(context),
       ),
     );
+  }
+
+  Widget buildScrollViewWithListeners(BuildContext context) {
+    final listeners = blocListeners(context);
+    if (listeners.isNotEmpty) {
+      return MultiBlocListener(
+          listeners: listeners, child: buildScrollView(context));
+    } else {
+      return buildScrollView(context);
+    }
   }
 
   Widget buildCustomScrollView(BuildContext context) {
