@@ -95,9 +95,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
               onRefresh: () async {
                 bloc.add(ReloadItemsEvent(context: context));
               },
-              child: buildScrollViewWithListeners(context),
+              child: buildCustomScrollView(context),
             )
-          : buildScrollViewWithListeners(context),
+          : buildCustomScrollView(context),
     );
   }
 
