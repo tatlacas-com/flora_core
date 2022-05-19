@@ -85,22 +85,19 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   List<BlocListener> blocListeners(BuildContext context) => [];
 
   Widget buildScrollView(BuildContext context) {
-    return MultiBlocListener(
-      listeners: blocListeners(context),
-      child: NotificationListener<ScrollNotification>(
-        onNotification: (ScrollNotification scrollInfo) {
-          onScrollNotification(scrollInfo);
-          return true;
-        },
-        child: pullToRefresh
-            ? RefreshIndicator(
-                onRefresh: () async {
-                  bloc.add(ReloadItemsEvent(context: context));
-                },
-                child: buildScrollViewWithListeners(context),
-              )
-            : buildScrollViewWithListeners(context),
-      ),
+    return NotificationListener<ScrollNotification>(
+      onNotification: (ScrollNotification scrollInfo) {
+        onScrollNotification(scrollInfo);
+        return true;
+      },
+      child: pullToRefresh
+          ? RefreshIndicator(
+              onRefresh: () async {
+                bloc.add(ReloadItemsEvent(context: context));
+              },
+              child: buildScrollViewWithListeners(context),
+            )
+          : buildScrollViewWithListeners(context),
     );
   }
 
@@ -108,7 +105,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     final listeners = blocListeners(context);
     if (listeners.isNotEmpty) {
       return MultiBlocListener(
-          listeners: listeners, child: buildScrollView(context));
+        listeners: listeners,
+        child: buildScrollView(context),
+      );
     } else {
       return buildScrollView(context);
     }
