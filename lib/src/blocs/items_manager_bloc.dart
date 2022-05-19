@@ -97,21 +97,22 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   @protected
   FutureOr<void> onReloadItemsRequested(
       ReloadItemsEvent event, Emitter<ItemsManagerState> emit) async {
-    if (state is! LoadedState) return;
-    var loadedState = state as LoadedState;
-    for (var x = loadedState.sections.length - 1; x >= 0; x--) {
-      var section = loadedState.sections[x];
-      for (var i = section.items.length - 1; i >= 0; i--) {
-        var removed = section.items.removeAt(i);
-        emit(
-          ItemRemovedState(
-            itemSection: x,
-            reachedBottom: loadedState.reachedBottom,
-            itemIndex: i,
-            removedItem: removed,
-            sections: loadedState.sections,
-          ),
-        );
+    if(state is LoadedState){
+      var loadedState = state as LoadedState;
+      for (var x = loadedState.sections.length - 1; x >= 0; x--) {
+        var section = loadedState.sections[x];
+        for (var i = section.items.length - 1; i >= 0; i--) {
+          var removed = section.items.removeAt(i);
+          emit(
+            ItemRemovedState(
+              itemSection: x,
+              reachedBottom: loadedState.reachedBottom,
+              itemIndex: i,
+              removedItem: removed,
+              sections: loadedState.sections,
+            ),
+          );
+        }
       }
     }
     try {
