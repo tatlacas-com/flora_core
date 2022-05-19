@@ -82,20 +82,25 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         : buildScrollView(context);
   }
 
+  List<BlocListener> blocListeners(BuildContext context) => [];
+
   Widget buildScrollView(BuildContext context) {
-    return NotificationListener<ScrollNotification>(
-      onNotification: (ScrollNotification scrollInfo) {
-        onScrollNotification(scrollInfo);
-        return true;
-      },
-      child: pullToRefresh
-          ? RefreshIndicator(
-              onRefresh: () async {
-                bloc.add(ReloadItemsEvent(context: context));
-              },
-              child: buildCustomScrollView(context),
-            )
-          : buildCustomScrollView(context),
+    return MultiBlocListener(
+      listeners: blocListeners(context),
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          onScrollNotification(scrollInfo);
+          return true;
+        },
+        child: pullToRefresh
+            ? RefreshIndicator(
+                onRefresh: () async {
+                  bloc.add(ReloadItemsEvent(context: context));
+                },
+                child: buildCustomScrollView(context),
+              )
+            : buildCustomScrollView(context),
+      ),
     );
   }
 
@@ -174,7 +179,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  List<Widget> buildLoadingFailedSlivers(BuildContext context, LoadItemsFailedState state) {
+  List<Widget> buildLoadingFailedSlivers(
+      BuildContext context, LoadItemsFailedState state) {
     return [
       SliverPadding(
         padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
@@ -186,7 +192,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     ];
   }
 
-  Widget buildLoadingFailedWidget(BuildContext context, LoadItemsFailedState state) {
+  Widget buildLoadingFailedWidget(
+      BuildContext context, LoadItemsFailedState state) {
     return const Center(
       child: Text('Show Screen Failed to load items widget here...'),
     );
