@@ -63,12 +63,14 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       final state = (this.state as LoadedState);
       state.section(event.section).items.insert(event.index, event.item);
 
-      emit(ItemInsertedState(
-          reachedBottom: state.reachedBottom,
-          itemSection: event.section,
-          itemIndex: event.index,
-          insertedItem: event.item,
-          sections: state.sections));
+      emit(
+        ItemInsertedState(
+            reachedBottom: state.reachedBottom,
+            itemSection: event.section,
+            itemIndex: event.index,
+            insertedItem: event.item,
+            sections: state.sections),
+      );
     }
   }
 
@@ -255,14 +257,20 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       );
     }
     if (reachedBottom) {
-      _insertBottomSpacer(loadedState);
+      _insertBottomSpacer(
+        loadedState,
+        emit,
+      );
     }
   }
 
-  void _insertBottomSpacer(LoadedState loadedState) {
+  void _insertBottomSpacer(
+      LoadedState loadedState, Emitter<ItemsManagerState> emit) {
     var spacer = bottomSpacer;
     if (spacer != null) {
       var lastSection = loadedState.sections.length - 1;
+      if (loadedState.sections[lastSection].items.last.runtimeType ==
+          spacer.runtimeType) return;
       loadedState.sections[lastSection].items.add(spacer);
       emit(
         ItemInsertedState(
