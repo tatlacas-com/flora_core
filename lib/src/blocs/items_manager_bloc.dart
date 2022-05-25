@@ -97,7 +97,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   @protected
   FutureOr<void> onReloadItemsRequested(
       ReloadItemsEvent event, Emitter<ItemsManagerState> emit) async {
-    if(state is LoadedState){
+    if (state is LoadedState) {
       var loadedState = state as LoadedState;
       for (var x = loadedState.sections.length - 1; x >= 0; x--) {
         var section = loadedState.sections[x];
@@ -181,15 +181,17 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
   }
 
-  Future onLoadItemsException(Emitter<ItemsManagerState> emit, dynamic e) async {
+  Future onLoadItemsException(
+      Emitter<ItemsManagerState> emit, dynamic e) async {
     emit(LoadItemsFailedState(
         exceptionType: e is NetworkException
             ? e.exceptionType
             : NetworkExceptionType.unknown));
   }
 
-
   dynamic loadingMoreItem(int section) => null;
+
+  dynamic get bottomSpacer => null;
 
   int get pageSize => 20;
 
@@ -252,6 +254,26 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         ),
       );
     }
+    if (reachedBottom) {
+      _insertBottomSpacer(loadedState);
+    }
+  }
+
+  void _insertBottomSpacer(LoadedState loadedState) {
+    var spacer = bottomSpacer;
+    if (spacer != null) {
+      var lastSection = loadedState.sections.length - 1;
+      loadedState.sections[lastSection].items.add(spacer);
+      emit(
+        ItemInsertedState(
+          itemSection: lastSection,
+          reachedBottom: loadedState.reachedBottom,
+          itemIndex: loadedState.sections[lastSection].items.length - 1,
+          insertedItem: spacer,
+          sections: loadedState.sections,
+        ),
+      );
+    }
   }
 
   @protected
@@ -276,7 +298,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
   }
 
-  Future onLoadMoreItemsException(Emitter<ItemsManagerState> emit, LoadedState loadedState, dynamic e) async {
+  Future onLoadMoreItemsException(Emitter<ItemsManagerState> emit,
+      LoadedState loadedState, dynamic e) async {
     emit(
       LoadMoreItemsFailedState(
         reachedBottom: false,
