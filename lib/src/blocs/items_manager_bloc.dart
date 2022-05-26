@@ -27,6 +27,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     on<InsertItemEvent>(onInsertItem);
     on<RemoveItemEvent>(onRemoveItem);
     on<LoadMoreItemsEvent>(onLoadMoreItemsEvent);
+    on<EmitRetrievedEvent>(onEmitRetrievedEvent);
   }
 
   bool isReplacingItem(
@@ -39,21 +40,28 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   @protected
+  FutureOr<void> onEmitRetrievedEvent(
+      EmitRetrievedEvent event, Emitter<ItemsManagerState> emit) async {
+    if (state is! LoadedState) return;
+    final loadedState = state as LoadedState;
+    emit(ItemsRetrievedState(items: loadedState.sections));
+  }
+
+  @protected
   FutureOr<void> onReplaceItem(
       ReplaceItemEvent event, Emitter<ItemsManagerState> emit) async {
-    if (state is LoadedState) {
-      final state = (this.state as LoadedState);
-      final removedItem =
-          state.section(event.section).items.removeAt(event.index);
-      state.section(event.section).items.insert(event.index, event.item);
-      emit(ItemReplacedState(
-          reachedBottom: state.reachedBottom,
-          itemSection: event.section,
-          itemIndex: event.index,
-          removedItem: removedItem,
-          insertedItem: event.item,
-          sections: state.sections));
-    }
+    if (state is! LoadedState) return;
+    final loadedState = state as LoadedState;
+    final removedItem =
+        loadedState.section(event.section).items.removeAt(event.index);
+    loadedState.section(event.section).items.insert(event.index, event.item);
+    emit(ItemReplacedState(
+        reachedBottom: loadedState.reachedBottom,
+        itemSection: event.section,
+        itemIndex: event.index,
+        removedItem: removedItem,
+        insertedItem: event.item,
+        sections: loadedState.sections));
   }
 
   @protected
