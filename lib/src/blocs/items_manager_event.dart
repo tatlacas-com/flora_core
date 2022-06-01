@@ -83,3 +83,5 @@ class LoadMoreItemsEvent extends ItemsManagerEvent {
     required this.context,
   }) : super(requestId: requestId);
 }
+
+class EmitRetrievedEvent extends ItemsManagerEvent {}

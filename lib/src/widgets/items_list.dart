@@ -45,9 +45,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   double childAspectRatio(int section) => 1;
 
-  double crossAxisSpacing(int section) => 16;
+  double crossAxisSpacing(int section) => 8;
 
-  double mainAxisSpacing(int section) => 16;
+  double mainAxisSpacing(int section) => 8;
 
   final Map<int, GlobalKey<SliverAnimatedListState>> _animatedListKeys =
       <int, GlobalKey<SliverAnimatedListState>>{};
@@ -116,10 +116,20 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget buildCustomScrollView(BuildContext context) {
     return BlocConsumer<TBloc, ItemsManagerState>(
       listener: (context, state) {
+
         if (state is ItemRemovedState) {
+          if(state.sections[state.itemSection].usesGrid){
+            bloc.add(EmitRetrievedEvent());
+            return;
+          }
+
           removeListItem(state.removedItem,
               section: state.itemSection, index: state.itemIndex);
         } else if (state is ItemInsertedState) {
+          if(state.sections[state.itemSection].usesGrid){
+            bloc.add(EmitRetrievedEvent());
+            return;
+          }
           insertListItem(state.insertedItem,
               section: state.itemSection,
               index: state.itemIndex,
@@ -361,9 +371,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget buildVerticalSliverGrid(int section, Section sectionItems) {
-    return useAnimatedList(section)
-        ? buildVerticalSliverGridAnimated(section, sectionItems)
-        : buildVerticalSliverGridDefault(section, sectionItems);
+    return buildVerticalSliverGridDefault(section, sectionItems);
   }
 
   Widget buildHorizontalSliverList(int section, Section sectionItems) {
@@ -405,23 +413,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  Widget buildVerticalSliverGridAnimated(int section, Section sectionItems) {
-    return SliverGrid(
-      key: Key("${section}sectionSliverGrid"),
-      gridDelegate: _buildSliverGridDelegate(section),
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          return buildListItem(
-            context: context,
-            section: section,
-            index: index,
-            item: sectionItems.items[index],
-          );
-        },
-        childCount: sectionItems.totalItems(),
-      ),
-    );
-  }
 
   Widget buildListItem({
     required BuildContext context,

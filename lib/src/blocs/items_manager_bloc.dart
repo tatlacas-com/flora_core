@@ -27,6 +27,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     on<InsertItemEvent>(onInsertItem);
     on<RemoveItemEvent>(onRemoveItem);
     on<LoadMoreItemsEvent>(onLoadMoreItemsEvent);
+    on<EmitRetrievedEvent>(onEmitRetrievedEvent);
   }
 
   bool isReplacingItem(
@@ -39,21 +40,28 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   @protected
+  FutureOr<void> onEmitRetrievedEvent(
+      EmitRetrievedEvent event, Emitter<ItemsManagerState> emit) async {
+    if (state is! LoadedState) return;
+    final loadedState = state as LoadedState;
+    emit(ItemsRetrievedState(items: loadedState.sections));
+  }
+
+  @protected
   FutureOr<void> onReplaceItem(
       ReplaceItemEvent event, Emitter<ItemsManagerState> emit) async {
-    if (state is LoadedState) {
-      final state = (this.state as LoadedState);
-      final removedItem =
-          state.section(event.section).items.removeAt(event.index);
-      state.section(event.section).items.insert(event.index, event.item);
-      emit(ItemReplacedState(
-          reachedBottom: state.reachedBottom,
-          itemSection: event.section,
-          itemIndex: event.index,
-          removedItem: removedItem,
-          insertedItem: event.item,
-          sections: state.sections));
-    }
+    if (state is! LoadedState) return;
+    final loadedState = state as LoadedState;
+    final removedItem =
+        loadedState.section(event.section).items.removeAt(event.index);
+    loadedState.section(event.section).items.insert(event.index, event.item);
+    emit(ItemReplacedState(
+        reachedBottom: loadedState.reachedBottom,
+        itemSection: event.section,
+        itemIndex: event.index,
+        removedItem: removedItem,
+        insertedItem: event.item,
+        sections: loadedState.sections));
   }
 
   @protected
@@ -63,12 +71,14 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       final state = (this.state as LoadedState);
       state.section(event.section).items.insert(event.index, event.item);
 
-      emit(ItemInsertedState(
-          reachedBottom: state.reachedBottom,
-          itemSection: event.section,
-          itemIndex: event.index,
-          insertedItem: event.item,
-          sections: state.sections));
+      emit(
+        ItemInsertedState(
+            reachedBottom: state.reachedBottom,
+            itemSection: event.section,
+            itemIndex: event.index,
+            insertedItem: event.item,
+            sections: state.sections),
+      );
     }
   }
 
@@ -97,7 +107,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   @protected
   FutureOr<void> onReloadItemsRequested(
       ReloadItemsEvent event, Emitter<ItemsManagerState> emit) async {
-    if(state is LoadedState){
+    if (state is LoadedState) {
       var loadedState = state as LoadedState;
       for (var x = loadedState.sections.length - 1; x >= 0; x--) {
         var section = loadedState.sections[x];
@@ -181,15 +191,17 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
   }
 
-  Future onLoadItemsException(Emitter<ItemsManagerState> emit, dynamic e) async {
+  Future onLoadItemsException(
+      Emitter<ItemsManagerState> emit, dynamic e) async {
     emit(LoadItemsFailedState(
         exceptionType: e is NetworkException
             ? e.exceptionType
             : NetworkExceptionType.unknown));
   }
 
-
   dynamic loadingMoreItem(int section) => null;
+
+  dynamic get bottomSpacer => null;
 
   int get pageSize => 20;
 
@@ -252,6 +264,32 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         ),
       );
     }
+    if (reachedBottom) {
+      _insertBottomSpacer(
+        loadedState,
+        emit,
+      );
+    }
+  }
+
+  void _insertBottomSpacer(
+      LoadedState loadedState, Emitter<ItemsManagerState> emit) {
+    var spacer = bottomSpacer;
+    if (spacer != null) {
+      var lastSection = loadedState.sections.length - 1;
+      if (loadedState.sections[lastSection].items.last.runtimeType ==
+          spacer.runtimeType) return;
+      loadedState.sections[lastSection].items.add(spacer);
+      emit(
+        ItemInsertedState(
+          itemSection: lastSection,
+          reachedBottom: loadedState.reachedBottom,
+          itemIndex: loadedState.sections[lastSection].items.length - 1,
+          insertedItem: spacer,
+          sections: loadedState.sections,
+        ),
+      );
+    }
   }
 
   bool _loadingMore = false;
@@ -280,7 +318,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     _loadingMore = false;
   }
 
-  Future onLoadMoreItemsException(Emitter<ItemsManagerState> emit, LoadedState loadedState, dynamic e) async {
+  Future onLoadMoreItemsException(Emitter<ItemsManagerState> emit,
+      LoadedState loadedState, dynamic e) async {
     emit(
       LoadMoreItemsFailedState(
         reachedBottom: false,
