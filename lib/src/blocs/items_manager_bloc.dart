@@ -254,13 +254,16 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
   }
 
+  bool _loadingMore = false;
+
   @protected
   FutureOr<void> onLoadMoreItemsEvent(
       LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async {
-    if (state is LoadingMoreItemsState) return;
+    if (_loadingMore) return;
     if (state is! LoadedState) return;
     var loadedState = state as LoadedState;
     if (loadedState.reachedBottom) return;
+    _loadingMore = true;
     try {
       emit(
         LoadingMoreItemsState(
@@ -274,6 +277,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       if (kDebugMode) print(e);
       await onLoadMoreItemsException(emit, loadedState, e);
     }
+    _loadingMore = false;
   }
 
   Future onLoadMoreItemsException(Emitter<ItemsManagerState> emit, LoadedState loadedState, dynamic e) async {
