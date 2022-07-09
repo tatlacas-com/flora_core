@@ -19,7 +19,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   ItemsManagerBloc(
       {required this.repo,
-      ItemsManagerState initialState = const ItemsLoadingState()})
+      ItemsManagerState initialState = const ItemsInitialState()})
       : super(initialState) {
     on<LoadItemsEvent>(onLoadItemsRequested);
     on<ReloadItemsEvent>(onReloadItemsRequested);
@@ -177,6 +177,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   @protected
   FutureOr<void> onLoadItemsRequested(
       LoadItemsEvent event, Emitter<ItemsManagerState> emit) async {
+    if(state is LoadingMoreItemsState)return;
+    emit(const ItemsLoadingState());
     try {
       var loadedItems = await repo.loadItemsFromLocalStorage(event.context);
       if (loadedItems.isNotEmpty) {

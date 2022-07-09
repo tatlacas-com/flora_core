@@ -24,10 +24,10 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<TBloc>();
-    if (bloc.state is ItemsLoadingState) {
+    if (bloc.state is ItemsInitialState) {
       bloc.add(LoadItemsEvent(context: context));
     }
-    if(!buildInBase) return SizedBox();
+    if(!buildInBase) return const SizedBox();
     if(useScaffold) {
       return Scaffold(
         appBar: appBar ?? ZeroHeightAppBar(),

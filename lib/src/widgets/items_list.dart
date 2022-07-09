@@ -148,7 +148,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     BuildContext context,
     ItemsManagerState state,
   ) {
-    if (state is ItemsLoadingState) {
+    if (state is ItemsLoadingState || state is ItemsInitialState) {
       return buildLoadingView(context);
     }
     if (state is LoadItemsFailedState) {

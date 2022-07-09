@@ -7,7 +7,13 @@ abstract class ItemsManagerState extends Equatable {
 }
 
 class ItemsLoadingState extends ItemsManagerState implements ItemsBuildUi {
-  const ItemsLoadingState({DateTime? loadId});
+  const ItemsLoadingState();
+
+  @override
+  List<Object> get props => [];
+}
+class ItemsInitialState extends ItemsManagerState implements ItemsBuildUi {
+  const ItemsInitialState();
 
   @override
   List<Object> get props => [];
