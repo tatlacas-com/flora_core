@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:http/http.dart' as http;
 
 import 'exceptions.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
 
 abstract class WebClient extends Equatable {
   final String baseUrl;
@@ -42,9 +42,11 @@ abstract class WebClient extends Equatable {
       headers[HttpHeaders.authorizationHeader] = "Bearer $accessToken";
     }
     final jsonPayload = jsonEncodedPayload ? payload : jsonEncode(payload);
+    final uri = Uri.parse('$baseUrl$endpoint');
+    debugPrint('HTTP POST FILE: $uri');
     final response = await http
         .post(
-          Uri.parse('$baseUrl$endpoint'),
+          uri,
           body: jsonPayload,
           headers: headers,
         )
@@ -67,6 +69,7 @@ abstract class WebClient extends Equatable {
 
     var uri = Uri.parse('$baseUrl$endpoint');
 
+    debugPrint('HTTP POST FILE: $uri');
     var request = http.MultipartRequest("POST", uri);
     accessToken = accessToken ?? this.accessToken;
     if (accessToken != null) {
@@ -100,9 +103,10 @@ abstract class WebClient extends Equatable {
     } else if (endpoint is Uri) {
       uri = endpoint;
     } else {
-      if (kDebugMode) print("Unsupported endpoint: $endpoint");
+      debugPrint("Unsupported endpoint: $endpoint");
       throw ArgumentError('Unsupported endpoint');
     }
+    debugPrint('HTTP GET: $uri');
     final response = await http
         .get(uri, headers: headers)
         .timeout(Duration(seconds: timeoutSeconds));
@@ -112,16 +116,16 @@ abstract class WebClient extends Equatable {
 
   void _throwIfNotSuccess(int statusCode, {required String endpoint}) {
     if (statusCode == 403) {
-      if (kDebugMode) print("AccessDeniedException: $endpoint");
+      debugPrint("AccessDeniedException: $endpoint");
       throw AccessDeniedException(endpoint: endpoint);
     } else if (statusCode == 401) {
-      if (kDebugMode) print("UnauthorizedException: $endpoint");
+      debugPrint("UnauthorizedException: $endpoint");
       throw UnauthorizedException(endpoint: endpoint);
     } else if (statusCode == 404) {
-      if (kDebugMode) print("NotFoundException: $endpoint");
+      debugPrint("NotFoundException: $endpoint");
       throw NotFoundException(endpoint: endpoint);
     } else if (statusCode == 500) {
-      if (kDebugMode) print("ServerException: $endpoint");
+      debugPrint("ServerException: $endpoint");
       throw ServerException(endpoint: endpoint);
     }
   }
