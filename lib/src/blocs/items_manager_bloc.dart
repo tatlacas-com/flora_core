@@ -246,23 +246,28 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     var loadedState = state as LoadedState;
     var indx = 0;
     var lastSection = loadedState.sections.length - 1;
-    lastSection = lastSection >= 0 ? lastSection : 0;
+    lastSection = lastSection < 0 ?  0 : lastSection;
     var reachedBottom = hasReachedBottom(lastSection, _items);
     if (loadedState.sections[lastSection].items.isNotEmpty &&
         loadedState.sections[lastSection].items.last ==
             loadingMoreItem(lastSection)) {
-      var removed = loadedState.sections[lastSection].items.removeLast();
-      if (loadingMoreItem(lastSection) != null &&
-          removeLoadingIfBottomReached(lastSection)) {
-        emit(
-          ItemRemovedState(
-            itemSection: lastSection,
-            reachedBottom: reachedBottom,
-            itemIndex: loadedState.sections[lastSection].items.length,
-            removedItem: removed,
-            sections: loadedState.sections,
-          ),
-        );
+      try {
+        var removed = loadedState.sections[lastSection].items.removeLast();
+        if (loadingMoreItem(lastSection) != null &&
+            removeLoadingIfBottomReached(lastSection)) {
+          emit(
+            ItemRemovedState(
+              itemSection: lastSection,
+              reachedBottom: reachedBottom,
+              itemIndex: loadedState.sections[lastSection].items.length,
+              removedItem: removed,
+              sections: loadedState.sections,
+            ),
+          );
+        }
+      } catch (e) {
+        if (kDebugMode) print('Error: $runtimeType emitMoreItemsRetrieved: $e');
+        await onLoadItemsException(emit, e);
       }
     }
 
@@ -279,10 +284,15 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       );
     }
     if (reachedBottom) {
-      _insertBottomSpacer(
-        loadedState,
-        emit,
-      );
+      try {
+        _insertBottomSpacer(
+          loadedState,
+          emit,
+        );
+      } catch (e) {
+        if (kDebugMode) print('Error: $runtimeType insertBottomSpacer: $e');
+        await onLoadItemsException(emit, e);
+      }
     }
   }
 
@@ -291,8 +301,9 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     var spacer = bottomSpacer;
     if (spacer != null) {
       var lastSection = loadedState.sections.length - 1;
-      if (loadedState.sections[lastSection].items.last.runtimeType ==
-          spacer.runtimeType) return;
+      if (lastSection < 0 ||
+          loadedState.sections[lastSection].items.isEmpty ||
+          loadedState.sections[lastSection].items.last == spacer) return;
       loadedState.sections[lastSection].items.add(spacer);
       emit(
         ItemInsertedState(
