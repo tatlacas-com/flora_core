@@ -246,21 +246,26 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     var loadedState = state as LoadedState;
     var indx = 0;
     var lastSection = loadedState.sections.length - 1;
-
-    var removed = loadedState.sections[lastSection].items.removeLast();
+    lastSection = lastSection >= 0 ? lastSection : 0;
     var reachedBottom = hasReachedBottom(lastSection, _items);
-    if (loadingMoreItem(lastSection) != null &&
-        removeLoadingIfBottomReached(lastSection)) {
-      emit(
-        ItemRemovedState(
-          itemSection: lastSection,
-          reachedBottom: reachedBottom,
-          itemIndex: loadedState.sections[lastSection].items.length,
-          removedItem: removed,
-          sections: loadedState.sections,
-        ),
-      );
+    if (loadedState.sections[lastSection].items.isNotEmpty &&
+        loadedState.sections[lastSection].items.last ==
+            loadingMoreItem(lastSection)) {
+      var removed = loadedState.sections[lastSection].items.removeLast();
+      if (loadingMoreItem(lastSection) != null &&
+          removeLoadingIfBottomReached(lastSection)) {
+        emit(
+          ItemRemovedState(
+            itemSection: lastSection,
+            reachedBottom: reachedBottom,
+            itemIndex: loadedState.sections[lastSection].items.length,
+            removedItem: removed,
+            sections: loadedState.sections,
+          ),
+        );
+      }
     }
+
     for (var item in _items) {
       loadedState.sections[lastSection].items.add(item);
       emit(
