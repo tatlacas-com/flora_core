@@ -43,7 +43,7 @@ abstract class WebClient extends Equatable {
     }
     final jsonPayload = jsonEncodedPayload ? payload : jsonEncode(payload);
     final uri = Uri.parse('$baseUrl$endpoint');
-    debugPrint('HTTP POST FILE: $uri');
+    debugPrint('HTTP POST: $uri');
     final response = await http
         .post(
           uri,
