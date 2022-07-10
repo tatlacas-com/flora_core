@@ -177,7 +177,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   @protected
   FutureOr<void> onLoadItemsRequested(
       LoadItemsEvent event, Emitter<ItemsManagerState> emit) async {
-    if(state is LoadingMoreItemsState)return;
+    if (state is LoadingMoreItemsState) return;
     emit(const ItemsLoadingState());
     try {
       var loadedItems = await repo.loadItemsFromLocalStorage(event.context);
@@ -213,7 +213,9 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     var lastSection = loadedState.sections.length - 1;
     var lastItemIndex = loadedState.sections[lastSection].items.length;
     var insertedItem = loadingMoreItem(lastSection);
-    if (insertedItem != null && loadedState.sections[lastSection].items.isNotEmpty && loadedState.sections[lastSection].items.last != insertedItem) {
+    if (insertedItem != null &&
+        loadedState.sections[lastSection].items.isNotEmpty &&
+        loadedState.sections[lastSection].items.last != insertedItem) {
       debugPrint('INSERT LOADING CELL');
       loadedState.sections[lastSection].items.add(insertedItem);
       emit(
@@ -226,7 +228,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         ),
       );
     }
-    return await loadMoreItems(event, emit, loadedState.sections[lastSection].items.length);
+    return await loadMoreItems(
+        event, emit, loadedState.sections[lastSection].items.length);
   }
 
   Future<List<dynamic>> loadMoreItems(LoadMoreItemsEvent event,
@@ -236,6 +239,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   bool hasReachedBottom(int section, List<dynamic> items) =>
       items.length < pageSize;
 
+  bool removeLoadingIfBottom(int section) => true;
+
   FutureOr<void> emitMoreItemsRetrieved(
       Emitter<ItemsManagerState> emit, List<dynamic> _items) async {
     var loadedState = state as LoadedState;
@@ -244,7 +249,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
     var removed = loadedState.sections[lastSection].items.removeLast();
     var reachedBottom = hasReachedBottom(lastSection, _items);
-    if (loadingMoreItem(lastSection) != null) {
+    if (loadingMoreItem(lastSection) != null &&
+        removeLoadingIfBottom(lastSection)) {
       emit(
         ItemRemovedState(
           itemSection: lastSection,
