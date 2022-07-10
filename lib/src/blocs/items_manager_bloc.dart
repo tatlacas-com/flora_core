@@ -244,7 +244,6 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   FutureOr<void> emitMoreItemsRetrieved(
       Emitter<ItemsManagerState> emit, List<dynamic> _items) async {
     var loadedState = state as LoadedState;
-    var indx = 0;
     var lastSection = loadedState.sections.length - 1;
     lastSection = lastSection < 0 ?  0 : lastSection;
     var reachedBottom = hasReachedBottom(lastSection, _items);
@@ -271,6 +270,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       }
     }
 
+    var indx = 0;
     for (var item in _items) {
       loadedState.sections[lastSection].items.add(item);
       emit(
