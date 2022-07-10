@@ -141,7 +141,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         await emitItemsReloadRetrieved(emit, loadedItems);
       }
     } catch (e) {
-      if (kDebugMode) print(e);
+      if (kDebugMode) print('Error: $runtimeType onReloadItemsRequested: $e');
       await onLoadItemsException(emit, e);
     }
   }
@@ -188,7 +188,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       loadedItems = await repo.loadItemsFromCloud(event.context);
       await emitItemsRetrieved(emit, loadedItems);
     } catch (e) {
-      if (kDebugMode) print(e);
+      if (kDebugMode) print('Error: $runtimeType onLoadItemsRequested: $e');
       await onLoadItemsException(emit, e);
     }
   }
@@ -321,7 +321,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       var items = await prepareLoadMoreItems(event, emit);
       await emitMoreItemsRetrieved(emit, items);
     } catch (e) {
-      if (kDebugMode) print(e);
+      if (kDebugMode) print('Error: $runtimeType onLoadMoreItemsEvent  $e');
       await onLoadMoreItemsException(emit, loadedState, e);
     }
     _loadingMore = false;
