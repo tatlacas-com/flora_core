@@ -213,7 +213,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     var lastSection = loadedState.sections.length - 1;
     var lastItemIndex = loadedState.sections[lastSection].items.length;
     var insertedItem = loadingMoreItem(lastSection);
-    if (insertedItem != null && loadedState.sections[lastSection].items.last != insertedItem) {
+    if (insertedItem != null && loadedState.sections[lastSection].items.isNotEmpty && loadedState.sections[lastSection].items.last != insertedItem) {
       debugPrint('INSERT LOADING CELL');
       loadedState.sections[lastSection].items.add(insertedItem);
       emit(
