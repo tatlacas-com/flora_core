@@ -51,6 +51,7 @@ abstract class WebClient extends Equatable {
           headers: headers,
         )
         .timeout(Duration(seconds: timeoutSeconds));
+    debugPrint('HTTP POST RESPONSE: ${response.statusCode}');
     _throwIfNotSuccess(response.statusCode, endpoint: endpoint);
     return response;
   }
@@ -69,7 +70,7 @@ abstract class WebClient extends Equatable {
 
     var uri = Uri.parse('$baseUrl$endpoint');
 
-    debugPrint('HTTP POST FILE: $uri');
+    debugPrint('HTTP POST_FILE: $uri');
     var request = http.MultipartRequest("POST", uri);
     accessToken = accessToken ?? this.accessToken;
     if (accessToken != null) {
@@ -81,6 +82,7 @@ abstract class WebClient extends Equatable {
 
     request.files.add(multipartFile);
     var response = await request.send();
+    debugPrint('HTTP POST_FILE RESPONSE: ${response.statusCode}');
     _throwIfNotSuccess(response.statusCode, endpoint: endpoint);
     return response;
   }
@@ -110,6 +112,7 @@ abstract class WebClient extends Equatable {
     final response = await http
         .get(uri, headers: headers)
         .timeout(Duration(seconds: timeoutSeconds));
+    debugPrint('HTTP GET RESPONSE: ${response.statusCode}');
     _throwIfNotSuccess(response.statusCode, endpoint: uri.toString());
     return response;
   }
