@@ -239,7 +239,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   bool hasReachedBottom(int section, List<dynamic> items) =>
       items.length < pageSize;
 
-  bool removeLoadingIfBottom(int section) => true;
+  bool removeLoadingIfBottomReached(int section) => true;
 
   FutureOr<void> emitMoreItemsRetrieved(
       Emitter<ItemsManagerState> emit, List<dynamic> _items) async {
@@ -250,7 +250,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     var removed = loadedState.sections[lastSection].items.removeLast();
     var reachedBottom = hasReachedBottom(lastSection, _items);
     if (loadingMoreItem(lastSection) != null &&
-        removeLoadingIfBottom(lastSection)) {
+        removeLoadingIfBottomReached(lastSection)) {
       emit(
         ItemRemovedState(
           itemSection: lastSection,
