@@ -213,7 +213,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     var lastSection = loadedState.sections.length - 1;
     var lastItemIndex = loadedState.sections[lastSection].items.length;
     var insertedItem = loadingMoreItem(lastSection);
-    if (insertedItem != null) {
+    if (insertedItem != null && loadedState.sections[lastSection].items.last != insertedItem) {
+      debugPrint('INSERT LOADING CELL');
       loadedState.sections[lastSection].items.add(insertedItem);
       emit(
         ItemInsertedState(
@@ -225,7 +226,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         ),
       );
     }
-    return await loadMoreItems(event, emit, lastItemIndex + 1);
+    return await loadMoreItems(event, emit, loadedState.sections[lastSection].items.length);
   }
 
   Future<List<dynamic>> loadMoreItems(LoadMoreItemsEvent event,
