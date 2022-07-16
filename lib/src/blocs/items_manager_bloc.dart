@@ -16,6 +16,9 @@ part 'items_manager_state.dart';
 abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     extends Bloc<ItemsManagerEvent, ItemsManagerState> {
   final TRepo repo;
+  bool _loading = false;
+
+  bool get loading => _loading;
 
   ItemsManagerBloc(
       {required this.repo,
@@ -107,6 +110,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   @protected
   FutureOr<void> onReloadItemsRequested(
       ReloadItemsEvent event, Emitter<ItemsManagerState> emit) async {
+    if (_loading) return;
+    _loading = true;
     if (state is LoadedState) {
       var loadedState = state as LoadedState;
       for (var x = loadedState.sections.length - 1; x >= 0; x--) {
@@ -130,18 +135,22 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       if (event.fromCloud) {
         var loadedItems = await repo.loadItemsFromCloud(event.context);
         if (loadedItems.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
+          _loading = false;
           await emitItemsReloadRetrieved(emit, loadedItems);
           return;
         }
         emit(ReloadFromCloudEmptyState());
         loadedItems = await repo.loadItemsFromLocalStorage(event.context);
+        _loading = false;
         await emitItemsReloadRetrieved(emit, loadedItems);
       } else {
         var loadedItems = await repo.loadItemsFromLocalStorage(event.context);
+        _loading = false;
         await emitItemsReloadRetrieved(emit, loadedItems);
       }
     } catch (e) {
       if (kDebugMode) print('Error: $runtimeType onReloadItemsRequested: $e');
+      _loading = false;
       await onLoadItemsException(emit, e);
     }
   }
@@ -177,18 +186,24 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   @protected
   FutureOr<void> onLoadItemsRequested(
       LoadItemsEvent event, Emitter<ItemsManagerState> emit) async {
+    if (_loading) return;
+    _loading = true;
+
     if (state is LoadingMoreItemsState) return;
     emit(const ItemsLoadingState());
     try {
       var loadedItems = await repo.loadItemsFromLocalStorage(event.context);
       if (loadedItems.isNotEmpty) {
+        _loading = false;
         await emitItemsRetrieved(emit, loadedItems);
         return;
       }
       loadedItems = await repo.loadItemsFromCloud(event.context);
+      _loading = false;
       await emitItemsRetrieved(emit, loadedItems);
     } catch (e) {
       if (kDebugMode) print('Error: $runtimeType onLoadItemsRequested: $e');
+      _loading = false;
       await onLoadItemsException(emit, e);
     }
   }
@@ -245,7 +260,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       Emitter<ItemsManagerState> emit, List<dynamic> _items) async {
     var loadedState = state as LoadedState;
     var lastSection = loadedState.sections.length - 1;
-    lastSection = lastSection < 0 ?  0 : lastSection;
+    lastSection = lastSection < 0 ? 0 : lastSection;
     var reachedBottom = hasReachedBottom(lastSection, _items);
     if (loadedState.sections[lastSection].items.isNotEmpty &&
         loadedState.sections[lastSection].items.last ==
