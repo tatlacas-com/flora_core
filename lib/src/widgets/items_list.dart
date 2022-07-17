@@ -486,7 +486,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget _buildHorizontalAnimatedList(int section, Section sectionItems) {
-    if (!_animatedListKeys.containsKey(section)) {
+    if (!_animatedListKeys.containsKey(section) || resetAnimatedKey(section)) {
       _animatedListKeys[section] = GlobalKey<SliverAnimatedListState>();
     }
     return AnimatedList(
@@ -521,8 +521,10 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
+  bool resetAnimatedKey(int section) => _animatedListKeys[section]?.currentState == null;
+
   Widget _buildVerticalSliverAnimatedList(int section, Section sectionItems) {
-    if (!_animatedListKeys.containsKey(section)) {
+    if (!_animatedListKeys.containsKey(section) || resetAnimatedKey(section)) {
       _animatedListKeys[section] = GlobalKey<SliverAnimatedListState>();
     }
     return SliverAnimatedList(
