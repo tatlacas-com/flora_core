@@ -54,15 +54,14 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   @protected
   SliverAnimatedListState? _animatedList(int section) {
-    if (_animatedListKeys[section] == null) {
+    if (_animatedListKeys[section]?.currentState == null) {
       resetAnimatedListKey(section);
     }
     return _animatedListKeys[section]?.currentState;
   }
 
   @protected
-  void resetAnimatedListKey(dynamic section) {
-    assert(section is int);
+  void resetAnimatedListKey(int section) {
     if (!useAnimatedList(section)) return;
     _animatedListKeys[section] = GlobalKey<SliverAnimatedListState>();
   }
