@@ -133,18 +133,18 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     try {
       emit(const ItemsLoadingState());
       if (event.fromCloud) {
-        var loadedItems = await repo.loadItemsFromCloud(event.context);
+        var loadedItems = await repo.loadItemsFromCloud();
         if (loadedItems.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
           _loading = false;
           await emitItemsReloadRetrieved(emit, loadedItems);
           return;
         }
         emit(ReloadFromCloudEmptyState());
-        loadedItems = await repo.loadItemsFromLocalStorage(event.context);
+        loadedItems = await repo.loadItemsFromLocalStorage();
         _loading = false;
         await emitItemsReloadRetrieved(emit, loadedItems);
       } else {
-        var loadedItems = await repo.loadItemsFromLocalStorage(event.context);
+        var loadedItems = await repo.loadItemsFromLocalStorage();
         _loading = false;
         await emitItemsReloadRetrieved(emit, loadedItems);
       }
@@ -192,13 +192,13 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     if (state is LoadingMoreItemsState) return;
     emit(const ItemsLoadingState());
     try {
-      var loadedItems = await repo.loadItemsFromLocalStorage(event.context);
+      var loadedItems = await repo.loadItemsFromLocalStorage();
       if (loadedItems.isNotEmpty) {
         _loading = false;
         await emitItemsRetrieved(emit, loadedItems);
         return;
       }
-      loadedItems = await repo.loadItemsFromCloud(event.context);
+      loadedItems = await repo.loadItemsFromCloud();
       _loading = false;
       await emitItemsRetrieved(emit, loadedItems);
     } catch (e) {

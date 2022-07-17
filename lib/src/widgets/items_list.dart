@@ -93,7 +93,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       child: pullToRefresh
           ? RefreshIndicator(
               onRefresh: () async {
-                bloc.add(ReloadItemsEvent(context: context));
+                bloc.add(ReloadItemsEvent());
               },
               child: buildCustomScrollView(context),
             )
@@ -166,7 +166,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   void onScrollNotification(ScrollNotification scrollInfo) {
     var diff = scrollInfo.metrics.maxScrollExtent - scrollInfo.metrics.pixels;
     if (diff < reloadThresholdPixels) {
-      bloc.add(LoadMoreItemsEvent(context: context));
+      bloc.add(LoadMoreItemsEvent());
     }
   }
 
@@ -189,7 +189,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return RefreshIndicator(
       onRefresh: () async {
         var bloc = context.read<TBloc>();
-        bloc.add(ReloadItemsEvent(context: context));
+        bloc.add(ReloadItemsEvent());
       },
       child: CustomScrollView(
         key: PageStorageKey<String>(TBloc.runtimeType.toString()),

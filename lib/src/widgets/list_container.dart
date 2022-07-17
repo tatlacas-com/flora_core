@@ -25,7 +25,7 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
   Widget build(BuildContext context) {
     final bloc = context.read<TBloc>();
     if (bloc.state is ItemsInitialState) {
-      bloc.add(LoadItemsEvent(context: context));
+      bloc.add(LoadItemsEvent());
     }
     if(!buildInBase) return const SizedBox();
     if(useScaffold) {
