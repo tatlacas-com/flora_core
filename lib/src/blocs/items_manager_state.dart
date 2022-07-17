@@ -58,7 +58,7 @@ class ItemsRetrievedState extends LoadedState implements ItemsBuildUi {
         );
 }
 
-class ItemReplacedState extends ItemChangedState implements ItemsBuildUi {
+class ItemReplacedState extends ItemChangedState {
   const ItemReplacedState({
     required int itemSection,
     required int itemIndex,

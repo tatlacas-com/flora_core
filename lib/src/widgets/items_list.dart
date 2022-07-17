@@ -115,24 +115,29 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget buildCustomScrollView(BuildContext context) {
     return BlocConsumer<TBloc, ItemsManagerState>(
       listener: (context, state) {
-
         if (state is ItemRemovedState) {
-          if(state.sections[state.itemSection].usesGrid){
-            bloc.add(EmitRetrievedEvent());
-            return;
-          }
-
-          removeListItem(state.removedItem,
-              section: state.itemSection, index: state.itemIndex);
+          _removeItem(state);
         } else if (state is ItemInsertedState) {
-          if(state.sections[state.itemSection].usesGrid){
-            bloc.add(EmitRetrievedEvent());
-            return;
-          }
-          insertListItem(state.insertedItem,
-              section: state.itemSection,
-              index: state.itemIndex,
-              isReplace: false);
+          _insertItem(state);
+        } else if (state is ItemReplacedState) {
+          _removeItem(
+            ItemRemovedState(
+              itemSection: state.itemSection,
+              reachedBottom: state.reachedBottom,
+              itemIndex: state.itemIndex,
+              removedItem: state.removedItem,
+              sections: state.sections,
+            ),
+          );
+          _insertItem(
+            ItemInsertedState(
+              itemSection: state.itemSection,
+              reachedBottom: state.reachedBottom,
+              itemIndex: state.itemIndex,
+              insertedItem: state.insertedItem,
+              sections: state.sections,
+            ),
+          );
         }
       },
       listenWhen: (prev, next) => next is ItemChangedState,
@@ -141,6 +146,24 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         return buildOnStateChanged(context, state);
       },
     );
+  }
+
+  void _removeItem(ItemRemovedState state) {
+    if (state.sections[state.itemSection].usesGrid) {
+      bloc.add(EmitRetrievedEvent());
+      return;
+    }
+    removeListItem(state.removedItem,
+        section: state.itemSection, index: state.itemIndex);
+  }
+
+  void _insertItem(ItemInsertedState state) {
+    if (state.sections[state.itemSection].usesGrid) {
+      bloc.add(EmitRetrievedEvent());
+      return;
+    }
+    insertListItem(state.insertedItem,
+        section: state.itemSection, index: state.itemIndex, isReplace: false);
   }
 
   Widget buildOnStateChanged(
@@ -153,7 +176,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     if (state is LoadItemsFailedState) {
       return _buildLoadingFailed(state, context);
     }
-    if (state is ItemsRetrievedState || state is ItemChangedState) {
+    if (state is ItemsRetrievedState) {
       return _buildCustomScrollView(context);
     }
     throw ArgumentError('buildOnStateChanged Not supported state $state');
@@ -412,7 +435,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-
   Widget buildListItem({
     required BuildContext context,
     required int section,
@@ -521,7 +543,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  bool resetAnimatedKey(int section) => _animatedListKeys[section]?.currentState == null;
+  bool resetAnimatedKey(int section) =>
+      _animatedListKeys[section]?.currentState == null;
 
   Widget _buildVerticalSliverAnimatedList(int section, Section sectionItems) {
     if (!_animatedListKeys.containsKey(section) || resetAnimatedKey(section)) {
