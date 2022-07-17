@@ -162,10 +162,11 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   FutureOr<void> emitItemsReloadRetrieved(
       Emitter<ItemsManagerState> emit, List<Section> items) async {
+    emit( ItemsRetrievedState(items: items));
+   /* 
     final totalSections = items.length - 1;
     List<Section> sections = [];
-    emit(const ItemsRetrievedState(items: []));
-    for (var x = 0; x < items.length; x++) {
+   for (var x = 0; x < items.length; x++) {
       var section = items[x];
       sections.add(section.copyWith(items: []));
       for (var i = 0; i < section.items.length; i++) {
@@ -180,7 +181,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
               sections: sections),
         );
       }
-    }
+    }*/
   }
 
   @protected
