@@ -163,7 +163,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   FutureOr<void> emitItemsReloadRetrieved(
       Emitter<ItemsManagerState> emit, List<Section> items) async {
     emit( ItemsRetrievedState(items: items));
-   /* 
+   /*
     final totalSections = items.length - 1;
     List<Section> sections = [];
    for (var x = 0; x < items.length; x++) {
