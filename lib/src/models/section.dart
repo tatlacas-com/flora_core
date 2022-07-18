@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 class Section extends Equatable {
   final List<dynamic> items;
@@ -16,7 +17,7 @@ class Section extends Equatable {
 
   Section({
     this.sectionHeader,
-    this.emptyEntity,
+    this.emptyEntity = const SizedBox(),
     this.usesGrid = false,
     this.horizontalScroll = false,
     this.items = const [],
