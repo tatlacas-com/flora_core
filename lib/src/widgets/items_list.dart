@@ -305,9 +305,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return SliverPadding(
       padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
       sliver: SliverToBoxAdapter(
-        child: emptyEntity != null
-            ? buildSectionEmptyView(sectionIndex, context, emptyEntity)
-            : buildEmptyView(context),
+        child: buildSectionEmptyView(sectionIndex, context, emptyEntity),
       ),
     );
   }
@@ -352,9 +350,10 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         section: section,
         index: -1,
       );
+    } else if (emptyEntity is SizedBox) {
+      return emptyEntity;
     }
-    throw ArgumentError(
-        "unsupported section empty view item $emptyEntity. Either override buildSectionEmptyView() in your UI or make item implement Widgetable");
+    return buildEmptyView(context);
   }
 
   Widget sectionSliverGrid(int sectionIndex, BuildContext context,
