@@ -113,7 +113,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     if (_loading) return;
     _loading = true;
     if (state is LoadedState) {
-      var loadedState = state as LoadedState;
+      /*var loadedState = state as LoadedState;
       for (var x = loadedState.sections.length - 1; x >= 0; x--) {
         var section = loadedState.sections[x];
         for (var i = section.items.length - 1; i >= 0; i--) {
@@ -128,7 +128,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
             ),
           );
         }
-      }
+      }*/
     }
     try {
       emit(const ItemsLoadingState());
@@ -162,7 +162,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   FutureOr<void> emitItemsReloadRetrieved(
       Emitter<ItemsManagerState> emit, List<Section> items) async {
-    emit( ItemsRetrievedState(items: items));
+    emit(ItemsRetrievedState(items: items));
    /*
     final totalSections = items.length - 1;
     List<Section> sections = [];
