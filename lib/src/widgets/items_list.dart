@@ -91,13 +91,15 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       },
       child: pullToRefresh
           ? RefreshIndicator(
-              onRefresh: () async {
-                bloc.add(ReloadItemsEvent());
-              },
+              onRefresh: onRefreshIndicatorRefresh,
               child: buildCustomScrollView(context),
             )
           : buildCustomScrollView(context),
     );
+  }
+
+  Future onRefreshIndicatorRefresh() async {
+    bloc.add(ReloadItemsEvent());
   }
 
   Widget buildScrollViewWithListeners(BuildContext context) {
@@ -209,10 +211,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget _buildLoadingFailed(LoadItemsFailedState state, BuildContext context) {
     onLoadItemsFailedState(state);
     return RefreshIndicator(
-      onRefresh: () async {
-        var bloc = context.read<TBloc>();
-        bloc.add(ReloadItemsEvent());
-      },
+      onRefresh: onRefreshIndicatorRefresh,
       child: CustomScrollView(
         key: PageStorageKey<String>(TBloc.runtimeType.toString()),
         slivers: buildLoadingFailedSlivers(context, state),
