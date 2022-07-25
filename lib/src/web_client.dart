@@ -56,7 +56,7 @@ abstract class WebClient extends Equatable {
     return response;
   }
 
-  Future<http.StreamedResponse> postMultiPart(
+  Future<http.Response> postMultiPart(
     String endpoint,
     dynamic filePath, {
     String? baseUrl,
@@ -85,7 +85,7 @@ abstract class WebClient extends Equatable {
     final response = await request.send();
     debugPrint('HTTP POST-MULTI_PART RESPONSE: ${response.statusCode}');
     _throwIfNotSuccess(response.statusCode, endpoint: endpoint);
-    return response;
+    return await http.Response.fromStream(response);
   }
 
   Future<http.StreamedResponse?> uploadFile({
