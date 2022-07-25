@@ -56,6 +56,38 @@ abstract class WebClient extends Equatable {
     return response;
   }
 
+  Future<http.StreamedResponse> postMultiPart(
+    String endpoint,
+    dynamic filePath, {
+    String? baseUrl,
+    String? accessToken,
+    Map<String, String>? fields,
+  }) async {
+    baseUrl ??= this.baseUrl;
+    var headers = <String, String>{};
+    accessToken = accessToken ?? this.accessToken;
+    if (accessToken != null) {
+      headers[HttpHeaders.authorizationHeader] = "Bearer $accessToken";
+    }
+    final uri = Uri.parse('$baseUrl$endpoint');
+    var request = http.MultipartRequest("POST", uri);
+    request.headers.addAll(headers);
+    if (fields != null) {
+      request.fields.addAll(fields);
+    }
+    request.files.add(
+      http.MultipartFile.fromBytes(
+        'file',
+        await File(filePath).readAsBytes(),
+      ),
+    );
+    debugPrint('HTTP POST-MULTI_PART: $uri');
+    final response = await request.send();
+    debugPrint('HTTP POST-MULTI_PART RESPONSE: ${response.statusCode}');
+    _throwIfNotSuccess(response.statusCode, endpoint: endpoint);
+    return response;
+  }
+
   Future<http.StreamedResponse?> uploadFile({
     required String endpoint,
     required String filePath,
