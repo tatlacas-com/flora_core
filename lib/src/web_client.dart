@@ -75,17 +75,21 @@ abstract class WebClient extends Equatable {
     if (fields != null) {
       request.fields.addAll(fields);
     }
-    request.files.add(
-      http.MultipartFile.fromBytes(
-        'file',
-        await File(filePath).readAsBytes(),
-      ),
-    );
+    await addFile(request, filePath);
     debugPrint('HTTP POST-MULTI_PART: $uri');
     final response = await request.send();
     debugPrint('HTTP POST-MULTI_PART RESPONSE: ${response.statusCode}');
     _throwIfNotSuccess(response.statusCode, endpoint: endpoint);
     return await http.Response.fromStream(response);
+  }
+
+  Future<void> addFile(http.MultipartRequest request, filePath) async {
+     request.files.add(
+      http.MultipartFile.fromBytes(
+        'file',
+        await File(filePath).readAsBytes(),
+      ),
+    );
   }
 
   Future<http.StreamedResponse?> uploadFile({
