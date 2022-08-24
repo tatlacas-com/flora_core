@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart' show kDebugMode, protected;
 import 'package:flutter/material.dart';
 import 'package:tatlacas_flutter_core/src/exceptions.dart';
 import 'package:tatlacas_flutter_core/src/models/section.dart';
+import 'package:tatlacas_flutter_core/src/widgets/items_list.dart';
 
 import '../items_repo.dart';
 
@@ -13,6 +13,50 @@ part 'items_manager_event.dart';
 
 part 'items_manager_state.dart';
 
+///{@template itemsManagerBloc}
+/// A base class to facilitate the retrieval and processing of objects that will be shown on a [ItemsListState]
+///
+/// ```dart
+/// class ListBloc extends ItemsManagerBloc<ListRepo> {
+///   ListBloc({required ListRepo repo}) : super(repo: repo);
+/// }
+///
+/// class ListRepo extends ItemsRepo {
+///   @override
+///   Future<List<Section>> loadItemsFromLocalStorage() async {
+///     return [
+///       Section(items: ['1', '2', '3'])
+///     ];
+///   }
+/// }
+///
+/// class ListScreen extends ItemsListState<ListBloc> {
+///   @override
+///   Widget buildListItem(
+///       {required BuildContext context,
+///         required int section,
+///         required int index,
+///         required item,
+///         Animation<double>? animation,
+///         bool isReplace = false,
+///         bool isRemoved = false}) {
+///     if(item is String){
+///       return Text('Item number $item');
+///     }
+///     return super.buildListItem(
+///       context: context,
+///       section: section,
+///       index: index,
+///       item: item,
+///       animation: animation,
+///       isReplace: isReplace,
+///       isRemoved: isRemoved,
+///     );
+///   }
+/// }
+///
+/// ```
+/// {@endtemplate}
 abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     extends Bloc<ItemsManagerEvent, ItemsManagerState> {
   final TRepo repo;
@@ -112,24 +156,6 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       ReloadItemsEvent event, Emitter<ItemsManagerState> emit) async {
     if (_loading) return;
     _loading = true;
-    if (state is LoadedState) {
-      /*var loadedState = state as LoadedState;
-      for (var x = loadedState.sections.length - 1; x >= 0; x--) {
-        var section = loadedState.sections[x];
-        for (var i = section.items.length - 1; i >= 0; i--) {
-          var removed = section.items.removeAt(i);
-          emit(
-            ItemRemovedState(
-              itemSection: x,
-              reachedBottom: loadedState.reachedBottom,
-              itemIndex: i,
-              removedItem: removed,
-              sections: loadedState.sections,
-            ),
-          );
-        }
-      }*/
-    }
     try {
       emit(const ItemsLoadingState());
       if (event.fromCloud) {
@@ -149,7 +175,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         await emitItemsReloadRetrieved(emit, loadedItems);
       }
     } catch (e) {
-      if (kDebugMode) print('Error: $runtimeType onReloadItemsRequested: $e');
+      debugPrint('Error: $runtimeType onReloadItemsRequested: $e');
       _loading = false;
       await onLoadItemsException(emit, e);
     }
@@ -163,25 +189,6 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   FutureOr<void> emitItemsReloadRetrieved(
       Emitter<ItemsManagerState> emit, List<Section> items) async {
     emit(ItemsRetrievedState(items: items));
-   /*
-    final totalSections = items.length - 1;
-    List<Section> sections = [];
-   for (var x = 0; x < items.length; x++) {
-      var section = items[x];
-      sections.add(section.copyWith(items: []));
-      for (var i = 0; i < section.items.length; i++) {
-        var isLastItem = x == totalSections && i == section.items.length - 1;
-        sections[x].items.add(section.items[i]);
-        emit(
-          ItemInsertedState(
-              itemSection: x,
-              reachedBottom: !isLastItem,
-              itemIndex: i,
-              insertedItem: section.items[i],
-              sections: sections),
-        );
-      }
-    }*/
   }
 
   @protected
@@ -203,7 +210,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       _loading = false;
       await emitItemsRetrieved(emit, loadedItems);
     } catch (e) {
-      if (kDebugMode) print('Error: $runtimeType onLoadItemsRequested: $e');
+      debugPrint('Error: $runtimeType onLoadItemsRequested: $e');
       _loading = false;
       await onLoadItemsException(emit, e);
     }
@@ -232,7 +239,6 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     if (insertedItem != null &&
         loadedState.sections[lastSection].items.isNotEmpty &&
         loadedState.sections[lastSection].items.last != insertedItem) {
-      debugPrint('INSERT LOADING CELL');
       loadedState.sections[lastSection].items.add(insertedItem);
       emit(
         ItemInsertedState(
@@ -281,7 +287,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           );
         }
       } catch (e) {
-        if (kDebugMode) print('Error: $runtimeType emitMoreItemsRetrieved: $e');
+        debugPrint('Error: $runtimeType emitMoreItemsRetrieved: $e');
         await onLoadItemsException(emit, e);
       }
     }
@@ -306,7 +312,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           emit,
         );
       } catch (e) {
-        if (kDebugMode) print('Error: $runtimeType insertBottomSpacer: $e');
+        debugPrint('Error: $runtimeType insertBottomSpacer: $e');
         await onLoadItemsException(emit, e);
       }
     }
@@ -353,7 +359,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       var items = await prepareLoadMoreItems(event, emit);
       await emitMoreItemsRetrieved(emit, items);
     } catch (e) {
-      if (kDebugMode) print('Error: $runtimeType onLoadMoreItemsEvent  $e');
+      debugPrint('Error: $runtimeType onLoadMoreItemsEvent  $e');
       await onLoadMoreItemsException(emit, loadedState, e);
     }
     _loadingMore = false;
@@ -372,3 +378,4 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     );
   }
 }
+

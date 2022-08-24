@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 
+/// {@template itemsList}
+/// A base class for showing list or grid of widgets on ui. For sample see [ItemsManagerBloc]
+/// {@endtemplate}
 class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
   final ItemsListState<TBloc> Function()? stateBuilder;
 
