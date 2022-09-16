@@ -182,7 +182,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       return _buildLoadingFailed(state, context);
     }
     if (state is ItemsRetrievedState) {
-      return _buildCustomScrollView(context);
+      return buildItemsRetrievedScrollView(context);
     }
     throw ArgumentError('buildOnStateChanged Not supported state $state');
   }
@@ -197,7 +197,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     }
   }
 
-  Widget _buildCustomScrollView(BuildContext context) {
+  Widget buildItemsRetrievedScrollView(BuildContext context) {
     var withInjector = widget.buildSliversInSliverOverlapInjector ||
         buildSliversInSliverOverlapInjector;
     return CustomScrollView(
