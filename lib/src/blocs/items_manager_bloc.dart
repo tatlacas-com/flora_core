@@ -64,6 +64,14 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   bool get loading => _loading;
 
+  int get itemsCount {
+    final currState = state;
+    if(currState is LoadedState){
+      return currState.sections.fold<int>(0, (previousValue, element) => element.items.length + previousValue);
+    }
+    return 0;
+  }
+
   ItemsManagerBloc(
       {required this.repo,
       ItemsManagerState initialState = const ItemsInitialState()})

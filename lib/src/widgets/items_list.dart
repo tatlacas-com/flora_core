@@ -201,7 +201,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     var withInjector = widget.buildSliversInSliverOverlapInjector ||
         buildSliversInSliverOverlapInjector;
     return CustomScrollView(
-      key: PageStorageKey<String>(TBloc.runtimeType.toString()),
+      key: PageStorageKey<String>('${TBloc.runtimeType}${bloc.itemsCount}'),
       physics:
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       //needed for RefreshIndicator to work
