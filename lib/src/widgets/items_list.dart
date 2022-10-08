@@ -181,7 +181,11 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     if (state is LoadItemsFailedState) {
       return _buildLoadingFailed(state, context);
     }
-    if (state is ItemsRetrievedState) {
+    if (state is ItemsRetrievedState || state is LoadedState) {
+      return buildItemsRetrievedScrollView(context);
+    }
+    if (state is LoadedState) {
+      debugPrint('Possible unhandled state $state...');
       return buildItemsRetrievedScrollView(context);
     }
     throw ArgumentError('buildOnStateChanged Not supported state $state');
