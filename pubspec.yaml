@@ -17,6 +17,7 @@ dependencies:
   auto_animated: ^3.0.1
   flutter_lints: ^2.0.1
   universal_platform: ^1.0.0+1
+  dio: ^4.0.6
 
 dev_dependencies:
   flutter_test:
