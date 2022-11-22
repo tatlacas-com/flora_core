@@ -27,9 +27,14 @@ abstract class WebClient extends Equatable {
     if (!dio.interceptors
         .any((element) => element is WebClientQueuedInterceptorsWrapper)) {
       dio.interceptors.add(WebClientQueuedInterceptorsWrapper(
-        onError: onDioError,
-        onRequest: onDioRequest,
-        onResponse: onDioResponse,
+        onError: (DioError error, ErrorInterceptorHandler handler) =>
+            onDioError(error, handler),
+        onRequest:
+            (RequestOptions options, RequestInterceptorHandler handler) =>
+                onDioRequest(options, handler),
+        onResponse:
+            (Response<dynamic> response, ResponseInterceptorHandler handler) =>
+                onDioResponse(response, handler),
       ));
     }
   }
