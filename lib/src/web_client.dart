@@ -4,6 +4,18 @@ import 'package:flutter/foundation.dart' show debugPrint;
 
 import 'exceptions.dart';
 
+class WebClientQueuedInterceptorsWrapper extends QueuedInterceptorsWrapper {
+  WebClientQueuedInterceptorsWrapper({
+    InterceptorSendCallback? onRequest,
+    InterceptorSuccessCallback? onResponse,
+    InterceptorErrorCallback? onError,
+  }) : super(
+          onError: onError,
+          onRequest: onRequest,
+          onResponse: onResponse,
+        );
+}
+
 abstract class WebClient extends Equatable {
   final Dio dio;
   final String? accessToken;
@@ -12,11 +24,14 @@ abstract class WebClient extends Equatable {
     required this.dio,
     this.accessToken,
   }) {
-    dio.interceptors.add(QueuedInterceptorsWrapper(
-      onError: onDioError,
-      onRequest: onDioRequest,
-      onResponse: onDioResponse,
-    ));
+    if (!dio.interceptors
+        .any((element) => element is WebClientQueuedInterceptorsWrapper)) {
+      dio.interceptors.add(WebClientQueuedInterceptorsWrapper(
+        onError: onDioError,
+        onRequest: onDioRequest,
+        onResponse: onDioResponse,
+      ));
+    }
   }
 
   @override
