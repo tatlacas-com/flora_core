@@ -16,7 +16,7 @@ class WebClientQueuedInterceptorsWrapper extends QueuedInterceptorsWrapper {
         );
 }
 
-abstract class WebClient extends Equatable {
+abstract class WebClient extends Equatable implements Interceptor {
   final Dio dio;
   final String? accessToken;
 
@@ -24,19 +24,31 @@ abstract class WebClient extends Equatable {
     required this.dio,
     this.accessToken,
   }) {
-    if (!dio.interceptors
-        .any((element) => element is WebClientQueuedInterceptorsWrapper)) {
-      dio.interceptors.add(WebClientQueuedInterceptorsWrapper(
-        onError: (DioError error, ErrorInterceptorHandler handler) =>
-            onDioError(error, handler),
-        onRequest:
-            (RequestOptions options, RequestInterceptorHandler handler) =>
-                onDioRequest(options, handler),
-        onResponse:
-            (Response<dynamic> response, ResponseInterceptorHandler handler) =>
-                onDioResponse(response, handler),
-      ));
+    dio.interceptors.removeWhere((element) => element is WebClient);
+    dio.interceptors.add(this);
+  }
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    if (!options.headers.containsKey('Authorization') &&
+        accessToken?.isNotEmpty == true) {
+      options.headers['Authorization'] = 'Bearer $accessToken';
     }
+    handler.next(options);
+  }
+
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    _throwIfNotSuccess(response.statusCode,
+        endpoint: response.requestOptions.uri.toString());
+    handler.next(response);
+  }
+
+  @override
+  void onError(DioError err, ErrorInterceptorHandler handler) {
+    _throwIfNotSuccess(err.response?.statusCode,
+        endpoint: err.requestOptions.uri.toString());
+    handler.next(err);
   }
 
   @override
@@ -59,26 +71,5 @@ abstract class WebClient extends Equatable {
       debugPrint("ServerException: $endpoint");
       throw ServerException(endpoint: endpoint);
     }
-  }
-
-  void onDioError(DioError error, ErrorInterceptorHandler handler) {
-    _throwIfNotSuccess(error.response?.statusCode,
-        endpoint: error.requestOptions.uri.toString());
-    handler.next(error);
-  }
-
-  void onDioRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    if (!options.headers.containsKey('Authorization') &&
-        accessToken?.isNotEmpty == true) {
-      options.headers['Authorization'] = 'Bearer $accessToken';
-    }
-    handler.next(options);
-  }
-
-  void onDioResponse(
-      Response<dynamic> response, ResponseInterceptorHandler handler) {
-    _throwIfNotSuccess(response.statusCode,
-        endpoint: response.requestOptions.uri.toString());
-    handler.next(response);
   }
 }
