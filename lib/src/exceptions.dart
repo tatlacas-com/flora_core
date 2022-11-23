@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 enum NetworkExceptionType {
   accessDenied,
   unauthorized,
+  expiredToken,
   notFound,
   noContent,
   serverError,
@@ -38,6 +39,14 @@ class UnauthorizedException extends NetworkException {
             endpoint: endpoint,
             message: message,
             exceptionType: NetworkExceptionType.unauthorized);
+}
+
+class ExpiredTokenException extends NetworkException {
+  const ExpiredTokenException({required String endpoint, String? message})
+      : super(
+            endpoint: endpoint,
+            message: message,
+            exceptionType: NetworkExceptionType.expiredToken);
 }
 
 class NotFoundException extends NetworkException {
