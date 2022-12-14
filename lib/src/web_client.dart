@@ -4,8 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 
-import 'exceptions.dart';
-
 class WebClientQueuedInterceptorsWrapper extends QueuedInterceptorsWrapper {
   WebClientQueuedInterceptorsWrapper({
     InterceptorSendCallback? onRequest,

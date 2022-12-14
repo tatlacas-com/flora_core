@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:tatlacas_flutter_core/src/exceptions.dart';
 import 'package:tatlacas_flutter_core/src/models/section.dart';
 import 'package:tatlacas_flutter_core/src/widgets/items_list.dart';
 
@@ -227,10 +226,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   Future onLoadItemsException(
       Emitter<ItemsManagerState> emit, dynamic e) async {
-    emit(LoadItemsFailedState(
-        exceptionType: e is NetworkException
-            ? e.exceptionType
-            : NetworkExceptionType.unknown));
+    emit(LoadItemsFailedState(exception: e));
   }
 
   dynamic loadingMoreItem(int section) => null;
@@ -380,9 +376,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       LoadMoreItemsFailedState(
         reachedBottom: false,
         sections: loadedState.sections,
-        exceptionType: e is NetworkException
-            ? e.exceptionType
-            : NetworkExceptionType.unknown,
+        exception: e,
       ),
     );
   }
