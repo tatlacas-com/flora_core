@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:tatlacas_flutter_core/src/models/network_exception_type.dart';
 import 'package:tatlacas_flutter_core/src/models/section.dart';
 import 'package:tatlacas_flutter_core/src/widgets/items_list.dart';
 
