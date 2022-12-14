@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 
 enum NetworkExceptionType {
@@ -9,57 +10,56 @@ enum NetworkExceptionType {
   unknown,
 }
 
-abstract class NetworkException extends Equatable implements Exception {
-  final String? message;
+abstract class NetworkException extends DioError
+    with EquatableMixin
+    implements Exception {
+  final String? log;
   final String endpoint;
   final NetworkExceptionType exceptionType;
 
-  const NetworkException({
-    this.message,
-    required this.endpoint,
-    required this.exceptionType,
-  });
+  NetworkException(
+      {this.log,
+      required this.endpoint,
+      required this.exceptionType,
+      required super.requestOptions});
 
   @override
   List<Object?> get props => [message, endpoint, exceptionType];
 }
 
 class AccessDeniedException extends NetworkException {
-  const AccessDeniedException({required String endpoint, String? message})
+  AccessDeniedException(
+      {required String endpoint, required super.requestOptions, super.log})
       : super(
             endpoint: endpoint,
-            message: message,
             exceptionType: NetworkExceptionType.accessDenied);
 }
 
 class UnauthorizedException extends NetworkException {
-  const UnauthorizedException({required String endpoint, String? message})
+  UnauthorizedException(
+      {required String endpoint, required super.requestOptions, super.log})
       : super(
             endpoint: endpoint,
-            message: message,
             exceptionType: NetworkExceptionType.unauthorized);
 }
 
 class NotFoundException extends NetworkException {
-  const NotFoundException({required String endpoint, String? message})
-      : super(
-            endpoint: endpoint,
-            message: message,
-            exceptionType: NetworkExceptionType.notFound);
+  NotFoundException(
+      {required String endpoint, required super.requestOptions, super.log})
+      : super(endpoint: endpoint, exceptionType: NetworkExceptionType.notFound);
 }
 
 class NoContentException extends NetworkException {
-  const NoContentException({required String endpoint, String? message})
+  NoContentException(
+      {required String endpoint, required super.requestOptions, super.log})
       : super(
-            endpoint: endpoint,
-            message: message,
-            exceptionType: NetworkExceptionType.noContent);
+            endpoint: endpoint, exceptionType: NetworkExceptionType.noContent);
 }
 
 class ServerException extends NetworkException {
-  const ServerException({required String endpoint, String? message})
+  ServerException(
+      {required String endpoint, required super.requestOptions, super.log})
       : super(
             endpoint: endpoint,
-            message: message,
             exceptionType: NetworkExceptionType.serverError);
 }
