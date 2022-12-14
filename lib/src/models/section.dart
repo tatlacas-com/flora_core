@@ -15,7 +15,7 @@ class Section extends Equatable {
     return items.length;
   }
 
-  Section({
+  const Section({
     this.sectionHeader,
     this.emptyEntity = const SizedBox(),
     this.usesGrid = false,
@@ -39,7 +39,7 @@ class Section extends Equatable {
     bool? usesGrid,
     bool? horizontalScroll,
     double? horizontalScrollHeight,
-    dynamic? emptyEntity,
+    dynamic emptyEntity,
   }) {
     return Section(
       items: items ?? this.items,

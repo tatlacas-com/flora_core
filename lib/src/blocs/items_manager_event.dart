@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_this
+
 part of 'items_manager_bloc.dart';
 
 abstract class ItemsManagerEvent extends Equatable {
