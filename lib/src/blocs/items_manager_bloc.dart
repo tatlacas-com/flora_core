@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:tatlacas_flutter_core/src/exceptions.dart';
+import 'package:tatlacas_flutter_core/src/models/network_exception_type.dart';
 import 'package:tatlacas_flutter_core/src/models/section.dart';
 import 'package:tatlacas_flutter_core/src/widgets/items_list.dart';
 
@@ -89,10 +90,10 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   bool isReplacingItem(
       {required int section, required int index, required dynamic item}) {
     if (state is! ItemReplacedState) return false;
-    final _st = state as ItemReplacedState;
-    return _st.itemSection == section &&
-        _st.itemIndex == index &&
-        _st.insertedItem == item;
+    final st = state as ItemReplacedState;
+    return st.itemSection == section &&
+        st.itemIndex == index &&
+        st.insertedItem == item;
   }
 
   @protected
@@ -230,9 +231,9 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   Future onLoadItemsException(
       Emitter<ItemsManagerState> emit, dynamic e) async {
     emit(LoadItemsFailedState(
-        exceptionType: e is NetworkException
-            ? e.exceptionType
-            : NetworkExceptionType.unknown));
+        exceptionType: e is DioError
+            ? NetworkExceptionType.other.fromCode(e.response?.statusCode)
+            : NetworkExceptionType.other));
   }
 
   dynamic loadingMoreItem(int section) => null;
@@ -275,11 +276,11 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   bool removeLoadingIfBottomReached(int section) => true;
 
   FutureOr<void> emitMoreItemsRetrieved(
-      Emitter<ItemsManagerState> emit, List<dynamic> _items) async {
+      Emitter<ItemsManagerState> emit, List<dynamic> items) async {
     var loadedState = state as LoadedState;
     var lastSection = loadedState.sections.length - 1;
     lastSection = lastSection < 0 ? 0 : lastSection;
-    var reachedBottom = hasReachedBottom(lastSection, _items);
+    var reachedBottom = hasReachedBottom(lastSection, items);
     if (loadedState.sections[lastSection].items.isNotEmpty &&
         loadedState.sections[lastSection].items.last ==
             loadingMoreItem(lastSection)) {
@@ -305,7 +306,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
 
     var indx = 0;
-    for (var item in _items) {
+    for (var item in items) {
       loadedState.sections[lastSection].items.add(item);
       emit(
         ItemInsertedState(
@@ -384,12 +385,11 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       LoadedState loadedState, dynamic e) async {
     emit(
       LoadMoreItemsFailedState(
-        reachedBottom: false,
-        sections: loadedState.sections,
-        exceptionType: e is NetworkException
-            ? e.exceptionType
-            : NetworkExceptionType.unknown,
-      ),
+          reachedBottom: false,
+          sections: loadedState.sections,
+          exceptionType: e is DioError
+              ? NetworkExceptionType.other.fromCode(e.response?.statusCode)
+              : NetworkExceptionType.other),
     );
   }
 }

@@ -12,6 +12,7 @@ class ItemsLoadingState extends ItemsManagerState implements ItemsBuildUi {
   @override
   List<Object> get props => [];
 }
+
 class ItemsInitialState extends ItemsManagerState implements ItemsBuildUi {
   const ItemsInitialState();
 
@@ -187,6 +188,7 @@ class LoadingMoreItemsState extends LoadedState {
   @override
   List<Object> get props => [loadId];
 }
+
 class ItemsReloadedState extends LoadedState {
   final DateTime loadId;
 

@@ -1,8 +1,8 @@
+// ignore_for_file: unused_import
+
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
-
-import 'exceptions.dart';
 
 class WebClientQueuedInterceptorsWrapper extends QueuedInterceptorsWrapper {
   WebClientQueuedInterceptorsWrapper({
@@ -16,7 +16,7 @@ class WebClientQueuedInterceptorsWrapper extends QueuedInterceptorsWrapper {
         );
 }
 
-abstract class WebClient extends Equatable implements Interceptor {
+abstract class WebClient extends Interceptor with EquatableMixin {
   final Dio dio;
   final String? accessToken;
 
@@ -38,17 +38,19 @@ abstract class WebClient extends Equatable implements Interceptor {
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
-    _throwIfNotSuccess(response.statusCode,
-        endpoint: response.requestOptions.uri.toString());
-    handler.next(response);
-  }
-
-  @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
-    _throwIfNotSuccess(err.response?.statusCode,
-        endpoint: err.requestOptions.uri.toString());
-    handler.next(err);
+    final endpoint = err.requestOptions.uri.toString();
+    final statusCode = err.response?.statusCode;
+    if (statusCode == 403) {
+      debugPrint("AccessDeniedException: $endpoint");
+    } else if (statusCode == 401) {
+      debugPrint("UnauthorizedException: $endpoint");
+    } else if (statusCode == 404) {
+      debugPrint("NotFoundException: $endpoint");
+    } else if (statusCode == 500) {
+      debugPrint("ServerException: $endpoint");
+    }
+    super.onError(err, handler);
   }
 
   @override
@@ -56,20 +58,4 @@ abstract class WebClient extends Equatable implements Interceptor {
 
   @override
   String toString() => 'WebClient {baseUrl:${dio.options.baseUrl}';
-
-  void _throwIfNotSuccess(int? statusCode, {required String endpoint}) {
-    if (statusCode == 403) {
-      debugPrint("AccessDeniedException: $endpoint");
-      throw AccessDeniedException(endpoint: endpoint);
-    } else if (statusCode == 401) {
-      debugPrint("UnauthorizedException: $endpoint");
-      throw UnauthorizedException(endpoint: endpoint);
-    } else if (statusCode == 404) {
-      debugPrint("NotFoundException: $endpoint");
-      throw NotFoundException(endpoint: endpoint);
-    } else if (statusCode == 500) {
-      debugPrint("ServerException: $endpoint");
-      throw ServerException(endpoint: endpoint);
-    }
-  }
 }
