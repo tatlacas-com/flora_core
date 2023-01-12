@@ -66,8 +66,9 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   int get itemsCount {
     final currState = state;
-    if(currState is LoadedState){
-      return currState.sections.fold<int>(0, (previousValue, element) => element.items.length + previousValue);
+    if (currState is LoadedState) {
+      return currState.sections.fold<int>(
+          0, (previousValue, element) => element.items.length + previousValue);
     }
     return 0;
   }
@@ -186,6 +187,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       debugPrint('Error: $runtimeType onReloadItemsRequested: $e');
       _loading = false;
       await onLoadItemsException(emit, e);
+      rethrow;
     }
   }
 
@@ -221,6 +223,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       debugPrint('Error: $runtimeType onLoadItemsRequested: $e');
       _loading = false;
       await onLoadItemsException(emit, e);
+      rethrow;
     }
   }
 
@@ -297,6 +300,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       } catch (e) {
         debugPrint('Error: $runtimeType emitMoreItemsRetrieved: $e');
         await onLoadItemsException(emit, e);
+        rethrow;
       }
     }
 
@@ -322,6 +326,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       } catch (e) {
         debugPrint('Error: $runtimeType insertBottomSpacer: $e');
         await onLoadItemsException(emit, e);
+        rethrow;
       }
     }
   }
@@ -369,6 +374,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     } catch (e) {
       debugPrint('Error: $runtimeType onLoadMoreItemsEvent  $e');
       await onLoadMoreItemsException(emit, loadedState, e);
+      _loadingMore = false;
+      rethrow;
     }
     _loadingMore = false;
   }
@@ -386,4 +393,3 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     );
   }
 }
-
