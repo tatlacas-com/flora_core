@@ -21,6 +21,7 @@ class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
 
   @override
   ItemsListState<TBloc> createState() =>
+      // ignore: no_logic_in_create_state
       stateBuilder?.call() ?? ItemsListState<TBloc>();
 }
 
@@ -133,6 +134,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
               removedItem: state.removedItem,
               sections: state.sections,
             ),
+            isReplace: true,
           );
           _insertItem(
             ItemInsertedState(
@@ -142,6 +144,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
               insertedItem: state.insertedItem,
               sections: state.sections,
             ),
+            isReplace: true,
           );
         }
       },
@@ -153,22 +156,36 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  void _removeItem(ItemRemovedState state) {
+  void _removeItem(
+    ItemRemovedState state, {
+    bool isReplace = false,
+  }) {
     if (state.sections[state.itemSection].usesGrid) {
       bloc.add(EmitRetrievedEvent());
       return;
     }
-    removeListItem(state.removedItem,
-        section: state.itemSection, index: state.itemIndex);
+    removeListItem(
+      state.removedItem,
+      section: state.itemSection,
+      index: state.itemIndex,
+      isReplace: isReplace,
+    );
   }
 
-  void _insertItem(ItemInsertedState state) {
+  void _insertItem(
+    ItemInsertedState state, {
+    bool isReplace = false,
+  }) {
     if (state.sections[state.itemSection].usesGrid) {
       bloc.add(EmitRetrievedEvent());
       return;
     }
-    insertListItem(state.insertedItem,
-        section: state.itemSection, index: state.itemIndex, isReplace: false);
+    insertListItem(
+      state.insertedItem,
+      section: state.itemSection,
+      index: state.itemIndex,
+      isReplace: isReplace,
+    );
   }
 
   Widget buildOnStateChanged(
@@ -673,7 +690,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
           context: context,
           animation: animation,
           isReplace: isReplace),
-      duration: duration,
+      duration: isReplace ? Duration.zero : duration,
     );
   }
 
@@ -689,7 +706,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       debugPrint(
           'Tried to access null animateListState for section $section $index in insertListItem');
     }
-    animState?.insertItem(index, duration: duration);
+    animState?.insertItem(index,
+        duration: isReplace ? Duration.zero : duration);
   }
 
   Widget buildEmptyView(BuildContext context) {

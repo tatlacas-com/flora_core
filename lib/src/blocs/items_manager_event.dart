@@ -33,38 +33,26 @@ abstract class ChangeItemEvent extends ItemsManagerEvent {
 
 class ReplaceItemEvent extends ChangeItemEvent {
   ReplaceItemEvent({
-    required dynamic item,
-    required int section,
-    required int index,
-  }) : super(
-          item: item,
-          section: section,
-          index: index,
-        );
+    required super.item,
+    required super.section,
+    required super.index,
+  });
 }
 
 class RemoveItemEvent extends ChangeItemEvent {
   RemoveItemEvent({
-    required dynamic item,
-    required int section,
-    required int index,
-  }) : super(
-          item: item,
-          section: section,
-          index: index,
-        );
+    required super.item,
+    required super.section,
+    required super.index,
+  });
 }
 
 class InsertItemEvent extends ChangeItemEvent {
   InsertItemEvent({
-    required dynamic item,
-    required int section,
-    required int index,
-  }) : super(
-          item: item,
-          section: section,
-          index: index,
-        );
+    required super.item,
+    required super.section,
+    required super.index,
+  });
 }
 
 class ReloadItemsEvent extends ItemsManagerEvent {
@@ -83,8 +71,8 @@ class ReloadItemsEvent extends ItemsManagerEvent {
 
 class LoadMoreItemsEvent extends ItemsManagerEvent {
   LoadMoreItemsEvent({
-    DateTime? requestId,
-  }) : super(requestId: requestId);
+    super.requestId,
+  });
 }
 
 class EmitRetrievedEvent extends ItemsManagerEvent {}
