@@ -20,6 +20,7 @@ abstract class WebClient extends Interceptor with EquatableMixin {
   final Dio dio;
   Future<String?> get accessToken async => _accessToken;
   final String? _accessToken;
+  String? get accessTokenValue => _accessToken;
   WebClient({
     required this.dio,
     String? accessToken,
