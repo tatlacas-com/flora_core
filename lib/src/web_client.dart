@@ -18,7 +18,7 @@ class WebClientQueuedInterceptorsWrapper extends QueuedInterceptorsWrapper {
 
 abstract class WebClient extends Interceptor with EquatableMixin {
   final Dio dio;
-  Future<String?> accessToken() async => _accessToken;
+  Future<String?> get accessToken async => _accessToken;
   final String? _accessToken;
   WebClient({
     required this.dio,
@@ -32,7 +32,7 @@ abstract class WebClient extends Interceptor with EquatableMixin {
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
     if (!options.headers.containsKey('Authorization') &&
-        (await accessToken())?.isNotEmpty == true) {
+        (await accessToken)?.isNotEmpty == true) {
       options.headers['Authorization'] = 'Bearer $accessToken';
     }
     handler.next(options);
