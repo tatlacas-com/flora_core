@@ -15,7 +15,7 @@ class ScreenContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar ?? ZeroHeightAppBar(),
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: body,
     );
   }
