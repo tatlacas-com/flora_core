@@ -32,9 +32,11 @@ abstract class WebClient extends Interceptor with EquatableMixin {
   @override
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
-    if (!options.headers.containsKey('Authorization') &&
-        (await accessToken)?.isNotEmpty == true) {
-      options.headers['Authorization'] = 'Bearer $accessToken';
+    if (!options.headers.containsKey('Authorization')) {
+      final token = await accessToken;
+      if (token?.isNotEmpty == true) {
+        options.headers['Authorization'] = 'Bearer $token';
+      }
     }
     handler.next(options);
   }
@@ -56,7 +58,7 @@ abstract class WebClient extends Interceptor with EquatableMixin {
   }
 
   @override
-  List<Object?> get props => [dio, accessToken];
+  List<Object?> get props => [dio, accessTokenValue];
 
   @override
   String toString() => 'WebClient {baseUrl:${dio.options.baseUrl}';
