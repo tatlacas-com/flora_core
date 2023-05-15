@@ -63,6 +63,7 @@ class ItemReplacedState extends ItemChangedState {
     required super.itemSection,
     required super.itemIndex,
     super.id,
+    super.changeParams,
     required super.reachedBottom,
     required super.removedItem,
     required super.insertedItem,
@@ -75,6 +76,7 @@ class ItemRemovedState extends ItemChangedState {
     required super.itemSection,
     required super.reachedBottom,
     super.id,
+    super.changeParams,
     required super.itemIndex,
     required super.removedItem,
     required super.sections,
@@ -86,6 +88,7 @@ class ItemInsertedState extends ItemChangedState {
       {required super.itemSection,
       required super.reachedBottom,
       super.id,
+      super.changeParams,
       required super.itemIndex,
       required super.insertedItem,
       required super.sections});
@@ -97,11 +100,12 @@ class ItemChangedState extends LoadedState {
     required super.reachedBottom,
     required this.itemIndex,
     this.removedItem,
+    this.changeParams,
     this.insertedItem,
     this.id,
     required super.sections,
   });
-  final dynamic removedItem, insertedItem;
+  final dynamic removedItem, insertedItem, changeParams;
   final int itemSection, itemIndex;
   final String? id;
 
@@ -112,6 +116,7 @@ class ItemChangedState extends LoadedState {
         itemSection,
         itemIndex,
         id,
+        changeParams,
       ];
 }
 
