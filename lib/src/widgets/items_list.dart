@@ -648,6 +648,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         index: index,
         animation: animation,
         item: item,
+        isReplace: true,
         isRemoved: true,
       );
     }
