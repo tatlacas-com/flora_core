@@ -166,9 +166,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       return;
     }
     removeListItem(
-      state.removedItem,
-      section: state.itemSection,
-      index: state.itemIndex,
+      state: state,
       isReplace: isReplace,
     );
   }
@@ -182,9 +180,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       return;
     }
     insertListItem(
-      state.insertedItem,
-      section: state.itemSection,
-      index: state.itemIndex,
+      state: state,
       isReplace: isReplace,
     );
   }
@@ -200,10 +196,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       return _buildLoadingFailed(state, context);
     }
     if (state is ItemsRetrievedState || state is LoadedState) {
-      return buildItemsRetrievedScrollView(context);
-    }
-    if (state is LoadedState) {
-      debugPrint('Possible unhandled state $state...');
       return buildItemsRetrievedScrollView(context);
     }
     throw ArgumentError('buildOnStateChanged Not supported state $state');
@@ -670,24 +662,22 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         item: item);
   }
 
-  void removeListItem(
-    dynamic removedItem, {
-    required int section,
-    required int index,
+  void removeListItem({
+    required ItemRemovedState state,
     Duration duration = const Duration(milliseconds: 300),
     bool isReplace = false,
   }) {
-    final animState = _animatedList(section);
+    final animState = _animatedList(state.itemSection);
     if (animState == null) {
       debugPrint(
-          'Tried to access null animateListState for section $section $index in removeListItem');
+          'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in removeListItem');
     }
     animState?.removeItem(
-      index,
+      state.itemIndex,
       (context, animation) => buildRemovedListItem(
-          item: removedItem,
-          index: index,
-          section: section,
+          item: state.removedItem,
+          index: state.itemIndex,
+          section: state.itemSection,
           context: context,
           animation: animation,
           isReplace: isReplace),
@@ -695,19 +685,17 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  void insertListItem(
-    dynamic insertedItem, {
-    required int section,
-    required int index,
+  void insertListItem({
+    required ItemInsertedState state,
     required bool isReplace,
     Duration duration = const Duration(milliseconds: 300),
   }) {
-    final animState = _animatedList(section);
+    final animState = _animatedList(state.itemSection);
     if (animState == null) {
       debugPrint(
-          'Tried to access null animateListState for section $section $index in insertListItem');
+          'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
     }
-    animState?.insertItem(index,
+    animState?.insertItem(state.itemIndex,
         duration: isReplace ? Duration.zero : duration);
   }
 
