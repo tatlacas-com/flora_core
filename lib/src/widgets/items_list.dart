@@ -9,7 +9,6 @@ import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 /// A base class for showing list or grid of widgets on ui. For sample see [ItemsManagerBloc]
 /// {@endtemplate}
 class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
-
   const ItemsList({
     super.key,
     this.stateBuilder,
@@ -129,6 +128,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
           _removeItem(
             ItemRemovedState(
               itemSection: state.itemSection,
+              changeParams: state.changeParams,
               reachedBottom: state.reachedBottom,
               itemIndex: state.itemIndex,
               removedItem: state.removedItem,
@@ -141,6 +141,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
               itemSection: state.itemSection,
               reachedBottom: state.reachedBottom,
               itemIndex: state.itemIndex,
+              changeParams: state.changeParams,
               insertedItem: state.insertedItem,
               sections: state.sections,
             ),
