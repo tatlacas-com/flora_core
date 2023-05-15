@@ -663,6 +663,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     required ItemRemovedState state,
     Duration duration = const Duration(milliseconds: 300),
     bool isReplace = false,
+    bool animDurationZeroOnReplace = true,
   }) {
     final animState = _animatedList(state.itemSection);
     if (animState == null) {
@@ -678,7 +679,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
           context: context,
           animation: animation,
           isReplace: isReplace),
-      duration: isReplace ? Duration.zero : duration,
+      duration:
+          isReplace && animDurationZeroOnReplace ? Duration.zero : duration,
     );
   }
 
@@ -686,6 +688,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     required ItemInsertedState state,
     required bool isReplace,
     Duration duration = const Duration(milliseconds: 300),
+    bool animDurationZeroOnReplace = true,
   }) {
     final animState = _animatedList(state.itemSection);
     if (animState == null) {
@@ -693,7 +696,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
           'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
     }
     animState?.insertItem(state.itemIndex,
-        duration: isReplace ? Duration.zero : duration);
+        duration:
+            isReplace && animDurationZeroOnReplace ? Duration.zero : duration);
   }
 
   Widget buildEmptyView(BuildContext context) {
