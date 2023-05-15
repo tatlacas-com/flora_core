@@ -598,11 +598,10 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         bloc.isReplacingItem(section: section, index: index, item: item);
     if (isReplace) {
       return buildAnimatedReplaceListItem(
-          context: context,
-          index: index,
-          animation: animation,
-          section: section,
-          item: item);
+        context: context,
+        state: bloc.state as ItemReplacedState,
+        animation: animation,
+      );
     }
     return FadeTransition(
       opacity: Tween<double>(
@@ -622,17 +621,15 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   @protected
   Widget buildAnimatedReplaceListItem({
     required BuildContext context,
-    required int index,
     required Animation<double> animation,
-    required int section,
-    required dynamic item,
+    required ItemReplacedState state,
   }) {
     return buildListItem(
         context: context,
-        section: section,
-        index: index,
+        section: state.itemSection,
+        index: state.itemIndex,
         animation: animation,
-        item: item,
+        item: state.insertedItem,
         isReplace: true);
   }
 
