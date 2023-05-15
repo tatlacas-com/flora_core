@@ -6,21 +6,13 @@ import 'package:flutter/foundation.dart' show debugPrint;
 
 class WebClientQueuedInterceptorsWrapper extends QueuedInterceptorsWrapper {
   WebClientQueuedInterceptorsWrapper({
-    InterceptorSendCallback? onRequest,
-    InterceptorSuccessCallback? onResponse,
-    InterceptorErrorCallback? onError,
-  }) : super(
-          onError: onError,
-          onRequest: onRequest,
-          onResponse: onResponse,
-        );
+    super.onRequest,
+    super.onResponse,
+    super.onError,
+  });
 }
 
 abstract class WebClient extends Interceptor with EquatableMixin {
-  final Dio dio;
-  Future<String?> get accessToken async => _accessToken;
-  final String? _accessToken;
-  String? get accessTokenValue => _accessToken;
   WebClient({
     required this.dio,
     String? accessToken,
@@ -28,6 +20,10 @@ abstract class WebClient extends Interceptor with EquatableMixin {
     dio.interceptors.removeWhere((element) => element is WebClient);
     dio.interceptors.add(this);
   }
+  final Dio dio;
+  Future<String?> get accessToken async => _accessToken;
+  final String? _accessToken;
+  String? get accessTokenValue => _accessToken;
 
   @override
   void onRequest(
@@ -46,13 +42,13 @@ abstract class WebClient extends Interceptor with EquatableMixin {
     final endpoint = err.requestOptions.uri.toString();
     final statusCode = err.response?.statusCode;
     if (statusCode == 403) {
-      debugPrint("AccessDeniedException: $endpoint");
+      debugPrint('AccessDeniedException: $endpoint');
     } else if (statusCode == 401) {
-      debugPrint("UnauthorizedException: $endpoint");
+      debugPrint('UnauthorizedException: $endpoint');
     } else if (statusCode == 404) {
-      debugPrint("NotFoundException: $endpoint");
+      debugPrint('NotFoundException: $endpoint');
     } else if (statusCode == 500) {
-      debugPrint("ServerException: $endpoint");
+      debugPrint('ServerException: $endpoint');
     }
     super.onError(err, handler);
   }

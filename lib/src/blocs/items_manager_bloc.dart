@@ -60,19 +60,6 @@ part 'items_manager_state.dart';
 /// {@endtemplate}
 abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     extends Bloc<ItemsManagerEvent, ItemsManagerState> {
-  final TRepo repo;
-  bool _loading = false;
-
-  bool get loading => _loading;
-
-  int get itemsCount {
-    final currState = state;
-    if (currState is LoadedState) {
-      return currState.sections.fold<int>(
-          0, (previousValue, element) => element.items.length + previousValue);
-    }
-    return 0;
-  }
 
   ItemsManagerBloc(
       {required this.repo,
@@ -85,6 +72,19 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     on<RemoveItemEvent>(onRemoveItem);
     on<LoadMoreItemsEvent>(onLoadMoreItemsEvent);
     on<EmitRetrievedEvent>(onEmitRetrievedEvent);
+  }
+  final TRepo repo;
+  bool _loading = false;
+
+  bool get loading => _loading;
+
+  int get itemsCount {
+    final currState = state;
+    if (currState is LoadedState) {
+      return currState.sections.fold<int>(
+          0, (previousValue, element) => element.items.length + previousValue);
+    }
+    return 0;
   }
 
   bool isReplacingItem(

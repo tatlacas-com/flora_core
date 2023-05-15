@@ -9,13 +9,13 @@ import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 /// A base class for showing list or grid of widgets on ui. For sample see [ItemsManagerBloc]
 /// {@endtemplate}
 class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
-  final ItemsListState<TBloc> Function()? stateBuilder;
 
   const ItemsList({
-    Key? key,
+    super.key,
     this.stateBuilder,
     this.buildSliversInSliverOverlapInjector = false,
-  }) : super(key: key);
+  });
+  final ItemsListState<TBloc> Function()? stateBuilder;
 
   final bool buildSliversInSliverOverlapInjector;
 
@@ -363,7 +363,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
               ));
     }
     throw ArgumentError(
-        "unsupported list header item $sectionHeader. Either override buildSectionHeader() in your UI or make item implement Widgetable");
+        'unsupported list header item $sectionHeader. Either override buildSectionHeader() in your UI or make item implement Widgetable');
   }
 
   Widget buildSectionEmptyView(
@@ -441,7 +441,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   SliverGrid buildVerticalSliverGridDefault(int section, Section sectionItems) {
     return SliverGrid(
-      key: Key("${section}sectionSliverGrid"),
+      key: Key('${section}sectionSliverGrid'),
       gridDelegate: _buildSliverGridDelegate(section),
       delegate: SliverChildBuilderDelegate(
         (context, index) {

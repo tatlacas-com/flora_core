@@ -6,20 +6,20 @@ import 'package:tatlacas_flutter_core/src/widgets/zero_height_app_bar.dart';
 import 'items_list.dart';
 
 class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
-  final PreferredSizeWidget? appBar;
-  final ItemsListState<TBloc> Function() listStateBuilder;
-  final Key? listBuilderKey;
-  final bool buildInBase;
-  final bool useScaffold;
 
   const ListContainer({
-    Key? key,
+    super.key,
     this.listBuilderKey,
     this.buildInBase = true,
     this.useScaffold = true,
     required this.listStateBuilder,
     this.appBar,
-  }) : super(key: key);
+  });
+  final PreferredSizeWidget? appBar;
+  final ItemsListState<TBloc> Function() listStateBuilder;
+  final Key? listBuilderKey;
+  final bool buildInBase;
+  final bool useScaffold;
 
   @override
   Widget build(BuildContext context) {

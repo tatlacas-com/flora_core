@@ -2,6 +2,15 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 class Section extends Equatable {
+
+  const Section({
+    this.sectionHeader,
+    this.emptyEntity = const SizedBox(),
+    this.usesGrid = false,
+    this.horizontalScroll = false,
+    this.items = const [],
+    this.horizontalScrollHeight = 100,
+  });
   final List<dynamic> items;
   final dynamic sectionHeader;
   final bool usesGrid;
@@ -14,15 +23,6 @@ class Section extends Equatable {
   int totalItems() {
     return items.length;
   }
-
-  const Section({
-    this.sectionHeader,
-    this.emptyEntity = const SizedBox(),
-    this.usesGrid = false,
-    this.horizontalScroll = false,
-    this.items = const [],
-    this.horizontalScrollHeight = 100,
-  });
 
   @override
   List<Object?> get props => [

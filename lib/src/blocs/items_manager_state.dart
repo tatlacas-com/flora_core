@@ -21,6 +21,10 @@ class ItemsInitialState extends ItemsManagerState implements ItemsBuildUi {
 }
 
 abstract class LoadedState extends ItemsManagerState {
+  const LoadedState({
+    required this.sections,
+    required this.reachedBottom,
+  });
   final List<Section> sections;
 
   int get totalSections => sections.length;
@@ -42,11 +46,6 @@ abstract class LoadedState extends ItemsManagerState {
 
   dynamic sectionHeader(int section) => sections[section].sectionHeader;
 
-  const LoadedState({
-    required this.sections,
-    required this.reachedBottom,
-  });
-
   @override
   List<Object?> get props => [sections];
 }
@@ -61,146 +60,115 @@ class ItemsRetrievedState extends LoadedState implements ItemsBuildUi {
 
 class ItemReplacedState extends ItemChangedState {
   const ItemReplacedState({
-    required int itemSection,
-    required int itemIndex,
-    required bool reachedBottom,
-    required dynamic removedItem,
-    required dynamic insertedItem,
-    required List<Section> sections,
-  }) : super(
-          itemIndex: itemIndex,
-          itemSection: itemSection,
-          sections: sections,
-          reachedBottom: reachedBottom,
-          removedItem: removedItem,
-          insertedItem: insertedItem,
-        );
+    required super.itemSection,
+    required super.itemIndex,
+    super.id,
+    required super.reachedBottom,
+    required super.removedItem,
+    required super.insertedItem,
+    required super.sections,
+  });
 }
 
 class ItemRemovedState extends ItemChangedState {
   const ItemRemovedState({
-    required int itemSection,
-    required bool reachedBottom,
-    required int itemIndex,
-    required dynamic removedItem,
-    required List<Section> sections,
-  }) : super(
-          itemIndex: itemIndex,
-          itemSection: itemSection,
-          reachedBottom: reachedBottom,
-          sections: sections,
-          removedItem: removedItem,
-        );
+    required super.itemSection,
+    required super.reachedBottom,
+    super.id,
+    required super.itemIndex,
+    required super.removedItem,
+    required super.sections,
+  });
 }
 
 class ItemInsertedState extends ItemChangedState {
   const ItemInsertedState(
-      {required int itemSection,
-      required bool reachedBottom,
-      required int itemIndex,
-      required dynamic insertedItem,
-      required List<Section> sections})
-      : super(
-          itemIndex: itemIndex,
-          itemSection: itemSection,
-          reachedBottom: reachedBottom,
-          sections: sections,
-          insertedItem: insertedItem,
-        );
+      {required super.itemSection,
+      required super.reachedBottom,
+      super.id,
+      required super.itemIndex,
+      required super.insertedItem,
+      required super.sections});
 }
 
 class ItemChangedState extends LoadedState {
-  final dynamic removedItem, insertedItem;
-  final int itemSection, itemIndex;
-
   const ItemChangedState({
     required this.itemSection,
-    required bool reachedBottom,
+    required super.reachedBottom,
     required this.itemIndex,
     this.removedItem,
     this.insertedItem,
-    required List<Section> sections,
-  }) : super(
-          reachedBottom: reachedBottom,
-          sections: sections,
-        );
+    this.id,
+    required super.sections,
+  });
+  final dynamic removedItem, insertedItem;
+  final int itemSection, itemIndex;
+  final String? id;
 
   @override
-  List<Object?> get props =>
-      [removedItem, insertedItem, itemSection, itemIndex];
+  List<Object?> get props => [
+        removedItem,
+        insertedItem,
+        itemSection,
+        itemIndex,
+        id,
+      ];
 }
 
 class ReloadFromCloudEmptyState extends ItemsManagerState {
-  final DateTime loadId;
-
   ReloadFromCloudEmptyState({DateTime? loadId})
       : loadId = loadId ?? DateTime.now();
+  final DateTime loadId;
 
   @override
   List<Object> get props => [loadId];
 }
 
 class LoadItemsFailedState extends ItemsManagerState implements ItemsBuildUi {
-  final DateTime loadId;
-  final NetworkExceptionType exceptionType;
-
   LoadItemsFailedState({
     DateTime? loadId,
     required this.exceptionType,
   }) : loadId = loadId ?? DateTime.now();
+  final DateTime loadId;
+  final NetworkExceptionType exceptionType;
 
   @override
   List<Object> get props => [loadId, exceptionType];
 }
 
 class LoadMoreItemsFailedState extends LoadedState {
-  final DateTime loadId;
-  final NetworkExceptionType exceptionType;
-
   LoadMoreItemsFailedState({
     DateTime? loadId,
-    required bool reachedBottom,
+    required super.reachedBottom,
     required this.exceptionType,
-    required List<Section> sections,
-  })  : loadId = loadId ?? DateTime.now(),
-        super(
-          sections: sections,
-          reachedBottom: reachedBottom,
-        );
+    required super.sections,
+  }) : loadId = loadId ?? DateTime.now();
+  final DateTime loadId;
+  final NetworkExceptionType exceptionType;
 
   @override
   List<Object> get props => [loadId, exceptionType];
 }
 
 class LoadingMoreItemsState extends LoadedState {
-  final DateTime loadId;
-
   LoadingMoreItemsState({
     DateTime? loadId,
-    required bool reachedBottom,
-    required List<Section> sections,
-  })  : loadId = loadId ?? DateTime.now(),
-        super(
-          sections: sections,
-          reachedBottom: reachedBottom,
-        );
+    required super.reachedBottom,
+    required super.sections,
+  }) : loadId = loadId ?? DateTime.now();
+  final DateTime loadId;
 
   @override
   List<Object> get props => [loadId];
 }
 
 class ItemsReloadedState extends LoadedState {
-  final DateTime loadId;
-
   ItemsReloadedState({
     DateTime? loadId,
-    required bool reachedBottom,
-    required List<Section> sections,
-  })  : loadId = loadId ?? DateTime.now(),
-        super(
-          sections: sections,
-          reachedBottom: reachedBottom,
-        );
+    required super.reachedBottom,
+    required super.sections,
+  }) : loadId = loadId ?? DateTime.now();
+  final DateTime loadId;
 
   @override
   List<Object> get props => [loadId];

@@ -3,29 +3,29 @@
 part of 'items_manager_bloc.dart';
 
 abstract class ItemsManagerEvent extends Equatable {
-  final DateTime requestId;
 
   ItemsManagerEvent({DateTime? requestId})
       : this.requestId = requestId ?? DateTime.now();
+  final DateTime requestId;
 
   @override
   List<Object?> get props => [requestId];
 }
 
 class LoadItemsEvent extends ItemsManagerEvent {
-  LoadItemsEvent({DateTime? requestId});
+  LoadItemsEvent();
 }
 
 abstract class ChangeItemEvent extends ItemsManagerEvent {
-  final dynamic item;
-  final int section;
-  final int index;
 
   ChangeItemEvent({
     required this.item,
     required this.section,
     required this.index,
   });
+  final dynamic item;
+  final int section;
+  final int index;
 
   @override
   List<Object?> get props => [item, section, index];
@@ -56,14 +56,14 @@ class InsertItemEvent extends ChangeItemEvent {
 }
 
 class ReloadItemsEvent extends ItemsManagerEvent {
-  final bool fromCloud;
-  final bool loadFromLocalIfCloudEmpty;
 
   ReloadItemsEvent({
     this.fromCloud = true,
     this.loadFromLocalIfCloudEmpty = true,
-    DateTime? requestId,
-  }) : super(requestId: requestId);
+    super.requestId,
+  });
+  final bool fromCloud;
+  final bool loadFromLocalIfCloudEmpty;
 
   @override
   List<Object?> get props => [fromCloud, loadFromLocalIfCloudEmpty, requestId];
