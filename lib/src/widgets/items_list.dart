@@ -26,6 +26,9 @@ class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
 
 class ItemsListState<TBloc extends ItemsManagerBloc>
     extends State<ItemsList<TBloc>> with AutomaticKeepAliveClientMixin {
+  ItemsListState({ScrollController? scrollController}) {
+    this.scrollController = scrollController ?? ScrollController();
+  }
   late TBloc bloc;
 
   double get reloadThresholdPixels => 250;
@@ -36,7 +39,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   bool get useNestedScrollView => true;
 
-  final ScrollController scrollController = ScrollController();
+  late final ScrollController scrollController;
 
   bool get buildSliversInSliverOverlapInjector => false;
 
@@ -218,6 +221,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: PageStorageKey<String>('${TBloc.runtimeType}${bloc.itemsCount}'),
       physics:
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      controller: scrollController,
       //needed for RefreshIndicator to work
       slivers: withInjector
           ? buildSectionsWithOverlapInjector(context)
@@ -230,6 +234,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return RefreshIndicator(
       onRefresh: onRefreshIndicatorRefresh,
       child: CustomScrollView(
+        controller: scrollController,
         key: PageStorageKey<String>(TBloc.runtimeType.toString()),
         slivers: buildLoadingFailedSlivers(context, state),
       ),
