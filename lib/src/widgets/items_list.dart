@@ -181,10 +181,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     ItemRemovedState state, {
     bool isReplace = false,
   }) {
-    if (state.sections[state.itemSection].usesGrid) {
-      bloc.add(EmitRetrievedEvent());
-      return;
-    }
     removeListItem(
       state: state,
       isReplace: isReplace,
@@ -195,10 +191,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     ItemInsertedState state, {
     bool isReplace = false,
   }) {
-    if (state.sections[state.itemSection].usesGrid) {
-      bloc.add(EmitRetrievedEvent());
-      return;
-    }
     insertListItem(
       state: state,
       isReplace: isReplace,
@@ -719,23 +711,43 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     bool isReplace = false,
     bool animDurationZeroOnReplace = true,
   }) {
-    final animState = _animatedList(state.itemSection);
-    if (animState == null) {
-      debugPrint(
-          'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in removeListItem');
+    if (state.sections[state.itemSection].usesGrid) {
+      final animState = _animatedGrid(state.itemSection);
+      if (animState == null) {
+        debugPrint(
+            'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in removeListItem');
+      }
+      animState?.removeItem(
+        state.itemIndex,
+        (context, animation) => buildRemovedListItem(
+            item: state.removedItem,
+            index: state.itemIndex,
+            section: state.itemSection,
+            context: context,
+            animation: animation,
+            isReplace: isReplace),
+        duration:
+            isReplace && animDurationZeroOnReplace ? Duration.zero : duration,
+      );
+    } else {
+      final animState = _animatedList(state.itemSection);
+      if (animState == null) {
+        debugPrint(
+            'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in removeListItem');
+      }
+      animState?.removeItem(
+        state.itemIndex,
+        (context, animation) => buildRemovedListItem(
+            item: state.removedItem,
+            index: state.itemIndex,
+            section: state.itemSection,
+            context: context,
+            animation: animation,
+            isReplace: isReplace),
+        duration:
+            isReplace && animDurationZeroOnReplace ? Duration.zero : duration,
+      );
     }
-    animState?.removeItem(
-      state.itemIndex,
-      (context, animation) => buildRemovedListItem(
-          item: state.removedItem,
-          index: state.itemIndex,
-          section: state.itemSection,
-          context: context,
-          animation: animation,
-          isReplace: isReplace),
-      duration:
-          isReplace && animDurationZeroOnReplace ? Duration.zero : duration,
-    );
   }
 
   void insertListItem({
@@ -744,14 +756,27 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     Duration duration = const Duration(milliseconds: 300),
     bool animDurationZeroOnReplace = true,
   }) {
-    final animState = _animatedList(state.itemSection);
-    if (animState == null) {
-      debugPrint(
-          'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
+    if (state.sections[state.itemSection].usesGrid) {
+      final animState = _animatedGrid(state.itemSection);
+      if (animState == null) {
+        debugPrint(
+            'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
+      }
+      animState?.insertItem(state.itemIndex,
+          duration: isReplace && animDurationZeroOnReplace
+              ? Duration.zero
+              : duration);
+    } else {
+      final animState = _animatedList(state.itemSection);
+      if (animState == null) {
+        debugPrint(
+            'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
+      }
+      animState?.insertItem(state.itemIndex,
+          duration: isReplace && animDurationZeroOnReplace
+              ? Duration.zero
+              : duration);
     }
-    animState?.insertItem(state.itemIndex,
-        duration:
-            isReplace && animDurationZeroOnReplace ? Duration.zero : duration);
   }
 
   Widget buildEmptyView(BuildContext context) {
