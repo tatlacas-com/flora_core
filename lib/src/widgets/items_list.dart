@@ -58,6 +58,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   final Map<int, GlobalKey<SliverAnimatedListState>> _animatedListKeys =
       <int, GlobalKey<SliverAnimatedListState>>{};
 
+  final Map<int, GlobalKey<SliverAnimatedGridState>> _animatedGridKeys =
+      <int, GlobalKey<SliverAnimatedGridState>>{};
+
   @protected
   SliverAnimatedListState? _animatedList(int section) {
     if (_animatedListKeys[section]?.currentState == null) {
@@ -67,9 +70,23 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   @protected
+  SliverAnimatedGridState? _animatedGrid(int section) {
+    if (_animatedGridKeys[section]?.currentState == null) {
+      resetAnimatedGridKey(section);
+    }
+    return _animatedGridKeys[section]?.currentState;
+  }
+
+  @protected
   void resetAnimatedListKey(int section) {
-    if (!useAnimatedList(section)) return;
+    if (!useAnimated(section)) return;
     _animatedListKeys[section] = GlobalKey<SliverAnimatedListState>();
+  }
+
+  @protected
+  void resetAnimatedGridKey(int section) {
+    if (!useAnimated(section)) return;
+    _animatedGridKeys[section] = GlobalKey<SliverAnimatedGridState>();
   }
 
   @override
@@ -271,7 +288,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  bool useAnimatedList(int section) => true;
+  bool useAnimated(int section) => true;
 
   List<Widget> buildSectionsWithOverlapInjector(BuildContext context) {
     var sections = buildSections(context);
@@ -413,7 +430,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget buildVerticalSliverGrid(int section, Section sectionItems) {
-    return buildVerticalSliverGridDefault(section, sectionItems);
+    return useAnimated(section)
+        ? _buildVerticalSliverAnimatedGrid(section, sectionItems)
+        : buildVerticalSliverGridDefault(section, sectionItems);
   }
 
   Widget buildHorizontalSliverList(int section, Section sectionItems) {
@@ -425,16 +444,43 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget buildHorizontalSliverListContents(int section, Section sectionItems) {
     return SizedBox(
       height: sectionItems.horizontalScrollHeight,
-      child: useAnimatedList(section)
+      child: useAnimated(section)
           ? _buildHorizontalAnimatedList(section, sectionItems)
           : _buildHorizontalList(section, sectionItems),
     );
   }
 
   Widget buildVerticalSliverList(int section, Section sectionItems) {
-    return useAnimatedList(section)
+    return useAnimated(section)
         ? _buildVerticalSliverAnimatedList(section, sectionItems)
         : buildVerticalSliverListDefault(section, sectionItems);
+  }
+
+  Widget _buildVerticalSliverAnimatedGrid(int section, Section sectionItems) {
+    if (!_animatedGridKeys.containsKey(section) ||
+        resetAnimatedKey(section, isGrid: true)) {
+      _animatedGridKeys[section] = GlobalKey<SliverAnimatedGridState>();
+    }
+    return SliverAnimatedGrid(
+      key: _animatedGridKeys[section],
+      gridDelegate: _buildSliverGridDelegate(section),
+      itemBuilder:
+          (BuildContext context, int index, Animation<double> animation) {
+        try {
+          return buildAnimatedListItem(
+              context: context,
+              index: index,
+              animation: animation,
+              section: section,
+              item: sectionItems.items[index]);
+        } catch (e) {
+          debugPrint(
+              'Error building section: $section index:$index totalItemsInSection: ${sectionItems.totalItems()}/${sectionItems.items.length} -- $e');
+        }
+        return const SizedBox();
+      },
+      initialItemCount: sectionItems.totalItems(),
+    );
   }
 
   SliverGrid buildVerticalSliverGridDefault(int section, Section sectionItems) {
@@ -528,7 +574,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget _buildHorizontalAnimatedList(int section, Section sectionItems) {
-    if (!_animatedListKeys.containsKey(section) || resetAnimatedKey(section)) {
+    if (!_animatedListKeys.containsKey(section) ||
+        resetAnimatedKey(section, isGrid: false)) {
       _animatedListKeys[section] = GlobalKey<SliverAnimatedListState>();
     }
     return AnimatedList(
@@ -563,8 +610,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  bool resetAnimatedKey(int section) =>
-      _animatedListKeys[section]?.currentState == null;
+  bool resetAnimatedKey(int section, {bool isGrid = false}) => isGrid
+      ? _animatedGridKeys[section]?.currentState == null
+      : _animatedListKeys[section]?.currentState == null;
 
   Widget _buildVerticalSliverAnimatedList(int section, Section sectionItems) {
     if (!_animatedListKeys.containsKey(section) || resetAnimatedKey(section)) {
