@@ -167,18 +167,18 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     try {
       emit(const ItemsLoadingState());
       if (event.fromCloud) {
-        var loadedItems = await loadItemsFromCloud();
+        var loadedItems = await loadItemsFromCloud(emit);
         if (loadedItems.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
           _loading = false;
           await emitItemsReloadRetrieved(emit, loadedItems);
           return;
         }
         emit(ReloadFromCloudEmptyState());
-        loadedItems = await loadItemsFromLocalStorage();
+        loadedItems = await loadItemsFromLocalStorage(emit);
         _loading = false;
         await emitItemsReloadRetrieved(emit, loadedItems);
       } else {
-        var loadedItems = await loadItemsFromLocalStorage();
+        var loadedItems = await loadItemsFromLocalStorage(emit);
         _loading = false;
         await emitItemsReloadRetrieved(emit, loadedItems);
       }
@@ -190,9 +190,11 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
   }
 
-  Future<List<Section>> loadItemsFromCloud() async =>
+  Future<List<Section>> loadItemsFromCloud(
+          Emitter<ItemsManagerState> emit) async =>
       await repo?.loadItemsFromCloud() ?? [];
-  Future<List<Section>> loadItemsFromLocalStorage() async =>
+  Future<List<Section>> loadItemsFromLocalStorage(
+          Emitter<ItemsManagerState> emit) async =>
       await repo?.loadItemsFromLocalStorage() ?? [];
 
   FutureOr<void> emitItemsRetrieved(
@@ -214,13 +216,13 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     if (state is LoadingMoreItemsState) return;
     emit(const ItemsLoadingState());
     try {
-      var loadedItems = await loadItemsFromLocalStorage();
+      var loadedItems = await loadItemsFromLocalStorage(emit);
       if (loadedItems.isNotEmpty) {
         _loading = false;
         await emitItemsRetrieved(emit, loadedItems);
         return;
       }
-      loadedItems = await loadItemsFromCloud();
+      loadedItems = await loadItemsFromCloud(emit);
       _loading = false;
       await emitItemsRetrieved(emit, loadedItems);
     } catch (e) {
