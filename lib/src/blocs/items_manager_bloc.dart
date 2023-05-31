@@ -60,10 +60,8 @@ part 'items_manager_state.dart';
 /// {@endtemplate}
 abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     extends Bloc<ItemsManagerEvent, ItemsManagerState> {
-
   ItemsManagerBloc(
-      {required this.repo,
-      ItemsManagerState initialState = const ItemsInitialState()})
+      {this.repo, ItemsManagerState initialState = const ItemsInitialState()})
       : super(initialState) {
     on<LoadItemsEvent>(onLoadItemsRequested);
     on<ReloadItemsEvent>(onReloadItemsRequested);
@@ -73,7 +71,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     on<LoadMoreItemsEvent>(onLoadMoreItemsEvent);
     on<EmitRetrievedEvent>(onEmitRetrievedEvent);
   }
-  final TRepo repo;
+  final TRepo? repo;
   bool _loading = false;
 
   bool get loading => _loading;
@@ -169,18 +167,18 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     try {
       emit(const ItemsLoadingState());
       if (event.fromCloud) {
-        var loadedItems = await repo.loadItemsFromCloud();
+        var loadedItems = await loadItemsFromCloud();
         if (loadedItems.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
           _loading = false;
           await emitItemsReloadRetrieved(emit, loadedItems);
           return;
         }
         emit(ReloadFromCloudEmptyState());
-        loadedItems = await repo.loadItemsFromLocalStorage();
+        loadedItems = await loadItemsFromLocalStorage();
         _loading = false;
         await emitItemsReloadRetrieved(emit, loadedItems);
       } else {
-        var loadedItems = await repo.loadItemsFromLocalStorage();
+        var loadedItems = await loadItemsFromLocalStorage();
         _loading = false;
         await emitItemsReloadRetrieved(emit, loadedItems);
       }
@@ -191,6 +189,11 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       rethrow;
     }
   }
+
+  Future<List<Section>> loadItemsFromCloud() async =>
+      await repo?.loadItemsFromCloud() ?? [];
+  Future<List<Section>> loadItemsFromLocalStorage() async =>
+      await repo?.loadItemsFromLocalStorage() ?? [];
 
   FutureOr<void> emitItemsRetrieved(
       Emitter<ItemsManagerState> emit, List<Section> items) async {
@@ -211,13 +214,13 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     if (state is LoadingMoreItemsState) return;
     emit(const ItemsLoadingState());
     try {
-      var loadedItems = await repo.loadItemsFromLocalStorage();
+      var loadedItems = await loadItemsFromLocalStorage();
       if (loadedItems.isNotEmpty) {
         _loading = false;
         await emitItemsRetrieved(emit, loadedItems);
         return;
       }
-      loadedItems = await repo.loadItemsFromCloud();
+      loadedItems = await loadItemsFromCloud();
       _loading = false;
       await emitItemsRetrieved(emit, loadedItems);
     } catch (e) {
