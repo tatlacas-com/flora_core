@@ -55,16 +55,27 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   double mainAxisSpacing(int section) => 8;
 
-  final Map<int, GlobalKey<SliverAnimatedListState>> _animatedListKeys =
+  final Map<int, GlobalKey<SliverAnimatedListState>> _sliverAnimatedListKeys =
       <int, GlobalKey<SliverAnimatedListState>>{};
+
+  final Map<int, GlobalKey<AnimatedListState>> _animatedListKeys =
+      <int, GlobalKey<AnimatedListState>>{};
 
   final Map<int, GlobalKey<SliverAnimatedGridState>> _animatedGridKeys =
       <int, GlobalKey<SliverAnimatedGridState>>{};
 
   @protected
-  SliverAnimatedListState? _animatedList(int section) {
+  SliverAnimatedListState? _sliverAnimatedList(int section) {
+    if (_sliverAnimatedListKeys[section]?.currentState == null) {
+      resetSliverAnimatedListKey(section);
+    }
+    return _sliverAnimatedListKeys[section]?.currentState;
+  }
+
+  @protected
+  AnimatedListState? _animatedList(int section) {
     if (_animatedListKeys[section]?.currentState == null) {
-      resetAnimatedListKey(section);
+      resetSliverAnimatedListKey(section);
     }
     return _animatedListKeys[section]?.currentState;
   }
@@ -78,9 +89,15 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   @protected
+  void resetSliverAnimatedListKey(int section) {
+    if (!useAnimated(section)) return;
+    _sliverAnimatedListKeys[section] = GlobalKey<SliverAnimatedListState>();
+  }
+
+  @protected
   void resetAnimatedListKey(int section) {
     if (!useAnimated(section)) return;
-    _animatedListKeys[section] = GlobalKey<SliverAnimatedListState>();
+    _animatedListKeys[section] = GlobalKey<AnimatedListState>();
   }
 
   @protected
@@ -567,8 +584,11 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget _buildHorizontalAnimatedList(int section, Section sectionItems) {
     if (!_animatedListKeys.containsKey(section) ||
-        resetAnimatedKey(section, isGrid: false)) {
-      _animatedListKeys[section] = GlobalKey<SliverAnimatedListState>();
+        resetAnimatedKey(
+          section,
+          horizontal: true,
+        )) {
+      _animatedListKeys[section] = GlobalKey<AnimatedListState>();
     }
     return AnimatedList(
       key: _animatedListKeys[section],
@@ -602,16 +622,24 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  bool resetAnimatedKey(int section, {bool isGrid = false}) => isGrid
-      ? _animatedGridKeys[section]?.currentState == null
-      : _animatedListKeys[section]?.currentState == null;
+  bool resetAnimatedKey(int section,
+      {bool isGrid = false, bool horizontal = false}) {
+    if (isGrid) {
+      return _animatedGridKeys[section]?.currentState == null;
+    }
+
+    return horizontal
+        ? _animatedListKeys[section]?.currentState == null
+        : _sliverAnimatedListKeys[section]?.currentState == null;
+  }
 
   Widget _buildVerticalSliverAnimatedList(int section, Section sectionItems) {
-    if (!_animatedListKeys.containsKey(section) || resetAnimatedKey(section)) {
-      _animatedListKeys[section] = GlobalKey<SliverAnimatedListState>();
+    if (!_sliverAnimatedListKeys.containsKey(section) ||
+        resetAnimatedKey(section)) {
+      _sliverAnimatedListKeys[section] = GlobalKey<SliverAnimatedListState>();
     }
     return SliverAnimatedList(
-      key: _animatedListKeys[section],
+      key: _sliverAnimatedListKeys[section],
       itemBuilder:
           (BuildContext context, int index, Animation<double> animation) {
         try {
@@ -729,8 +757,26 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         duration:
             isReplace && animDurationZeroOnReplace ? Duration.zero : duration,
       );
-    } else {
+    } else if (state.sections[state.itemSection].horizontalScroll) {
       final animState = _animatedList(state.itemSection);
+      if (animState == null) {
+        debugPrint(
+            'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in removeListItem');
+      }
+      animState?.removeItem(
+        state.itemIndex,
+        (context, animation) => buildRemovedListItem(
+            item: state.removedItem,
+            index: state.itemIndex,
+            section: state.itemSection,
+            context: context,
+            animation: animation,
+            isReplace: isReplace),
+        duration:
+            isReplace && animDurationZeroOnReplace ? Duration.zero : duration,
+      );
+    } else {
+      final animState = _sliverAnimatedList(state.itemSection);
       if (animState == null) {
         debugPrint(
             'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in removeListItem');
@@ -766,8 +812,18 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
           duration: isReplace && animDurationZeroOnReplace
               ? Duration.zero
               : duration);
-    } else {
+    } else if (state.sections[state.itemSection].horizontalScroll) {
       final animState = _animatedList(state.itemSection);
+      if (animState == null) {
+        debugPrint(
+            'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
+      }
+      animState?.insertItem(state.itemIndex,
+          duration: isReplace && animDurationZeroOnReplace
+              ? Duration.zero
+              : duration);
+    } else {
+      final animState = _sliverAnimatedList(state.itemSection);
       if (animState == null) {
         debugPrint(
             'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
