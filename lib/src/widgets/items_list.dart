@@ -26,9 +26,7 @@ class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
 
 class ItemsListState<TBloc extends ItemsManagerBloc>
     extends State<ItemsList<TBloc>> with AutomaticKeepAliveClientMixin {
-  ItemsListState({ScrollController? scrollController}) {
-    this.scrollController = scrollController ?? ScrollController();
-  }
+  ItemsListState({this.scrollController});
   late TBloc bloc;
 
   double get reloadThresholdPixels => 250;
@@ -39,7 +37,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   bool get useNestedScrollView => true;
 
-  late final ScrollController scrollController;
+  final ScrollController? scrollController;
 
   bool get buildSliversInSliverOverlapInjector => false;
 
