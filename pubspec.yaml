@@ -8,16 +8,16 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
+  auto_animated: ^3.0.1
+  bloc: ^8.0.2
+  dio: ^5.0.0
+  equatable: ^2.0.3
   flutter:
     sdk: flutter
-  equatable: ^2.0.3
-  http: ^0.13.4
-  bloc: ^8.0.2
   flutter_bloc: ^8.0.1
-  auto_animated: ^3.0.1
   flutter_lints: ^2.0.1
+  http: ^0.13.4
   universal_platform: ^1.0.0+1
-  dio: ^5.0.0
 
 dev_dependencies:
   flutter_test:

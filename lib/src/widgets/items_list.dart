@@ -841,7 +841,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   @override
   void dispose() {
-    scrollController.dispose();
+    scrollController?.dispose();
     super.dispose();
   }
 
