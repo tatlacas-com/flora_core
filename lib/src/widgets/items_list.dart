@@ -28,7 +28,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     extends State<ItemsList<TBloc>> with AutomaticKeepAliveClientMixin {
   ItemsListState({
     ScrollController? nestedScrollController,
-    this.innerScrollController,
+    this.customScrollController,
   }) {
     this.nestedScrollController = nestedScrollController ?? ScrollController();
   }
@@ -43,7 +43,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   bool get useNestedScrollView => true;
 
   late final ScrollController nestedScrollController;
-  final ScrollController? innerScrollController;
+  final ScrollController? customScrollController;
 
   bool get buildSliversInSliverOverlapInjector => false;
 
@@ -110,18 +110,28 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     _animatedGridKeys[section] = GlobalKey<SliverAnimatedGridState>();
   }
 
+  final GlobalKey<NestedScrollViewState> nestedScrollViewGlobalKey =
+      GlobalKey();
+  ScrollController? get innerController {
+    return useNestedScrollView
+        ? nestedScrollViewGlobalKey.currentState!.innerController
+        : null;
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     bloc = context.read<TBloc>();
     return useNestedScrollView
         ? NestedScrollView(
+            key: nestedScrollViewGlobalKey,
             controller: nestedScrollController,
             floatHeaderSlivers: floatHeaderSlivers,
             headerSliverBuilder: (BuildContext cnxt, bool innerBoxIsScrolled) {
               return buildAppBarSlivers(context);
             },
-            body: buildScrollViewWithListeners(context))
+            body: buildScrollViewWithListeners(context),
+          )
         : buildScrollViewWithListeners(context);
   }
 
@@ -251,7 +261,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: PageStorageKey<String>('${TBloc.runtimeType}${bloc.itemsCount}'),
       physics:
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-      controller: innerScrollController,
+      controller: useNestedScrollView ? null : customScrollController,
       //needed for RefreshIndicator to work
       slivers: withInjector
           ? buildSectionsWithOverlapInjector(context)
@@ -264,7 +274,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return RefreshIndicator(
       onRefresh: onRefreshIndicatorRefresh,
       child: CustomScrollView(
-        controller: innerScrollController,
+        controller: useNestedScrollView ? null : customScrollController,
         key: PageStorageKey<String>(TBloc.runtimeType.toString()),
         slivers: buildLoadingFailedSlivers(context, state),
       ),
@@ -850,7 +860,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   void disposeControllers() {
     nestedScrollController.dispose();
-    innerScrollController?.dispose();
+    customScrollController?.dispose();
   }
 
   @override
