@@ -377,6 +377,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     if (sectionHeader is Widgetable) {
       return sectionHeader.build(
           section: section,
+          context: context,
           index: -1,
           onClick: () => onListHeaderClick(
                 context: context,
@@ -393,6 +394,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     if (emptyEntity is Widgetable) {
       return emptyEntity.build(
         section: section,
+        context: context,
         index: -1,
       );
     } else if (emptyEntity is SizedBox) {
@@ -520,6 +522,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     if (item is Widgetable) {
       return item.build(
           section: section,
+          context: context,
           index: index,
           animation: animation,
           onClick: () => onListItemClick(
