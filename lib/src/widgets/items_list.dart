@@ -26,8 +26,11 @@ class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
 
 class ItemsListState<TBloc extends ItemsManagerBloc>
     extends State<ItemsList<TBloc>> with AutomaticKeepAliveClientMixin {
-  ItemsListState({ScrollController? scrollController}) {
-    this.scrollController = scrollController ?? ScrollController();
+  ItemsListState({
+    ScrollController? mainScrollController,
+    this.innerScrollController,
+  }) {
+    this.nestedScrollController = mainScrollController ?? ScrollController();
   }
   late TBloc bloc;
 
@@ -39,7 +42,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   bool get useNestedScrollView => true;
 
-  late final ScrollController? scrollController;
+  late final ScrollController? nestedScrollController;
+  final ScrollController? innerScrollController;
 
   bool get buildSliversInSliverOverlapInjector => false;
 
@@ -112,7 +116,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     bloc = context.read<TBloc>();
     return useNestedScrollView
         ? NestedScrollView(
-            controller: scrollController,
+            controller: nestedScrollController,
             floatHeaderSlivers: floatHeaderSlivers,
             headerSliverBuilder: (BuildContext cnxt, bool innerBoxIsScrolled) {
               return buildAppBarSlivers(context);
@@ -247,7 +251,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: PageStorageKey<String>('${TBloc.runtimeType}${bloc.itemsCount}'),
       physics:
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-      controller: scrollController,
+      controller: innerScrollController,
       //needed for RefreshIndicator to work
       slivers: withInjector
           ? buildSectionsWithOverlapInjector(context)
@@ -260,7 +264,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return RefreshIndicator(
       onRefresh: onRefreshIndicatorRefresh,
       child: CustomScrollView(
-        controller: scrollController,
+        controller: innerScrollController,
         key: PageStorageKey<String>(TBloc.runtimeType.toString()),
         slivers: buildLoadingFailedSlivers(context, state),
       ),
@@ -846,7 +850,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   @override
   void dispose() {
-    scrollController?.dispose();
+    nestedScrollController?.dispose();
+    innerScrollController?.dispose();
     super.dispose();
   }
 
