@@ -27,10 +27,10 @@ class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
 class ItemsListState<TBloc extends ItemsManagerBloc>
     extends State<ItemsList<TBloc>> with AutomaticKeepAliveClientMixin {
   ItemsListState({
-    ScrollController? mainScrollController,
+    ScrollController? nestedScrollController,
     this.innerScrollController,
   }) {
-    this.nestedScrollController = mainScrollController ?? ScrollController();
+    this.nestedScrollController = nestedScrollController ?? ScrollController();
   }
   late TBloc bloc;
 
@@ -42,7 +42,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   bool get useNestedScrollView => true;
 
-  late final ScrollController? nestedScrollController;
+  late final ScrollController nestedScrollController;
   final ScrollController? innerScrollController;
 
   bool get buildSliversInSliverOverlapInjector => false;
@@ -850,7 +850,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   @override
   void dispose() {
-    nestedScrollController?.dispose();
+    nestedScrollController.dispose();
     innerScrollController?.dispose();
     super.dispose();
   }
