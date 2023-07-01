@@ -119,9 +119,14 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   @override
+  void initState() {
+    super.initState();
+    bloc = context.read<TBloc>();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
-    bloc = context.read<TBloc>();
     return useNestedScrollView
         ? NestedScrollView(
             key: nestedScrollViewGlobalKey,
