@@ -848,10 +848,13 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  @override
-  void dispose() {
+  void disposeControllers() {
     nestedScrollController.dispose();
     innerScrollController?.dispose();
+  }
+
+  @override
+  void dispose() {
     super.dispose();
   }
 
