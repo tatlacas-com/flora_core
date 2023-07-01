@@ -172,32 +172,11 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return BlocConsumer<TBloc, ItemsManagerState>(
       listener: (context, state) {
         if (state is ItemRemovedState) {
-          _removeItem(state);
+          removeItem(state);
         } else if (state is ItemInsertedState) {
-          _insertItem(state);
+          insertItem(state);
         } else if (state is ItemReplacedState) {
-          _removeItem(
-            ItemRemovedState(
-              itemSection: state.itemSection,
-              changeParams: state.changeParams,
-              reachedBottom: state.reachedBottom,
-              itemIndex: state.itemIndex,
-              removedItem: state.removedItem,
-              sections: state.sections,
-            ),
-            isReplace: true,
-          );
-          _insertItem(
-            ItemInsertedState(
-              itemSection: state.itemSection,
-              reachedBottom: state.reachedBottom,
-              itemIndex: state.itemIndex,
-              changeParams: state.changeParams,
-              insertedItem: state.insertedItem,
-              sections: state.sections,
-            ),
-            isReplace: true,
-          );
+          replaceItem(state);
         }
       },
       listenWhen: (prev, next) => next is ItemChangedState,
@@ -208,7 +187,32 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  void _removeItem(
+  void replaceItem(ItemReplacedState state) {
+    removeItem(
+      ItemRemovedState(
+        itemSection: state.itemSection,
+        changeParams: state.changeParams,
+        reachedBottom: state.reachedBottom,
+        itemIndex: state.itemIndex,
+        removedItem: state.removedItem,
+        sections: state.sections,
+      ),
+      isReplace: true,
+    );
+    insertItem(
+      ItemInsertedState(
+        itemSection: state.itemSection,
+        reachedBottom: state.reachedBottom,
+        itemIndex: state.itemIndex,
+        changeParams: state.changeParams,
+        insertedItem: state.insertedItem,
+        sections: state.sections,
+      ),
+      isReplace: true,
+    );
+  }
+
+  void removeItem(
     ItemRemovedState state, {
     bool isReplace = false,
   }) {
@@ -218,7 +222,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  void _insertItem(
+  void insertItem(
     ItemInsertedState state, {
     bool isReplace = false,
   }) {
