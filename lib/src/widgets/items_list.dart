@@ -69,7 +69,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       <int, GlobalKey<SliverAnimatedGridState>>{};
 
   @protected
-  SliverAnimatedListState? _sliverAnimatedList(int section) {
+  SliverAnimatedListState? sliverAnimatedListState(int section) {
     if (_sliverAnimatedListKeys[section]?.currentState == null) {
       resetSliverAnimatedListKey(section);
     }
@@ -77,15 +77,15 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   @protected
-  AnimatedListState? _animatedList(int section) {
+  AnimatedListState? animatedListState(int section) {
     if (_animatedListKeys[section]?.currentState == null) {
-      resetSliverAnimatedListKey(section);
+      resetAnimatedListKey(section);
     }
     return _animatedListKeys[section]?.currentState;
   }
 
   @protected
-  SliverAnimatedGridState? _animatedGrid(int section) {
+  SliverAnimatedGridState? sliverAnimatedGridState(int section) {
     if (_animatedGridKeys[section]?.currentState == null) {
       resetAnimatedGridKey(section);
     }
@@ -747,7 +747,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     bool animDurationZeroOnReplace = true,
   }) {
     if (state.sections[state.itemSection].usesGrid) {
-      final animState = _animatedGrid(state.itemSection);
+      final animState = sliverAnimatedGridState(state.itemSection);
       if (animState == null) {
         debugPrint(
             'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in removeListItem');
@@ -765,7 +765,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
             isReplace && animDurationZeroOnReplace ? Duration.zero : duration,
       );
     } else if (state.sections[state.itemSection].horizontalScroll) {
-      final animState = _animatedList(state.itemSection);
+      final animState = animatedListState(state.itemSection);
       if (animState == null) {
         debugPrint(
             'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in removeListItem');
@@ -783,7 +783,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
             isReplace && animDurationZeroOnReplace ? Duration.zero : duration,
       );
     } else {
-      final animState = _sliverAnimatedList(state.itemSection);
+      final animState = sliverAnimatedListState(state.itemSection);
       if (animState == null) {
         debugPrint(
             'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in removeListItem');
@@ -810,7 +810,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     bool animDurationZeroOnReplace = true,
   }) {
     if (state.sections[state.itemSection].usesGrid) {
-      final animState = _animatedGrid(state.itemSection);
+      final animState = sliverAnimatedGridState(state.itemSection);
       if (animState == null) {
         debugPrint(
             'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
@@ -820,7 +820,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
               ? Duration.zero
               : duration);
     } else if (state.sections[state.itemSection].horizontalScroll) {
-      final animState = _animatedList(state.itemSection);
+      final animState = animatedListState(state.itemSection);
       if (animState == null) {
         debugPrint(
             'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
@@ -830,7 +830,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
               ? Duration.zero
               : duration);
     } else {
-      final animState = _sliverAnimatedList(state.itemSection);
+      final animState = sliverAnimatedListState(state.itemSection);
       if (animState == null) {
         debugPrint(
             'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
@@ -855,6 +855,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   @override
   void dispose() {
+    disposeControllers();
     super.dispose();
   }
 
