@@ -341,7 +341,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   List<Widget> buildSections(BuildContext context) {
     final state = bloc.state as LoadedState;
-    final List<Widget> sections = []; //buildAppBarSlivers(context);
+    final List<Widget> sections = [];
     if (state.isNotEmpty) {
       for (int sectionIndex = 0;
           sectionIndex < state.totalSections;
@@ -350,24 +350,29 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
           sections.add(buildSectionHeaderSliver(
               sectionIndex, context, state.sectionHeader(sectionIndex)));
         }
-        double marginBottom = sectionIndex == state.totalSections - 1 ? 80 : 0;
-        if (state.section(sectionIndex).isEmpty) {
-          sections.add(buildEmptySectionSliver(
-              context, sectionIndex, state.section(sectionIndex).emptyEntity));
-        } else {
-          sections.add(
-            state.usesGrid(sectionIndex)
-                ? sectionSliverGrid(sectionIndex, context,
-                    state.section(sectionIndex), marginBottom)
-                : sectionSliverList(sectionIndex, context,
-                    state.section(sectionIndex), marginBottom),
-          );
-        }
+        addSectionSliver(sectionIndex, state, sections, context);
       }
     } else {
       sections.add(buildEmptySliver(context));
     }
     return sections;
+  }
+
+  void addSectionSliver(int sectionIndex, LoadedState state,
+      List<Widget> sections, BuildContext context) {
+    double marginBottom = sectionIndex == state.totalSections - 1 ? 80 : 0;
+    if (state.section(sectionIndex).isEmpty) {
+      sections.add(buildEmptySectionSliver(
+          context, sectionIndex, state.section(sectionIndex).emptyEntity));
+    } else {
+      sections.add(
+        state.usesGrid(sectionIndex)
+            ? sectionSliverGrid(sectionIndex, context,
+                state.section(sectionIndex), marginBottom)
+            : sectionSliverList(sectionIndex, context,
+                state.section(sectionIndex), marginBottom),
+      );
+    }
   }
 
   Widget buildEmptySectionSliver(
