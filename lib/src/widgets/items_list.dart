@@ -29,6 +29,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   ItemsListState({
     ScrollController? nestedScrollController,
     this.customScrollController,
+    this.scrollPhysics,
   }) {
     this.nestedScrollController = nestedScrollController ?? ScrollController();
   }
@@ -44,6 +45,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   late final ScrollController nestedScrollController;
   final ScrollController? customScrollController;
+  final ScrollPhysics? scrollPhysics;
 
   bool get buildSliversInSliverOverlapInjector => false;
 
@@ -268,7 +270,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         buildSliversInSliverOverlapInjector;
     return CustomScrollView(
       key: PageStorageKey<String>('${TBloc.runtimeType}${bloc.itemsCount}'),
-      physics:
+      physics: scrollPhysics ??
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       controller: useNestedScrollView ? null : customScrollController,
       //needed for RefreshIndicator to work
