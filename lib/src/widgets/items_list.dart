@@ -321,6 +321,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   bool useAnimated(int section) => true;
+  double horizontalHeight(int section) => throw Exception(
+      'Provide height for this horizontal list section: $section');
 
   List<Widget> buildSectionsWithOverlapInjector(BuildContext context) {
     var sections = buildSections(context);
@@ -450,7 +452,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget buildHorizontalSliverGrid(int section, Section sectionItems) {
     return SliverToBoxAdapter(
       child: SizedBox(
-        height: sectionItems.horizontalScrollHeight,
+        height: horizontalHeight(section),
         child: GridView.builder(
           gridDelegate: _buildSliverGridDelegate(section),
           itemBuilder: (context, index) {
@@ -482,7 +484,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget buildHorizontalSliverListContents(int section, Section sectionItems) {
     return SizedBox(
-      height: sectionItems.horizontalScrollHeight,
+      height: horizontalHeight(section),
       child: useAnimated(section)
           ? _buildHorizontalAnimatedList(section, sectionItems)
           : _buildHorizontalList(section, sectionItems),
