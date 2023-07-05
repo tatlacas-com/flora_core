@@ -295,12 +295,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   List<Widget> buildLoadingFailedSlivers(
       BuildContext context, LoadItemsFailedState state) {
     return [
-      SliverPadding(
-        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-        sliver: SliverFillRemaining(
-          hasScrollBody: false,
-          child: buildLoadingFailedWidget(context, state),
-        ),
+      SliverFillRemaining(
+        hasScrollBody: false,
+        child: buildLoadingFailedWidget(context, state),
       )
     ];
   }
@@ -381,21 +378,15 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget buildEmptySectionSliver(
       BuildContext context, int sectionIndex, dynamic emptyEntity) {
-    return SliverPadding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-      sliver: SliverToBoxAdapter(
-        child: buildSectionEmptyView(sectionIndex, context, emptyEntity),
-      ),
+    return SliverToBoxAdapter(
+      child: buildSectionEmptyView(sectionIndex, context, emptyEntity),
     );
   }
 
   Widget buildEmptySliver(BuildContext context) {
-    return SliverPadding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-      sliver: SliverFillRemaining(
-        hasScrollBody: false,
-        child: buildEmptyView(context),
-      ),
+    return SliverFillRemaining(
+      hasScrollBody: false,
+      child: buildEmptyView(context),
     );
   }
 
