@@ -165,7 +165,13 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     if (_loading) return;
     _loading = true;
     try {
-      emit(const ItemsLoadingState());
+      final skeletons = await loadingSkeletons();
+      final hasSkeletons = skeletons.isNotEmpty;
+      if (hasSkeletons) {
+        emit(ItemsRetrievedState(items: skeletons));
+      } else {
+        emit(const ItemsLoadingState());
+      }
       if (event.fromCloud) {
         var loadedItems = await loadItemsFromCloud(emit);
         if (loadedItems.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
@@ -208,13 +214,22 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   @protected
+  Future<List<Section>> loadingSkeletons() async => [];
+
+  @protected
   FutureOr<void> onLoadItemsRequested(
       LoadItemsEvent event, Emitter<ItemsManagerState> emit) async {
     if (_loading) return;
     _loading = true;
 
     if (state is LoadingMoreItemsState) return;
-    emit(const ItemsLoadingState());
+    final skeletons = await loadingSkeletons();
+    final hasSkeletons = skeletons.isNotEmpty;
+    if (hasSkeletons) {
+      emit(ItemsRetrievedState(items: skeletons));
+    } else {
+      emit(const ItemsLoadingState());
+    }
     try {
       var loadedItems = await loadItemsFromLocalStorage(emit);
       if (loadedItems.isNotEmpty) {
