@@ -259,7 +259,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   Future onLoadItemsException(
       Emitter<ItemsManagerState> emit, dynamic e) async {
     emit(LoadItemsFailedState(
-        exceptionType: e is DioError
+        exceptionType: e is DioException
             ? NetworkExceptionType.other.fromCode(e.response?.statusCode)
             : NetworkExceptionType.other));
   }
@@ -415,7 +415,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       LoadMoreItemsFailedState(
           reachedBottom: false,
           sections: loadedState.sections,
-          exceptionType: e is DioError
+          exceptionType: e is DioException
               ? NetworkExceptionType.other.fromCode(e.response?.statusCode)
               : NetworkExceptionType.other),
     );

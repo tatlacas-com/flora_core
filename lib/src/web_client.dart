@@ -38,7 +38,7 @@ abstract class WebClient extends Interceptor with EquatableMixin {
   }
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     final endpoint = err.requestOptions.uri.toString();
     final statusCode = err.response?.statusCode;
     if (statusCode == 403) {
