@@ -51,10 +51,11 @@ abstract class LoadedState extends ItemsManagerState {
 }
 
 class ItemsRetrievedState extends LoadedState implements ItemsBuildUi {
-  const ItemsRetrievedState({required List<Section> items})
-      : super(
+  const ItemsRetrievedState({
+    required List<Section> items,
+    super.reachedBottom = false,
+  }) : super(
           sections: items,
-          reachedBottom: false,
         );
 }
 

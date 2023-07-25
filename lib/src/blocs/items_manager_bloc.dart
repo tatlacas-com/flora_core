@@ -168,7 +168,10 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       final skeletons = await loadingSkeletons();
       final hasSkeletons = skeletons.isNotEmpty;
       if (hasSkeletons) {
-        emit(ItemsRetrievedState(items: skeletons));
+        emit(ItemsRetrievedState(
+          items: skeletons,
+          reachedBottom: true,
+        ));
       } else {
         emit(const ItemsLoadingState());
       }
@@ -226,7 +229,12 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     final skeletons = await loadingSkeletons();
     final hasSkeletons = skeletons.isNotEmpty;
     if (hasSkeletons) {
-      emit(ItemsRetrievedState(items: skeletons));
+      emit(
+        ItemsRetrievedState(
+          items: skeletons,
+          reachedBottom: true,
+        ),
+      );
     } else {
       emit(const ItemsLoadingState());
     }
