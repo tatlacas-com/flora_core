@@ -208,12 +208,58 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   FutureOr<void> emitItemsRetrieved(
       Emitter<ItemsManagerState> emit, List<Section> items) async {
-    emit(ItemsRetrievedState(items: items));
+    final st = state;
+    if (st is ItemsRetrievedState) {
+      replaceAllItems(st, emit, items);
+    } else {
+      emit(ItemsRetrievedState(items: items));
+    }
+  }
+
+  void replaceAllItems(ItemsRetrievedState st, Emitter<ItemsManagerState> emit,
+      List<Section> sections) {
+    for (var i = 0; i < st.sections.length; i++) {
+      while (st.sections[i].items.isNotEmpty) {
+        final item = st.sections[i].items.removeAt(0);
+        emit(
+          ItemRemovedState(
+            itemSection: i,
+            reachedBottom: st.reachedBottom,
+            itemIndex: 0,
+            removedItem: item,
+            sections: st.sections,
+          ),
+        );
+      }
+    }
+    var indx = 0;
+    for (var i = 0; i < sections.length; i++) {
+      if (st.sections.length <= i) {
+        st.sections.add(sections[i].copyWith(items: <dynamic>[]));
+      }
+      for (final item in sections[i].items) {
+        st.sections[i].items.add(item);
+        emit(
+          ItemInsertedState(
+            itemSection: i,
+            reachedBottom: st.reachedBottom,
+            itemIndex: indx++,
+            insertedItem: item,
+            sections: st.sections,
+          ),
+        );
+      }
+    }
   }
 
   FutureOr<void> emitItemsReloadRetrieved(
       Emitter<ItemsManagerState> emit, List<Section> items) async {
-    emit(ItemsRetrievedState(items: items));
+    final st = state;
+    if (st is ItemsRetrievedState) {
+      replaceAllItems(st, emit, items);
+    } else {
+      emit(ItemsRetrievedState(items: items));
+    }
   }
 
   @protected
