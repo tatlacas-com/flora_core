@@ -272,7 +272,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: PageStorageKey<String>('${TBloc.runtimeType}${bloc.itemsCount}'),
       physics: scrollPhysics ??
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-      controller: useNestedScrollView ? null : customScrollController,
+      controller: customScrollController,
       //needed for RefreshIndicator to work
       slivers: withInjector
           ? buildSectionsWithOverlapInjector(context)
