@@ -69,6 +69,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   final Map<int, GlobalKey<AnimatedListState>> _animatedListKeys =
       <int, GlobalKey<AnimatedListState>>{};
 
+  ScrollController? controllerFor(int section) => null;
+
   final Map<int, GlobalKey<SliverAnimatedGridState>> _animatedGridKeys =
       <int, GlobalKey<SliverAnimatedGridState>>{};
 
@@ -620,6 +622,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     }
     return AnimatedList(
       key: _animatedListKeys[section],
+      controller: controllerFor(section),
       itemBuilder:
           (BuildContext context, int index, Animation<double> animation) =>
               buildAnimatedListItem(
