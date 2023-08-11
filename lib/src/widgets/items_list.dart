@@ -31,9 +31,11 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     this.customScrollController,
     this.scrollPhysics,
   }) {
+    _disposeController = nestedScrollController == null;
     this.nestedScrollController = nestedScrollController ?? ScrollController();
   }
   late TBloc bloc;
+  late bool _disposeController;
 
   double get reloadThresholdPixels => 250;
 
@@ -867,14 +869,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  void disposeControllers() {
-    nestedScrollController.dispose();
-    customScrollController?.dispose();
-  }
-
   @override
   void dispose() {
-    disposeControllers();
+    if (_disposeController) {
+      nestedScrollController.dispose();
+    }
+
     super.dispose();
   }
 
