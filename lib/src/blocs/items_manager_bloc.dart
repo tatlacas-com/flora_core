@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -63,18 +64,28 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   ItemsManagerBloc(
       {this.repo, ItemsManagerState initialState = const ItemsInitialState()})
       : super(initialState) {
-    on<LoadItemsEvent>(onLoadItemsRequested);
-    on<ReloadItemsEvent>(onReloadItemsRequested);
+    on<LoadItemsEvent>(
+      (event, emit) => add(_LoaderEvent(event)),
+      transformer: droppable(),
+    );
+    on<ReloadItemsEvent>(
+      (event, emit) => add(_LoaderEvent(event)),
+      transformer: droppable(),
+    );
     on<ReplaceItemEvent>(onReplaceItem);
     on<InsertItemEvent>(onInsertItem);
     on<RemoveItemEvent>(onRemoveItem);
-    on<LoadMoreItemsEvent>(onLoadMoreItemsEvent);
+    on<LoadMoreItemsEvent>(
+      onLoadMoreItemsEvent,
+      transformer: droppable(),
+    );
     on<EmitRetrievedEvent>(onEmitRetrievedEvent);
+    on<_LoaderEvent>(
+      _onLoaderEvent,
+      transformer: droppable(),
+    );
   }
   final TRepo? repo;
-  bool _loading = false;
-
-  bool get loading => _loading;
 
   int get itemsCount {
     final currState = state;
@@ -92,6 +103,16 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     return st.itemSection == section &&
         st.itemIndex == index &&
         st.insertedItem == item;
+  }
+
+  FutureOr<void> _onLoaderEvent(
+      _LoaderEvent event, Emitter<ItemsManagerState> emit) async {
+    final loadEvent = event.event;
+    await switch (loadEvent) {
+      LoadItemsEvent() => onLoadItemsRequested(loadEvent, emit),
+      ReloadItemsEvent() => onReloadItemsRequested(loadEvent, emit),
+      _ => Future.value(),
+    };
   }
 
   @protected
@@ -162,8 +183,6 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   @protected
   FutureOr<void> onReloadItemsRequested(
       ReloadItemsEvent event, Emitter<ItemsManagerState> emit) async {
-    if (_loading) return;
-    _loading = true;
     try {
       final skeletons = await loadingSkeletons();
       final hasSkeletons = skeletons.isNotEmpty;
@@ -178,22 +197,18 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       if (event.fromCloud) {
         var loadedItems = await loadItemsFromCloud(emit);
         if (loadedItems.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
-          _loading = false;
           await emitItemsReloadRetrieved(emit, loadedItems);
           return;
         }
         emit(ReloadFromCloudEmptyState());
         loadedItems = await loadItemsFromLocalStorage(emit);
-        _loading = false;
         await emitItemsReloadRetrieved(emit, loadedItems);
       } else {
         var loadedItems = await loadItemsFromLocalStorage(emit);
-        _loading = false;
         await emitItemsReloadRetrieved(emit, loadedItems);
       }
     } catch (e) {
       debugPrint('Error: $runtimeType onReloadItemsRequested: $e');
-      _loading = false;
       await onLoadItemsException(emit, e);
       rethrow;
     }
@@ -268,9 +283,6 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   @protected
   FutureOr<void> onLoadItemsRequested(
       LoadItemsEvent event, Emitter<ItemsManagerState> emit) async {
-    if (_loading) return;
-    _loading = true;
-
     if (state is LoadingMoreItemsState) return;
     final skeletons = await loadingSkeletons();
     final hasSkeletons = skeletons.isNotEmpty;
@@ -287,16 +299,13 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     try {
       var loadedItems = await loadItemsFromLocalStorage(emit);
       if (loadedItems.isNotEmpty) {
-        _loading = false;
         await emitItemsRetrieved(emit, loadedItems);
         return;
       }
       loadedItems = await loadItemsFromCloud(emit);
-      _loading = false;
       await emitItemsRetrieved(emit, loadedItems);
     } catch (e) {
       debugPrint('Error: $runtimeType onLoadItemsRequested: $e');
-      _loading = false;
       await onLoadItemsException(emit, e);
       rethrow;
     }
@@ -427,16 +436,12 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
   }
 
-  bool _loadingMore = false;
-
   @protected
   FutureOr<void> onLoadMoreItemsEvent(
       LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async {
-    if (_loadingMore) return;
     if (state is! LoadedState) return;
     var loadedState = state as LoadedState;
     if (loadedState.reachedBottom) return;
-    _loadingMore = true;
     try {
       emit(
         LoadingMoreItemsState(
@@ -449,10 +454,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     } catch (e) {
       debugPrint('Error: $runtimeType onLoadMoreItemsEvent  $e');
       await onLoadMoreItemsException(emit, loadedState, e);
-      _loadingMore = false;
       rethrow;
     }
-    _loadingMore = false;
   }
 
   Future onLoadMoreItemsException(Emitter<ItemsManagerState> emit,

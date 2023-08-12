@@ -2,8 +2,7 @@
 
 part of 'items_manager_bloc.dart';
 
-abstract class ItemsManagerEvent extends Equatable {
-
+sealed class ItemsManagerEvent extends Equatable {
   ItemsManagerEvent({DateTime? requestId})
       : this.requestId = requestId ?? DateTime.now();
   final DateTime requestId;
@@ -12,12 +11,16 @@ abstract class ItemsManagerEvent extends Equatable {
   List<Object?> get props => [requestId];
 }
 
-class LoadItemsEvent extends ItemsManagerEvent {
+final class LoadItemsEvent extends ItemsManagerEvent {
   LoadItemsEvent();
 }
 
-abstract class ChangeItemEvent extends ItemsManagerEvent {
+final class _LoaderEvent extends ItemsManagerEvent {
+  _LoaderEvent(this.event);
+  final ItemsManagerEvent event;
+}
 
+sealed class ChangeItemEvent extends ItemsManagerEvent {
   ChangeItemEvent({
     required this.item,
     required this.section,
@@ -31,7 +34,7 @@ abstract class ChangeItemEvent extends ItemsManagerEvent {
   List<Object?> get props => [item, section, index];
 }
 
-class ReplaceItemEvent extends ChangeItemEvent {
+final class ReplaceItemEvent extends ChangeItemEvent {
   ReplaceItemEvent({
     required super.item,
     required super.section,
@@ -39,7 +42,7 @@ class ReplaceItemEvent extends ChangeItemEvent {
   });
 }
 
-class RemoveItemEvent extends ChangeItemEvent {
+final class RemoveItemEvent extends ChangeItemEvent {
   RemoveItemEvent({
     required super.item,
     required super.section,
@@ -47,7 +50,7 @@ class RemoveItemEvent extends ChangeItemEvent {
   });
 }
 
-class InsertItemEvent extends ChangeItemEvent {
+final class InsertItemEvent extends ChangeItemEvent {
   InsertItemEvent({
     required super.item,
     required super.section,
@@ -55,8 +58,7 @@ class InsertItemEvent extends ChangeItemEvent {
   });
 }
 
-class ReloadItemsEvent extends ItemsManagerEvent {
-
+final class ReloadItemsEvent extends ItemsManagerEvent {
   ReloadItemsEvent({
     this.fromCloud = true,
     this.loadFromLocalIfCloudEmpty = true,
@@ -69,10 +71,10 @@ class ReloadItemsEvent extends ItemsManagerEvent {
   List<Object?> get props => [fromCloud, loadFromLocalIfCloudEmpty, requestId];
 }
 
-class LoadMoreItemsEvent extends ItemsManagerEvent {
+final class LoadMoreItemsEvent extends ItemsManagerEvent {
   LoadMoreItemsEvent({
     super.requestId,
   });
 }
 
-class EmitRetrievedEvent extends ItemsManagerEvent {}
+final class EmitRetrievedEvent extends ItemsManagerEvent {}
