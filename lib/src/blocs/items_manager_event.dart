@@ -2,7 +2,7 @@
 
 part of 'items_manager_bloc.dart';
 
-sealed class ItemsManagerEvent extends Equatable {
+abstract class ItemsManagerEvent extends Equatable {
   ItemsManagerEvent({DateTime? requestId})
       : this.requestId = requestId ?? DateTime.now();
   final DateTime requestId;
@@ -20,7 +20,7 @@ final class _LoaderEvent extends ItemsManagerEvent {
   final ItemsManagerEvent event;
 }
 
-sealed class ChangeItemEvent extends ItemsManagerEvent {
+abstract class ChangeItemEvent extends ItemsManagerEvent {
   ChangeItemEvent({
     required this.item,
     required this.section,
