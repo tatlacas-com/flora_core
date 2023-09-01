@@ -232,7 +232,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   void replaceAllItems(ItemsRetrievedState st, Emitter<ItemsManagerState> emit,
-      List<Section> sections) {
+      List<Section> sections,
+      {bool firstTime = false}) {
     for (var i = 0; i < st.sections.length; i++) {
       while (st.sections[i].items.isNotEmpty) {
         final item = st.sections[i].items.removeAt(0);
@@ -248,17 +249,20 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       }
     }
     var indx = 0;
+    var reachedBottom = firstTime ? false : st.reachedBottom;
     for (var i = 0; i < sections.length; i++) {
       if (st.sections.length <= i) {
         st.sections.add(sections[i].copyWith(items: <dynamic>[]));
       }
       for (final item in sections[i].items) {
         st.sections[i].items.add(item);
+        final isLastItem =
+            (indx == sections[i].items.length - 1) && i == sections.length - 1;
         emit(
           ItemInsertedState(
             itemSection: i,
-            reachedBottom: st.reachedBottom,
             itemIndex: indx++,
+            reachedBottom: isLastItem ? reachedBottom : st.reachedBottom,
             insertedItem: item,
             sections: st.sections,
           ),
