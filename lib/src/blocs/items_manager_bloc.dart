@@ -225,7 +225,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       Emitter<ItemsManagerState> emit, List<Section> items) async {
     final st = state;
     if (st is ItemsRetrievedState) {
-      replaceAllItems(
+      await replaceAllItems(
         st,
         emit,
         items,
@@ -236,9 +236,9 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
   }
 
-  void replaceAllItems(ItemsRetrievedState st, Emitter<ItemsManagerState> emit,
-      List<Section> sections,
-      {bool firstTime = false}) {
+  Future<void> replaceAllItems(ItemsRetrievedState st,
+      Emitter<ItemsManagerState> emit, List<Section> sections,
+      {bool firstTime = false}) async {
     for (var i = 0; i < st.sections.length; i++) {
       while (st.sections[i].items.isNotEmpty) {
         final item = st.sections[i].items.removeAt(0);
@@ -254,7 +254,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       }
     }
     var indx = 0;
-    var reachedBottom = firstTime ? false : st.reachedBottom;
+
     for (var i = 0; i < sections.length; i++) {
       if (st.sections.length <= i) {
         st.sections.add(sections[i].copyWith(items: <dynamic>[]));
@@ -263,15 +263,33 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         st.sections[i].items.add(item);
         final isLastItem =
             (indx == sections[i].items.length - 1) && i == sections.length - 1;
+        var reachedBottom = !firstTime || !isLastItem
+            ? st.reachedBottom
+            : hasReachedBottom(i, sections[i].items);
+
         emit(
           ItemInsertedState(
             itemSection: i,
             itemIndex: indx++,
-            reachedBottom: isLastItem ? reachedBottom : st.reachedBottom,
+            reachedBottom: reachedBottom,
             insertedItem: item,
             sections: st.sections,
           ),
         );
+
+        if (firstTime && isLastItem && reachedBottom) {
+          try {
+            _insertBottomSpacer(
+              state as LoadedState,
+              emit,
+            );
+          } catch (e) {
+            debugPrint(
+                'Error: replaceAllItems $runtimeType insertBottomSpacer: $e');
+            await onLoadItemsException(emit, e);
+            rethrow;
+          }
+        }
       }
     }
   }
@@ -280,7 +298,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       Emitter<ItemsManagerState> emit, List<Section> items) async {
     final st = state;
     if (st is ItemsRetrievedState) {
-      replaceAllItems(
+      await replaceAllItems(
         st,
         emit,
         items,
