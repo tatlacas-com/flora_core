@@ -225,7 +225,12 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       Emitter<ItemsManagerState> emit, List<Section> items) async {
     final st = state;
     if (st is ItemsRetrievedState) {
-      replaceAllItems(st, emit, items);
+      replaceAllItems(
+        st,
+        emit,
+        items,
+        firstTime: true,
+      );
     } else {
       emit(ItemsRetrievedState(items: items));
     }
