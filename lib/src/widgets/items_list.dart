@@ -116,6 +116,10 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     _animatedGridKeys[section] = GlobalKey<SliverAnimatedGridState>();
   }
 
+  @protected
+  final GlobalKey<RefreshIndicatorState> refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
+
   final GlobalKey<NestedScrollViewState> nestedScrollViewGlobalKey =
       GlobalKey();
   ScrollController? get innerController {
@@ -156,6 +160,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       },
       child: pullToRefresh
           ? RefreshIndicator(
+              key: refreshIndicatorKey,
               onRefresh: onRefreshIndicatorRefresh,
               child: buildCustomScrollView(context),
             )
@@ -164,7 +169,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Future onRefreshIndicatorRefresh() async {
+    final reloading = bloc.stream
+        .where((state) =>
+            !(state is ReloadingItemsState || state is ItemsLoadingState))
+        .first;
     bloc.add(ReloadItemsEvent());
+    await reloading;
   }
 
   Widget buildScrollViewWithListeners(BuildContext context) {
@@ -287,6 +297,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget _buildLoadingFailed(LoadItemsFailedState state, BuildContext context) {
     onLoadItemsFailedState(state);
     return RefreshIndicator(
+      key: refreshIndicatorKey,
       onRefresh: onRefreshIndicatorRefresh,
       child: CustomScrollView(
         controller: useNestedScrollView ? null : customScrollController,
