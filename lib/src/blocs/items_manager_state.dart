@@ -59,6 +59,15 @@ class ItemsRetrievedState extends LoadedState implements ItemsBuildUi {
         );
 }
 
+class ReloadingItemsState extends LoadedState implements ItemsBuildUi {
+  const ReloadingItemsState({
+    required List<Section> items,
+    super.reachedBottom = false,
+  }) : super(
+          sections: items,
+        );
+}
+
 class ItemReplacedState extends ItemChangedState {
   const ItemReplacedState({
     required super.itemSection,

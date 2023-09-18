@@ -184,13 +184,14 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   FutureOr<void> onReloadItemsRequested(
       ReloadItemsEvent event, Emitter<ItemsManagerState> emit) async {
     try {
-      final skeletons = await loadingSkeletons();
-      final hasSkeletons = skeletons.isNotEmpty;
-      if (hasSkeletons) {
-        emit(ItemsRetrievedState(
-          items: skeletons,
-          reachedBottom: true,
-        ));
+      final st = state;
+      if (st is LoadedState) {
+        emit(
+          ReloadingItemsState(
+            items: st.sections,
+            reachedBottom: st.reachedBottom,
+          ),
+        );
       } else {
         emit(const ItemsLoadingState());
       }
