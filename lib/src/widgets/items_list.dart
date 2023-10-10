@@ -286,7 +286,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         buildSliversInSliverOverlapInjector;
     return CustomScrollView(
       key: PageStorageKey<String>(
-          pageStorageKey ?? '${TBloc.runtimeType}${bloc.itemsCount}'),
+          pageStorageKey ?? '$runtimeType${bloc.itemsCount}'),
       physics: scrollPhysics ??
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       controller: customScrollController,
@@ -304,8 +304,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       onRefresh: onRefreshIndicatorRefresh,
       child: CustomScrollView(
         controller: useNestedScrollView ? null : customScrollController,
-        key: PageStorageKey<String>(
-            pageStorageKey ?? TBloc.runtimeType.toString()),
+        key: PageStorageKey<String>(pageStorageKey ?? runtimeType.toString()),
         slivers: buildLoadingFailedSlivers(context, state),
       ),
     );
