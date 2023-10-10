@@ -30,7 +30,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     ScrollController? nestedScrollController,
     this.customScrollController,
     this.scrollPhysics,
-    this.pageStorageKey,
   }) {
     _disposeController = nestedScrollController == null;
     this.nestedScrollController = nestedScrollController ?? ScrollController();
@@ -49,7 +48,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   late final ScrollController nestedScrollController;
   final ScrollController? customScrollController;
   final ScrollPhysics? scrollPhysics;
-  final String? pageStorageKey;
 
   bool get buildSliversInSliverOverlapInjector => false;
 
@@ -271,9 +269,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     throw ArgumentError('buildOnStateChanged Not supported state $state');
   }
 
-  @protected
-  void onLoadItemsFailedState(LoadItemsFailedState state) {}
-
   void onScrollNotification(ScrollNotification scrollInfo) {
     var diff = scrollInfo.metrics.maxScrollExtent - scrollInfo.metrics.pixels;
     if (diff < reloadThresholdPixels) {
@@ -284,9 +279,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget buildItemsRetrievedScrollView(BuildContext context) {
     var withInjector = widget.buildSliversInSliverOverlapInjector ||
         buildSliversInSliverOverlapInjector;
+    final key = '${runtimeType}Items';
     return CustomScrollView(
-      key: PageStorageKey<String>(
-          pageStorageKey ?? '$runtimeType${bloc.itemsCount}'),
+      key: PageStorageKey<String>(key),
       physics: scrollPhysics ??
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       controller: customScrollController,
@@ -298,13 +293,13 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget _buildLoadingFailed(LoadItemsFailedState state, BuildContext context) {
-    onLoadItemsFailedState(state);
+    final key = runtimeType.toString();
     return RefreshIndicator(
       key: refreshIndicatorKey,
       onRefresh: onRefreshIndicatorRefresh,
       child: CustomScrollView(
         controller: useNestedScrollView ? null : customScrollController,
-        key: PageStorageKey<String>(pageStorageKey ?? runtimeType.toString()),
+        key: PageStorageKey<String>(key),
         slivers: buildLoadingFailedSlivers(context, state),
       ),
     );
