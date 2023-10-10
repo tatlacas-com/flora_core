@@ -30,6 +30,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     ScrollController? nestedScrollController,
     this.customScrollController,
     this.scrollPhysics,
+    this.pageStorageKey,
   }) {
     _disposeController = nestedScrollController == null;
     this.nestedScrollController = nestedScrollController ?? ScrollController();
@@ -48,6 +49,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   late final ScrollController nestedScrollController;
   final ScrollController? customScrollController;
   final ScrollPhysics? scrollPhysics;
+  final String? pageStorageKey;
 
   bool get buildSliversInSliverOverlapInjector => false;
 
@@ -283,7 +285,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     var withInjector = widget.buildSliversInSliverOverlapInjector ||
         buildSliversInSliverOverlapInjector;
     return CustomScrollView(
-      key: PageStorageKey<String>('${TBloc.runtimeType}${bloc.itemsCount}'),
+      key: PageStorageKey<String>(
+          pageStorageKey ?? '${TBloc.runtimeType}${bloc.itemsCount}'),
       physics: scrollPhysics ??
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       controller: customScrollController,
@@ -301,7 +304,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       onRefresh: onRefreshIndicatorRefresh,
       child: CustomScrollView(
         controller: useNestedScrollView ? null : customScrollController,
-        key: PageStorageKey<String>(TBloc.runtimeType.toString()),
+        key: PageStorageKey<String>(
+            pageStorageKey ?? TBloc.runtimeType.toString()),
         slivers: buildLoadingFailedSlivers(context, state),
       ),
     );
