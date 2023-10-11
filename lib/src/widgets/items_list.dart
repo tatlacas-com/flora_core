@@ -134,6 +134,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     bloc = context.read<TBloc>();
   }
 
+  @mustCallSuper
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -293,15 +294,10 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget _buildLoadingFailed(LoadItemsFailedState state, BuildContext context) {
-    final key = runtimeType.toString();
-    return RefreshIndicator(
-      key: refreshIndicatorKey,
-      onRefresh: onRefreshIndicatorRefresh,
-      child: CustomScrollView(
-        controller: useNestedScrollView ? null : customScrollController,
-        key: PageStorageKey<String>(key),
-        slivers: buildLoadingFailedSlivers(context, state),
-      ),
+    return CustomScrollView(
+      controller: useNestedScrollView ? null : customScrollController,
+      key: PageStorageKey<String>(runtimeType.toString()),
+      slivers: buildLoadingFailedSlivers(context, state),
     );
   }
 
