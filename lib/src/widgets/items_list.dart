@@ -196,7 +196,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         if (state is ItemRemovedState) {
           removeItem(state);
         } else if (state is ItemInsertedState) {
-          insertItem(state);
+          insertItem(state, animated: state.animated);
         } else if (state is ItemReplacedState) {
           replaceItem(state);
         }
@@ -247,7 +247,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   void insertItem(
     ItemInsertedState state, {
     bool isReplace = false,
-    bool animated = true,
+    bool animated = false,
   }) {
     insertListItem(
       state: state,
@@ -839,7 +839,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     required bool isReplace,
     Duration duration = const Duration(milliseconds: 300),
     bool animDurationZeroOnReplace = true,
-    bool animated = true,
+    bool animated = false,
   }) {
     if (state.sections[state.itemSection].usesGrid) {
       final animState = sliverAnimatedGridState(state.itemSection);
