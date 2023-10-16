@@ -277,7 +277,6 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
             reachedBottom: reachedBottom,
             insertedItem: item,
             sections: st.sections,
-            animated: false,
           ),
         );
 
@@ -378,7 +377,6 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           itemIndex: lastItemIndex,
           insertedItem: insertedItem,
           sections: loadedState.sections,
-          animated: false,
         ),
       );
     }
@@ -435,7 +433,6 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           itemIndex: indx++,
           insertedItem: item,
           sections: loadedState.sections,
-          animated: false,
         ),
       );
     }
@@ -469,7 +466,6 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           itemIndex: loadedState.sections[lastSection].items.length - 1,
           insertedItem: spacer,
           sections: loadedState.sections,
-          animated: false,
         ),
       );
     }

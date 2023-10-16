@@ -229,7 +229,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         changeParams: state.changeParams,
         insertedItem: state.insertedItem,
         sections: state.sections,
-        animated: false,
       ),
       isReplace: true,
     );

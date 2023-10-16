@@ -98,7 +98,7 @@ class ItemInsertedState extends ItemChangedState {
     required super.itemIndex,
     required super.insertedItem,
     required super.sections,
-    required this.animated,
+    this.animated = false,
   });
   final bool animated;
   @override
