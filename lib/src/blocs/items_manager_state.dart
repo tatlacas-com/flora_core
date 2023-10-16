@@ -54,18 +54,14 @@ class ItemsRetrievedState extends LoadedState implements ItemsBuildUi {
   const ItemsRetrievedState({
     required List<Section> items,
     super.reachedBottom = false,
-  }) : super(
-          sections: items,
-        );
+  }) : super(sections: items);
 }
 
 class ReloadingItemsState extends LoadedState implements ItemsBuildUi {
   const ReloadingItemsState({
     required List<Section> items,
     super.reachedBottom = false,
-  }) : super(
-          sections: items,
-        );
+  }) : super(sections: items);
 }
 
 class ItemReplacedState extends ItemChangedState {
@@ -94,14 +90,19 @@ class ItemRemovedState extends ItemChangedState {
 }
 
 class ItemInsertedState extends ItemChangedState {
-  const ItemInsertedState(
-      {required super.itemSection,
-      required super.reachedBottom,
-      super.id,
-      super.changeParams,
-      required super.itemIndex,
-      required super.insertedItem,
-      required super.sections});
+  const ItemInsertedState({
+    required super.itemSection,
+    required super.reachedBottom,
+    super.id,
+    super.changeParams,
+    required super.itemIndex,
+    required super.insertedItem,
+    required super.sections,
+    required this.animated,
+  });
+  final bool animated;
+  @override
+  List<Object?> get props => [...super.props, animated];
 }
 
 class ItemChangedState extends LoadedState {

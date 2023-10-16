@@ -229,6 +229,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         changeParams: state.changeParams,
         insertedItem: state.insertedItem,
         sections: state.sections,
+        animated: false,
       ),
       isReplace: true,
     );
@@ -247,10 +248,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   void insertItem(
     ItemInsertedState state, {
     bool isReplace = false,
+    bool animated = true,
   }) {
     insertListItem(
       state: state,
       isReplace: isReplace,
+      animated: animated,
     );
   }
 
@@ -837,6 +840,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     required bool isReplace,
     Duration duration = const Duration(milliseconds: 300),
     bool animDurationZeroOnReplace = true,
+    bool animated = true,
   }) {
     if (state.sections[state.itemSection].usesGrid) {
       final animState = sliverAnimatedGridState(state.itemSection);
@@ -845,7 +849,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
             'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
       }
       animState?.insertItem(state.itemIndex,
-          duration: isReplace && animDurationZeroOnReplace
+          duration: !animated || (isReplace && animDurationZeroOnReplace)
               ? Duration.zero
               : duration);
     } else if (state.sections[state.itemSection].horizontalScroll) {
@@ -855,7 +859,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
             'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
       }
       animState?.insertItem(state.itemIndex,
-          duration: isReplace && animDurationZeroOnReplace
+          duration: !animated || (isReplace && animDurationZeroOnReplace)
               ? Duration.zero
               : duration);
     } else {
@@ -865,7 +869,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
             'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
       }
       animState?.insertItem(state.itemIndex,
-          duration: isReplace && animDurationZeroOnReplace
+          duration: !animated || (isReplace && animDurationZeroOnReplace)
               ? Duration.zero
               : duration);
     }
