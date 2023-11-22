@@ -321,11 +321,16 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget buildLoadingView(BuildContext context) {
-    return const Center(
-      child: SizedBox(
-        width: 60,
-        height: 60,
-        child: CircularProgressIndicator(),
+    return Center(
+      child: ListView(
+        shrinkWrap: true,
+        children: const [
+          SizedBox(
+            width: 60,
+            height: 60,
+            child: CircularProgressIndicator(),
+          ),
+        ],
       ),
     );
   }
