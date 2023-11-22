@@ -325,9 +325,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       child: ListView(
         shrinkWrap: true,
         children: const [
-          SizedBox(
-            width: 60,
-            height: 60,
+          Center(
             child: CircularProgressIndicator(),
           ),
         ],
