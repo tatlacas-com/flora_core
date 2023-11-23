@@ -25,7 +25,9 @@ class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
 
 class ItemsListState<TBloc extends ItemsManagerBloc>
     extends State<ItemsList<TBloc>>
-    with AutomaticKeepAliveClientMixin, ItemsSliversMixin<TBloc> {
+    with
+        AutomaticKeepAliveClientMixin,
+        ItemsSliversMixin<ItemsList<TBloc>, TBloc> {
   ItemsListState({
     ScrollController? nestedScrollController,
     this.customScrollController,

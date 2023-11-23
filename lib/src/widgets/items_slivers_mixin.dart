@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 
-mixin ItemsSliversMixin<TBloc extends ItemsManagerBloc>
-    on State<ItemsList<TBloc>> {
+mixin ItemsSliversMixin<T extends StatefulWidget,
+    TBloc extends ItemsManagerBloc> on State<T> {
   late TBloc bloc;
 
   final Map<int, GlobalKey<SliverAnimatedListState>> _sliverAnimatedListKeys =
