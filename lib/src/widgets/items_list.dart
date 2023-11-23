@@ -149,13 +149,13 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     BuildContext context,
     ItemsManagerState state,
   ) {
-    if (state is ItemsLoadingState || state is ItemsInitialState) {
-      return buildLoadingView(context);
-    }
     if (state is LoadItemsFailedState) {
       return _buildLoadingFailed(state, context);
     }
-    if (state is ItemsRetrievedState || state is LoadedState) {
+    if (state is ItemsLoadingState ||
+        state is ItemsInitialState ||
+        state is ItemsRetrievedState ||
+        state is LoadedState) {
       return buildItemsRetrievedScrollView(context);
     }
     throw ArgumentError('buildOnStateChanged Not supported state $state');
@@ -193,16 +193,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   List<Widget> buildSectionsWithOverlapInjector(BuildContext context) {
-    var sections = buildSections(context);
-    List<Widget> widgets = [
+    return [
       SliverOverlapInjector(
-// This is the flip side of the SliverOverlapAbsorber
-// above.
         handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
       ),
+      ...buildSections(context)
     ];
-    widgets.addAll(sections);
-    return widgets;
   }
 
   List<Widget> buildAppBarSlivers(BuildContext context) {

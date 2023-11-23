@@ -77,12 +77,17 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
     _animatedGridKeys[section] = GlobalKey<SliverAnimatedGridState>();
   }
 
+  Widget buildEmptySliver(BuildContext context) {
+    return SliverList.list(
+      children: [buildEmptyView(context)],
+    );
+  }
+
   List<Widget> buildLoadingFailedSlivers(
       BuildContext context, LoadItemsFailedState state) {
     return [
-      SliverFillRemaining(
-        hasScrollBody: false,
-        child: buildLoadingFailedWidget(context, state),
+      SliverList.list(
+        children: [buildLoadingFailedWidget(context, state)],
       )
     ];
   }
@@ -107,7 +112,18 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
     );
   }
 
+  List<Widget> buildLoadingSlivers(BuildContext context) {
+    return [
+      SliverList.list(
+        children: [buildLoadingView(context)],
+      )
+    ];
+  }
+
   List<Widget> buildSections(BuildContext context) {
+    if (bloc.state is ItemsLoadingState || bloc.state is ItemsInitialState) {
+      return buildLoadingSlivers(context);
+    }
     final state = bloc.state as LoadedState;
     final List<Widget> sections = [];
     if (state.isNotEmpty) {
@@ -147,13 +163,6 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
       BuildContext context, int sectionIndex, dynamic emptyEntity) {
     return SliverToBoxAdapter(
       child: buildSectionEmptyView(sectionIndex, context, emptyEntity),
-    );
-  }
-
-  Widget buildEmptySliver(BuildContext context) {
-    return SliverFillRemaining(
-      hasScrollBody: false,
-      child: buildEmptyView(context),
     );
   }
 
