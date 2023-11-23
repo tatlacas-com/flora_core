@@ -192,36 +192,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  List<Widget> buildLoadingFailedSlivers(
-      BuildContext context, LoadItemsFailedState state) {
-    return [
-      SliverFillRemaining(
-        hasScrollBody: false,
-        child: buildLoadingFailedWidget(context, state),
-      )
-    ];
-  }
-
-  Widget buildLoadingFailedWidget(
-      BuildContext context, LoadItemsFailedState state) {
-    return const Center(
-      child: Text('Show Screen Failed to load items widget here...'),
-    );
-  }
-
-  Widget buildLoadingView(BuildContext context) {
-    return Center(
-      child: ListView(
-        shrinkWrap: true,
-        children: const [
-          Center(
-            child: CircularProgressIndicator(),
-          ),
-        ],
-      ),
-    );
-  }
-
   List<Widget> buildSectionsWithOverlapInjector(BuildContext context) {
     var sections = buildSections(context);
     List<Widget> widgets = [

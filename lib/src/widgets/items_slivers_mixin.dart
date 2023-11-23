@@ -77,6 +77,36 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
     _animatedGridKeys[section] = GlobalKey<SliverAnimatedGridState>();
   }
 
+  List<Widget> buildLoadingFailedSlivers(
+      BuildContext context, LoadItemsFailedState state) {
+    return [
+      SliverFillRemaining(
+        hasScrollBody: false,
+        child: buildLoadingFailedWidget(context, state),
+      )
+    ];
+  }
+
+  Widget buildLoadingFailedWidget(
+      BuildContext context, LoadItemsFailedState state) {
+    return const Center(
+      child: Text('Show Screen Failed to load items widget here...'),
+    );
+  }
+
+  Widget buildLoadingView(BuildContext context) {
+    return Center(
+      child: ListView(
+        shrinkWrap: true,
+        children: const [
+          Center(
+            child: CircularProgressIndicator(),
+          ),
+        ],
+      ),
+    );
+  }
+
   List<Widget> buildSections(BuildContext context) {
     final state = bloc.state as LoadedState;
     final List<Widget> sections = [];
