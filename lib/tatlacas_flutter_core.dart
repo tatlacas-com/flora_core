@@ -8,6 +8,7 @@ export 'src/models/section.dart';
 export 'src/models/network_exception_type.dart';
 
 export 'src/widgets/items_list.dart';
+export 'src/widgets/items_slivers_mixin.dart';
 
 export 'src/models/app_theme_properties.dart';
 export 'src/models/i_preference_storage.dart';

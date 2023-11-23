@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tatlacas_flutter_core/src/widgets/items_slivers_mixin.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 
 /// {@template itemsList}
