@@ -145,53 +145,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  void replaceItem(ItemReplacedState state) {
-    removeItem(
-      ItemRemovedState(
-        itemSection: state.itemSection,
-        changeParams: state.changeParams,
-        reachedBottom: state.reachedBottom,
-        itemIndex: state.itemIndex,
-        removedItem: state.removedItem,
-        sections: state.sections,
-      ),
-      isReplace: true,
-    );
-    insertItem(
-      ItemInsertedState(
-        itemSection: state.itemSection,
-        reachedBottom: state.reachedBottom,
-        itemIndex: state.itemIndex,
-        changeParams: state.changeParams,
-        insertedItem: state.insertedItem,
-        sections: state.sections,
-      ),
-      isReplace: true,
-    );
-  }
-
-  void removeItem(
-    ItemRemovedState state, {
-    bool isReplace = false,
-  }) {
-    removeListItem(
-      state: state,
-      isReplace: isReplace,
-    );
-  }
-
-  void insertItem(
-    ItemInsertedState state, {
-    bool isReplace = false,
-    bool animated = false,
-  }) {
-    insertListItem(
-      state: state,
-      isReplace: isReplace,
-      animated: animated,
-    );
-  }
-
   Widget buildOnStateChanged(
     BuildContext context,
     ItemsManagerState state,
