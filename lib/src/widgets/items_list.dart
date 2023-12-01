@@ -176,8 +176,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: PageStorageKey<String>(key),
       physics: scrollPhysics ??
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-      controller:
-          useNestedScrollView ? nestedScrollController : customScrollController,
+      controller: customScrollController,
       //needed for RefreshIndicator to work
       slivers: withInjector
           ? buildSectionsWithOverlapInjector(context)
@@ -187,8 +186,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget _buildLoadingFailed(LoadItemsFailedState state, BuildContext context) {
     return CustomScrollView(
-      controller:
-          useNestedScrollView ? nestedScrollController : customScrollController,
+      controller: customScrollController,
       key: PageStorageKey<String>(runtimeType.toString()),
       slivers: buildLoadingFailedSlivers(context, state),
     );
