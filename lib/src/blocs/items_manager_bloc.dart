@@ -462,7 +462,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       emit(
         ItemInsertedState(
           itemSection: lastSection,
-          reachedBottom: loadedState.reachedBottom,
+          reachedBottom: true,
           itemIndex: loadedState.sections[lastSection].items.length - 1,
           insertedItem: spacer,
           sections: loadedState.sections,
