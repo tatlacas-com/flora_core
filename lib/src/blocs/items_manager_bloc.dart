@@ -198,14 +198,14 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         emit(const ItemsLoadingState());
       }
       if (event.fromCloud) {
-        var loadedItems = await loadItemsFromCloud(emit);
-        if (loadedItems.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
-          await emitItemsReloadRetrieved(emit, loadedItems);
+        var result = await loadItemsFromCloud(emit);
+        if (result.items.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
+          await emitItemsReloadRetrieved(emit, result);
           return;
         }
         emit(ReloadFromCloudEmptyState());
-        loadedItems = await loadItemsFromLocalStorage(emit);
-        await emitItemsReloadRetrieved(emit, loadedItems);
+        result = await loadItemsFromLocalStorage(emit);
+        await emitItemsReloadRetrieved(emit, result);
       } else {
         var loadedItems = await loadItemsFromLocalStorage(emit);
         await emitItemsReloadRetrieved(emit, loadedItems);
@@ -217,30 +217,31 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
   }
 
-  Future<List<Section>> loadItemsFromCloud(
+  Future<LoadItemsResult<Section>> loadItemsFromCloud(
           Emitter<ItemsManagerState> emit) async =>
-      await repo?.loadItemsFromCloud() ?? [];
-  Future<List<Section>> loadItemsFromLocalStorage(
+      await repo?.loadItemsFromCloud() ?? LoadItemsResult.empty();
+
+  Future<LoadItemsResult<Section>> loadItemsFromLocalStorage(
           Emitter<ItemsManagerState> emit) async =>
-      await repo?.loadItemsFromLocalStorage() ?? [];
+      await repo?.loadItemsFromLocalStorage() ?? LoadItemsResult.empty();
 
   FutureOr<void> emitItemsRetrieved(
-      Emitter<ItemsManagerState> emit, List<Section> items) async {
+      Emitter<ItemsManagerState> emit, LoadItemsResult<Section> result) async {
     final st = state;
     if (st is ItemsRetrievedState) {
       await replaceAllItems(
         st,
         emit,
-        items,
+        result,
         firstTime: true,
       );
     } else {
-      emit(ItemsRetrievedState(items: items));
+      emit(ItemsRetrievedState(items: result.items));
     }
   }
 
   Future<void> replaceAllItems(ItemsRetrievedState st,
-      Emitter<ItemsManagerState> emit, List<Section> sections,
+      Emitter<ItemsManagerState> emit, LoadItemsResult<Section> result,
       {bool firstTime = false}) async {
     for (var i = 0; i < st.sections.length; i++) {
       while (st.sections[i].items.isNotEmpty) {
@@ -257,7 +258,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       }
     }
     var indx = 0;
-
+    final sections = result.items;
     for (var i = 0; i < sections.length; i++) {
       if (st.sections.length <= i) {
         st.sections.add(sections[i].copyWith(items: <dynamic>[]));
@@ -268,7 +269,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
             (indx == sections[i].items.length - 1) && i == sections.length - 1;
         var reachedBottom = !firstTime || !isLastItem
             ? st.reachedBottom
-            : hasReachedBottom(i, sections[i].items);
+            : hasReachedBottom(i, result.count);
 
         emit(
           ItemInsertedState(
@@ -298,17 +299,17 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   FutureOr<void> emitItemsReloadRetrieved(
-      Emitter<ItemsManagerState> emit, List<Section> items) async {
+      Emitter<ItemsManagerState> emit, LoadItemsResult<Section> result) async {
     final st = state;
     if (st is ItemsRetrievedState) {
       await replaceAllItems(
         st,
         emit,
-        items,
+        result,
         firstTime: true,
       );
     } else {
-      emit(ItemsRetrievedState(items: items));
+      emit(ItemsRetrievedState(items: result.items));
     }
   }
 
@@ -332,13 +333,13 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       emit(const ItemsLoadingState());
     }
     try {
-      var loadedItems = await loadItemsFromLocalStorage(emit);
-      if (loadedItems.isNotEmpty) {
-        await emitItemsRetrieved(emit, loadedItems);
+      var result = await loadItemsFromLocalStorage(emit);
+      if (result.items.isNotEmpty) {
+        await emitItemsRetrieved(emit, result);
         return;
       }
-      loadedItems = await loadItemsFromCloud(emit);
-      await emitItemsRetrieved(emit, loadedItems);
+      result = await loadItemsFromCloud(emit);
+      await emitItemsRetrieved(emit, result);
     } catch (e) {
       debugPrint('Error: $runtimeType onLoadItemsRequested: $e');
       await onLoadItemsException(emit, e);
@@ -360,7 +361,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   int get pageSize => 20;
 
-  Future<List<dynamic>> prepareLoadMoreItems(
+  Future<LoadItemsResult> prepareLoadMoreItems(
       LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async {
     var loadedState = state as LoadedState;
     var lastSection = loadedState.sections.length - 1;
@@ -384,21 +385,20 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         event, emit, loadedState.sections[lastSection].items.length);
   }
 
-  Future<List<dynamic>> loadMoreItems(LoadMoreItemsEvent event,
+  Future<LoadItemsResult> loadMoreItems(LoadMoreItemsEvent event,
           Emitter<ItemsManagerState> emit, int lastItemIndex) async =>
-      [];
+      LoadItemsResult.empty();
 
-  bool hasReachedBottom(int section, List<dynamic> items) =>
-      items.length < pageSize;
+  bool hasReachedBottom(int section, int count) => count < pageSize;
 
   bool removeLoadingIfBottomReached(int section) => true;
 
   FutureOr<void> emitMoreItemsRetrieved(
-      Emitter<ItemsManagerState> emit, List<dynamic> items) async {
+      Emitter<ItemsManagerState> emit, LoadItemsResult result) async {
     var loadedState = state as LoadedState;
     var lastSection = loadedState.sections.length - 1;
     lastSection = lastSection < 0 ? 0 : lastSection;
-    var reachedBottom = hasReachedBottom(lastSection, items);
+    var reachedBottom = hasReachedBottom(lastSection, result.count);
     if (loadedState.sections[lastSection].items.isNotEmpty &&
         loadedState.sections[lastSection].items.last ==
             loadingMoreItem(lastSection)) {
@@ -424,7 +424,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
 
     var indx = 0;
-    for (var item in items) {
+    for (var item in result.items) {
       loadedState.sections[lastSection].items.add(item);
       emit(
         ItemInsertedState(

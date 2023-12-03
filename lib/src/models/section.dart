@@ -1,6 +1,16 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
+class LoadItemsResult<T> {
+  LoadItemsResult({required this.items, required this.count});
+  factory LoadItemsResult.empty() => LoadItemsResult(items: [], count: 0);
+
+  final List<T> items;
+
+  /// count of items returned by the server
+  final int count;
+}
+
 class Section extends Equatable {
   const Section({
     this.sectionHeader,
