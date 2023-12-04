@@ -251,6 +251,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
             itemSection: i,
             reachedBottom: st.reachedBottom,
             itemIndex: 0,
+            id: '${st.sections[i].items.length}',
             removedItem: item,
             sections: st.sections,
           ),
