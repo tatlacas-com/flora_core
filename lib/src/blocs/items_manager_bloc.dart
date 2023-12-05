@@ -360,7 +360,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   dynamic get bottomSpacer => null;
 
-  int get pageSize => 20;
+  int get pageSize => repo?.pageSize ?? 20;
 
   Future<LoadItemsResult> prepareLoadMoreItems(
       LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async {

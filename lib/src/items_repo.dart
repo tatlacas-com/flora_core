@@ -9,4 +9,5 @@ abstract class ItemsRepo {
 
   Future<LoadItemsResult<Section>> loadItemsFromCloud() async =>
       LoadItemsResult<Section>.empty();
+  int get pageSize => 20;
 }
