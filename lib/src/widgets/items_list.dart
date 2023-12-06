@@ -41,6 +41,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   double get reloadThresholdPixels => 250;
 
   bool get pullToRefresh => true;
+  bool get canLoadMoreItems => true;
 
   bool get floatHeaderSlivers => false;
 
@@ -162,6 +163,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   void onScrollNotification(ScrollNotification scrollInfo) {
+    if (!canLoadMoreItems) {
+      return;
+    }
     var diff = scrollInfo.metrics.maxScrollExtent - scrollInfo.metrics.pixels;
     if (diff < reloadThresholdPixels) {
       bloc.add(LoadMoreItemsEvent());
