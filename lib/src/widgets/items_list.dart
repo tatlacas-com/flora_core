@@ -157,7 +157,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         state is ItemsInitialState ||
         state is ItemsRetrievedState ||
         state is LoadedState) {
-      return buildItemsRetrievedScrollView(context);
+      return buildItemsRetrievedScrollView(context, state);
     }
     throw ArgumentError('buildOnStateChanged Not supported state $state');
   }
@@ -172,7 +172,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     }
   }
 
-  Widget buildItemsRetrievedScrollView(BuildContext context) {
+  Widget buildItemsRetrievedScrollView(
+      BuildContext context, ItemsManagerState state) {
     var withInjector = widget.buildSliversInSliverOverlapInjector ||
         buildSliversInSliverOverlapInjector;
     final key = '${runtimeType}Items';
@@ -183,8 +184,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       controller: customScrollController,
       //needed for RefreshIndicator to work
       slivers: withInjector
-          ? buildSectionsWithOverlapInjector(context)
-          : buildSections(context),
+          ? buildSectionsWithOverlapInjector(context, state)
+          : buildSections(context, state),
     );
   }
 
@@ -196,12 +197,13 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     );
   }
 
-  List<Widget> buildSectionsWithOverlapInjector(BuildContext context) {
+  List<Widget> buildSectionsWithOverlapInjector(
+      BuildContext context, ItemsManagerState state) {
     return [
       SliverOverlapInjector(
         handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
       ),
-      ...buildSections(context)
+      ...buildSections(context, state)
     ];
   }
 

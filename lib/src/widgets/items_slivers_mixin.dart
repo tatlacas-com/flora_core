@@ -120,11 +120,12 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
     ];
   }
 
-  List<Widget> buildSections(BuildContext context) {
-    if (bloc.state is ItemsLoadingState || bloc.state is ItemsInitialState) {
+  List<Widget> buildSections(BuildContext context, ItemsManagerState state) {
+    if (state is ItemsLoadingState ||
+        state is ItemsInitialState ||
+        state is! LoadedState) {
       return buildLoadingSlivers(context);
     }
-    final state = bloc.state as LoadedState;
     final List<Widget> sections = [];
     if (state.isNotEmpty) {
       for (int sectionIndex = 0;
