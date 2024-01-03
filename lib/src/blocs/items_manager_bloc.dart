@@ -365,16 +365,20 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   Future<LoadItemsResult> prepareLoadMoreItems(
       LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async {
     var loadedState = state as LoadedState;
-    var lastSection = loadedState.sections.length - 1;
-    var lastItemIndex = loadedState.sections[lastSection].items.length;
-    var insertedItem = loadingMoreItem(lastSection);
+    if (loadedState.sections.isEmpty) {
+      return LoadItemsResult.empty();
+    }
+    var lastSectionIndex = loadedState.sections.length - 1;
+    final lastSectionItems = loadedState.sections[lastSectionIndex].items;
+    var lastItemIndex = lastSectionItems.length;
+    var insertedItem = loadingMoreItem(lastSectionIndex);
     if (insertedItem != null &&
-        loadedState.sections[lastSection].items.isNotEmpty &&
-        loadedState.sections[lastSection].items.last != insertedItem) {
-      loadedState.sections[lastSection].items.add(insertedItem);
+        lastSectionItems.isNotEmpty &&
+        lastSectionItems.last != insertedItem) {
+      lastSectionItems.add(insertedItem);
       emit(
         ItemInsertedState(
-          itemSection: lastSection,
+          itemSection: lastSectionIndex,
           reachedBottom: loadedState.reachedBottom,
           itemIndex: lastItemIndex,
           insertedItem: insertedItem,
@@ -382,8 +386,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         ),
       );
     }
-    return await loadMoreItems(
-        event, emit, loadedState.sections[lastSection].items.length);
+    return await loadMoreItems(event, emit, lastSectionItems.length);
   }
 
   Future<LoadItemsResult> loadMoreItems(LoadMoreItemsEvent event,
@@ -399,19 +402,19 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     var loadedState = state as LoadedState;
     var lastSection = loadedState.sections.length - 1;
     lastSection = lastSection < 0 ? 0 : lastSection;
+    final lastSectionItems = loadedState.sections[lastSection].items;
     var reachedBottom = hasReachedBottom(lastSection, result.count);
-    if (loadedState.sections[lastSection].items.isNotEmpty &&
-        loadedState.sections[lastSection].items.last ==
-            loadingMoreItem(lastSection)) {
+    if (lastSectionItems.isNotEmpty &&
+        lastSectionItems.last == loadingMoreItem(lastSection)) {
       try {
-        var removed = loadedState.sections[lastSection].items.removeLast();
+        var removed = lastSectionItems.removeLast();
         if (loadingMoreItem(lastSection) != null &&
             removeLoadingIfBottomReached(lastSection)) {
           emit(
             ItemRemovedState(
               itemSection: lastSection,
               reachedBottom: reachedBottom,
-              itemIndex: loadedState.sections[lastSection].items.length,
+              itemIndex: lastSectionItems.length,
               removedItem: removed,
               sections: loadedState.sections,
             ),
@@ -426,7 +429,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
     var indx = 0;
     for (var item in result.items) {
-      loadedState.sections[lastSection].items.add(item);
+      lastSectionItems.add(item);
       emit(
         ItemInsertedState(
           reachedBottom: reachedBottom,
@@ -455,16 +458,18 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       LoadedState loadedState, Emitter<ItemsManagerState> emit) {
     var spacer = bottomSpacer;
     if (spacer != null) {
+      if (loadedState.sections.isEmpty) {
+        return;
+      }
       var lastSection = loadedState.sections.length - 1;
-      if (lastSection < 0 ||
-          loadedState.sections[lastSection].items.isEmpty ||
-          loadedState.sections[lastSection].items.last == spacer) return;
-      loadedState.sections[lastSection].items.add(spacer);
+      final lastSectionItems = loadedState.sections[lastSection].items;
+      if (lastSectionItems.isEmpty || lastSectionItems.last == spacer) return;
+      lastSectionItems.add(spacer);
       emit(
         ItemInsertedState(
           itemSection: lastSection,
           reachedBottom: true,
-          itemIndex: loadedState.sections[lastSection].items.length - 1,
+          itemIndex: lastSectionItems.length - 1,
           insertedItem: spacer,
           sections: loadedState.sections,
         ),
