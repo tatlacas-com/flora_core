@@ -400,8 +400,10 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   FutureOr<void> emitMoreItemsRetrieved(
       Emitter<ItemsManagerState> emit, LoadItemsResult result) async {
     var loadedState = state as LoadedState;
-    var lastSection = loadedState.sections.length - 1;
-    lastSection = lastSection < 0 ? 0 : lastSection;
+    if (loadedState.sections.isEmpty) {
+      return;
+    }
+    final lastSection = loadedState.sections.length - 1;
     final lastSectionItems = loadedState.sections[lastSection].items;
     var reachedBottom = hasReachedBottom(lastSection, result.count);
     if (lastSectionItems.isNotEmpty &&
@@ -482,7 +484,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async {
     if (state is! LoadedState) return;
     var loadedState = state as LoadedState;
-    if (loadedState.reachedBottom) return;
+    if (loadedState.reachedBottom || loadedState.sections.isEmpty) return;
     try {
       emit(
         LoadingMoreItemsState(
