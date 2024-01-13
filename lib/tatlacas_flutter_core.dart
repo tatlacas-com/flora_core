@@ -18,5 +18,6 @@ export 'src/widgets/list_container.dart';
 export 'src/widgets/zero_height_app_bar.dart';
 export 'src/for_platform.dart';
 export 'src/models/widgetable.dart';
+export 'src/models/tapped_item_kind.dart';
 export 'src/extensions.dart';
 export 'src/copy_with.dart';
