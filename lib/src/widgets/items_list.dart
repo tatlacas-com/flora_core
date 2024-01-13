@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tatlacas_flutter_core/src/models/tapped_item_kind.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 
 /// {@template itemsList}
@@ -115,7 +116,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     await reloading;
   }
 
-  void onTapUrl(String url) {
+  void onTapUrl(String url, TappedItemKind kind) {
     throw UnimplementedError();
   }
 

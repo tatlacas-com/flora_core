@@ -7,6 +7,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:tatlacas_flutter_core/src/models/network_exception_type.dart';
 import 'package:tatlacas_flutter_core/src/models/section.dart';
+import 'package:tatlacas_flutter_core/src/models/tapped_item_kind.dart';
 import 'package:tatlacas_flutter_core/src/widgets/items_list.dart';
 
 import '../items_repo.dart';
@@ -232,7 +233,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   Future<LoadItemsResult<Section>> loadItemsFromCloud(
     Emitter<ItemsManagerState> emit, {
     required ThemeData theme,
-    required Function(String url) onTapUrl,
+    required Function(String url, TappedItemKind kind) onTapUrl,
   }) async =>
       await repo?.loadItemsFromCloud(
         theme: theme,
@@ -243,7 +244,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   Future<LoadItemsResult<Section>> loadItemsFromLocalStorage(
     Emitter<ItemsManagerState> emit, {
     required ThemeData theme,
-    required Function(String url) onTapUrl,
+    required Function(String url, TappedItemKind kind) onTapUrl,
   }) async =>
       await repo?.loadItemsFromLocalStorage(
         theme: theme,

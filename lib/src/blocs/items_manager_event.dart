@@ -13,7 +13,7 @@ abstract class ItemsManagerEvent extends Equatable {
 
 final class LoadItemsEvent extends ItemsManagerEvent {
   LoadItemsEvent({required this.onTapUrl, required this.theme});
-  final Function(String url) onTapUrl;
+  final Function(String url, TappedItemKind kind) onTapUrl;
   final ThemeData theme;
 }
 
@@ -70,7 +70,7 @@ final class ReloadItemsEvent extends ItemsManagerEvent {
   });
   final bool fromCloud;
   final bool loadFromLocalIfCloudEmpty;
-  final Function(String url) onTapUrl;
+  final Function(String url, TappedItemKind kind) onTapUrl;
   final ThemeData theme;
 
   @override
@@ -83,7 +83,7 @@ final class LoadMoreItemsEvent extends ItemsManagerEvent {
     required this.onTapUrl,
     required this.theme,
   });
-  final Function(String url) onTapUrl;
+  final Function(String url, TappedItemKind kind) onTapUrl;
   final ThemeData theme;
 }
 
