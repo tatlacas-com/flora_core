@@ -69,6 +69,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   void initState() {
     super.initState();
     bloc = context.read<TBloc>();
+  }
+
+  void checkLoadFirstTime(BuildContext context) {
     if (bloc.state is ItemsInitialState) {
       bloc.add(LoadItemsEvent(theme: Theme.of(context), onTapUrl: onTapUrl));
     }
@@ -78,6 +81,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkLoadFirstTime(context);
+    });
     return useNestedScrollView
         ? NestedScrollView(
             key: nestedScrollViewGlobalKey,
