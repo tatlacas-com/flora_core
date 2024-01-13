@@ -205,7 +205,12 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           onTapUrl: event.onTapUrl,
         );
         if (result.items.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
-          await emitItemsReloadRetrieved(emit, result);
+          await emitItemsReloadRetrieved(
+            emit,
+            result,
+            theme: event.theme,
+            onTapUrl: event.onTapUrl,
+          );
           return;
         }
         emit(ReloadFromCloudEmptyState());
@@ -214,14 +219,24 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           theme: event.theme,
           onTapUrl: event.onTapUrl,
         );
-        await emitItemsReloadRetrieved(emit, result);
+        await emitItemsReloadRetrieved(
+          emit,
+          result,
+          theme: event.theme,
+          onTapUrl: event.onTapUrl,
+        );
       } else {
         var loadedItems = await loadItemsFromLocalStorage(
           emit,
           theme: event.theme,
           onTapUrl: event.onTapUrl,
         );
-        await emitItemsReloadRetrieved(emit, loadedItems);
+        await emitItemsReloadRetrieved(
+          emit,
+          loadedItems,
+          theme: event.theme,
+          onTapUrl: event.onTapUrl,
+        );
       }
     } catch (e) {
       debugPrint('Error: $runtimeType onReloadItemsRequested: $e');
@@ -253,7 +268,11 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       LoadItemsResult.empty();
 
   FutureOr<void> emitItemsRetrieved(
-      Emitter<ItemsManagerState> emit, LoadItemsResult<Section> result) async {
+    Emitter<ItemsManagerState> emit,
+    LoadItemsResult<Section> result, {
+    required Function(String url, TappedItemKind kind) onTapUrl,
+    required ThemeData theme,
+  }) async {
     final st = state;
     if (st is ItemsRetrievedState) {
       await replaceAllItems(
@@ -327,7 +346,11 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   FutureOr<void> emitItemsReloadRetrieved(
-      Emitter<ItemsManagerState> emit, LoadItemsResult<Section> result) async {
+    Emitter<ItemsManagerState> emit,
+    LoadItemsResult<Section> result, {
+    required Function(String url, TappedItemKind kind) onTapUrl,
+    required ThemeData theme,
+  }) async {
     final st = state;
     if (st is ItemsRetrievedState) {
       await replaceAllItems(
@@ -367,7 +390,12 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         onTapUrl: event.onTapUrl,
       );
       if (result.items.isNotEmpty) {
-        await emitItemsRetrieved(emit, result);
+        await emitItemsRetrieved(
+          emit,
+          result,
+          theme: event.theme,
+          onTapUrl: event.onTapUrl,
+        );
         return;
       }
       result = await loadItemsFromCloud(
@@ -375,7 +403,12 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         theme: event.theme,
         onTapUrl: event.onTapUrl,
       );
-      await emitItemsRetrieved(emit, result);
+      await emitItemsRetrieved(
+        emit,
+        result,
+        theme: event.theme,
+        onTapUrl: event.onTapUrl,
+      );
     } catch (e) {
       debugPrint('Error: $runtimeType onLoadItemsRequested: $e');
       await onLoadItemsException(emit, e);
