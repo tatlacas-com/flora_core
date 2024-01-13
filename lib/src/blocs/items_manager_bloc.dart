@@ -198,16 +198,28 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         emit(const ItemsLoadingState());
       }
       if (event.fromCloud) {
-        var result = await loadItemsFromCloud(emit);
+        var result = await loadItemsFromCloud(
+          emit,
+          theme: event.theme,
+          onTapUrl: event.onTapUrl,
+        );
         if (result.items.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
           await emitItemsReloadRetrieved(emit, result);
           return;
         }
         emit(ReloadFromCloudEmptyState());
-        result = await loadItemsFromLocalStorage(emit);
+        result = await loadItemsFromLocalStorage(
+          emit,
+          theme: event.theme,
+          onTapUrl: event.onTapUrl,
+        );
         await emitItemsReloadRetrieved(emit, result);
       } else {
-        var loadedItems = await loadItemsFromLocalStorage(emit);
+        var loadedItems = await loadItemsFromLocalStorage(
+          emit,
+          theme: event.theme,
+          onTapUrl: event.onTapUrl,
+        );
         await emitItemsReloadRetrieved(emit, loadedItems);
       }
     } catch (e) {
@@ -218,12 +230,26 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   Future<LoadItemsResult<Section>> loadItemsFromCloud(
-          Emitter<ItemsManagerState> emit) async =>
-      await repo?.loadItemsFromCloud() ?? LoadItemsResult.empty();
+    Emitter<ItemsManagerState> emit, {
+    required ThemeData theme,
+    required Function(String url) onTapUrl,
+  }) async =>
+      await repo?.loadItemsFromCloud(
+        theme: theme,
+        onTapUrl: onTapUrl,
+      ) ??
+      LoadItemsResult.empty();
 
   Future<LoadItemsResult<Section>> loadItemsFromLocalStorage(
-          Emitter<ItemsManagerState> emit) async =>
-      await repo?.loadItemsFromLocalStorage() ?? LoadItemsResult.empty();
+    Emitter<ItemsManagerState> emit, {
+    required ThemeData theme,
+    required Function(String url) onTapUrl,
+  }) async =>
+      await repo?.loadItemsFromLocalStorage(
+        theme: theme,
+        onTapUrl: onTapUrl,
+      ) ??
+      LoadItemsResult.empty();
 
   FutureOr<void> emitItemsRetrieved(
       Emitter<ItemsManagerState> emit, LoadItemsResult<Section> result) async {
@@ -334,12 +360,20 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       emit(const ItemsLoadingState());
     }
     try {
-      var result = await loadItemsFromLocalStorage(emit);
+      var result = await loadItemsFromLocalStorage(
+        emit,
+        theme: event.theme,
+        onTapUrl: event.onTapUrl,
+      );
       if (result.items.isNotEmpty) {
         await emitItemsRetrieved(emit, result);
         return;
       }
-      result = await loadItemsFromCloud(emit);
+      result = await loadItemsFromCloud(
+        emit,
+        theme: event.theme,
+        onTapUrl: event.onTapUrl,
+      );
       await emitItemsRetrieved(emit, result);
     } catch (e) {
       debugPrint('Error: $runtimeType onLoadItemsRequested: $e');

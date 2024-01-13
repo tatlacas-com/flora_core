@@ -12,7 +12,9 @@ abstract class ItemsManagerEvent extends Equatable {
 }
 
 final class LoadItemsEvent extends ItemsManagerEvent {
-  LoadItemsEvent();
+  LoadItemsEvent({required this.onTapUrl, required this.theme});
+  final Function(String url) onTapUrl;
+  final ThemeData theme;
 }
 
 final class _LoaderEvent extends ItemsManagerEvent {
@@ -62,10 +64,14 @@ final class ReloadItemsEvent extends ItemsManagerEvent {
   ReloadItemsEvent({
     this.fromCloud = true,
     this.loadFromLocalIfCloudEmpty = true,
+    required this.onTapUrl,
+    required this.theme,
     super.requestId,
   });
   final bool fromCloud;
   final bool loadFromLocalIfCloudEmpty;
+  final Function(String url) onTapUrl;
+  final ThemeData theme;
 
   @override
   List<Object?> get props => [fromCloud, loadFromLocalIfCloudEmpty, requestId];
@@ -74,7 +80,11 @@ final class ReloadItemsEvent extends ItemsManagerEvent {
 final class LoadMoreItemsEvent extends ItemsManagerEvent {
   LoadMoreItemsEvent({
     super.requestId,
+    required this.onTapUrl,
+    required this.theme,
   });
+  final Function(String url) onTapUrl;
+  final ThemeData theme;
 }
 
 final class EmitRetrievedEvent extends ItemsManagerEvent {}

@@ -93,26 +93,30 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget buildScrollView(BuildContext context) {
     return NotificationListener<ScrollNotification>(
       onNotification: (ScrollNotification scrollInfo) {
-        onScrollNotification(scrollInfo);
+        onScrollNotification(context, scrollInfo);
         return true;
       },
       child: pullToRefresh
           ? RefreshIndicator(
               key: refreshIndicatorKey,
-              onRefresh: onRefreshIndicatorRefresh,
+              onRefresh: () => onRefreshIndicatorRefresh(context),
               child: buildCustomScrollView(context),
             )
           : buildCustomScrollView(context),
     );
   }
 
-  Future onRefreshIndicatorRefresh() async {
+  Future onRefreshIndicatorRefresh(BuildContext context) async {
     final reloading = bloc.stream
         .where((state) =>
             !(state is ReloadingItemsState || state is ItemsLoadingState))
         .first;
-    bloc.add(ReloadItemsEvent());
+    bloc.add(ReloadItemsEvent(theme: Theme.of(context), onTapUrl: onTapUrl));
     await reloading;
+  }
+
+  void onTapUrl(String url) {
+    throw UnimplementedError();
   }
 
   Widget buildScrollViewWithListeners(BuildContext context) {
@@ -162,13 +166,15 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     throw ArgumentError('buildOnStateChanged Not supported state $state');
   }
 
-  void onScrollNotification(ScrollNotification scrollInfo) {
+  void onScrollNotification(
+      BuildContext context, ScrollNotification scrollInfo) {
     if (!canLoadMoreItems) {
       return;
     }
     var diff = scrollInfo.metrics.maxScrollExtent - scrollInfo.metrics.pixels;
     if (diff < reloadThresholdPixels) {
-      bloc.add(LoadMoreItemsEvent());
+      bloc.add(
+          LoadMoreItemsEvent(theme: Theme.of(context), onTapUrl: onTapUrl));
     }
   }
 
