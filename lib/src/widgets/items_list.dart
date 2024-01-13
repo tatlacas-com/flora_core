@@ -69,6 +69,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   void initState() {
     super.initState();
     bloc = context.read<TBloc>();
+    if (bloc.state is ItemsInitialState) {
+      bloc.add(LoadItemsEvent(theme: Theme.of(context), onTapUrl: onTapUrl));
+    }
   }
 
   @mustCallSuper
