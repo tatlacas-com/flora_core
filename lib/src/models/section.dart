@@ -14,6 +14,7 @@ class LoadItemsResult<T> {
 class Section extends Equatable {
   const Section({
     this.sectionHeader,
+    this.sectionFooter,
     this.emptyEntity = const SizedBox(),
     this.usesGrid = false,
     this.horizontalScroll = false,
@@ -21,6 +22,7 @@ class Section extends Equatable {
   });
   final List<dynamic> items;
   final dynamic sectionHeader;
+  final dynamic sectionFooter;
   final bool usesGrid;
   final bool horizontalScroll;
   bool get isEmpty => items.isEmpty;
@@ -35,6 +37,7 @@ class Section extends Equatable {
   List<Object?> get props => [
         items,
         sectionHeader,
+        sectionFooter,
         usesGrid,
         horizontalScroll,
       ];

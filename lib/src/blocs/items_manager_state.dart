@@ -45,6 +45,7 @@ abstract class LoadedState extends ItemsManagerState {
   bool usesGrid(int section) => sections[section].usesGrid;
 
   dynamic sectionHeader(int section) => sections[section].sectionHeader;
+  dynamic sectionFooter(int section) => sections[section].sectionFooter;
 
   @override
   List<Object?> get props => [sections];

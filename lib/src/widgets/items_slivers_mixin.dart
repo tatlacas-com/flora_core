@@ -131,11 +131,15 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
       for (int sectionIndex = 0;
           sectionIndex < state.totalSections;
           sectionIndex++) {
-        if (state.sectionHeader(sectionIndex) != null) {
-          sections.add(buildSectionHeaderSliver(
-              sectionIndex, context, state.sectionHeader(sectionIndex)));
-        }
+        sections.add(SliverToBoxAdapter(
+          child: buildSectionHeader(
+              sectionIndex, context, state.sectionHeader(sectionIndex)),
+        ));
         addSectionSliver(sectionIndex, state, sections, context);
+        sections.add(SliverToBoxAdapter(
+          child: buildSectionFooter(
+              sectionIndex, context, state.sectionHeader(sectionIndex)),
+        ));
       }
     } else {
       sections.add(buildEmptySliver(context));
@@ -167,11 +171,24 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
     );
   }
 
-  Widget buildSectionHeaderSliver(
-      int section, BuildContext context, dynamic sectionHeader) {
-    return SliverToBoxAdapter(
-      child: buildSectionHeader(section, context, sectionHeader),
-    );
+  Widget buildSectionFooter(
+      int section, BuildContext context, dynamic sectionFooter) {
+    if (sectionFooter is Widgetable) {
+      return sectionFooter.build(
+          section: section,
+          context: context,
+          index: -1,
+          onClick: () => onListHeaderClick(
+                context: context,
+                section: section,
+                item: sectionFooter,
+              ));
+    }
+    if (sectionFooter != null && !kReleaseMode) {
+      throw ArgumentError(
+          'unsupported list footer item $sectionFooter. Either override buildSectionFooter() in your UI or make item implement Widgetable');
+    }
+    return const SizedBox();
   }
 
   Widget buildSectionHeader(
@@ -187,8 +204,11 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
                 item: sectionHeader,
               ));
     }
-    throw ArgumentError(
-        'unsupported list header item $sectionHeader. Either override buildSectionHeader() in your UI or make item implement Widgetable');
+    if (sectionHeader != null && !kReleaseMode) {
+      throw ArgumentError(
+          'unsupported list header item $sectionHeader. Either override buildSectionHeader() in your UI or make item implement Widgetable');
+    }
+    return const SizedBox();
   }
 
   Widget buildSectionEmptyView(
