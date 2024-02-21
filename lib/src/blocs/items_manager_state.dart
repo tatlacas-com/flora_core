@@ -2,11 +2,11 @@ part of 'items_manager_bloc.dart';
 
 abstract class ItemsBuildUi {}
 
-abstract class ItemsManagerState<T extends SerializableItem> extends Equatable {
+abstract class ItemsManagerState<T extends PersistableMixin> extends Equatable {
   const ItemsManagerState();
 }
 
-class ItemsLoadingState<T extends SerializableItem> extends ItemsManagerState<T>
+class ItemsLoadingState<T extends PersistableMixin> extends ItemsManagerState<T>
     implements ItemsBuildUi {
   const ItemsLoadingState();
 
@@ -14,7 +14,7 @@ class ItemsLoadingState<T extends SerializableItem> extends ItemsManagerState<T>
   List<Object> get props => [];
 }
 
-class ItemsInitialState<T extends SerializableItem> extends ItemsManagerState<T>
+class ItemsInitialState<T extends PersistableMixin> extends ItemsManagerState<T>
     implements ItemsBuildUi {
   const ItemsInitialState();
 
@@ -22,7 +22,7 @@ class ItemsInitialState<T extends SerializableItem> extends ItemsManagerState<T>
   List<Object> get props => [];
 }
 
-abstract class LoadedState<T extends SerializableItem>
+abstract class LoadedState<T extends PersistableMixin>
     extends ItemsManagerState<T> {
   const LoadedState({
     required this.sections,
@@ -54,7 +54,7 @@ abstract class LoadedState<T extends SerializableItem>
   List<Object?> get props => [sections];
 }
 
-class ItemsRetrievedState<T extends SerializableItem> extends LoadedState<T>
+class ItemsRetrievedState<T extends PersistableMixin> extends LoadedState<T>
     implements ItemsBuildUi {
   const ItemsRetrievedState({
     required super.sections,
@@ -62,7 +62,7 @@ class ItemsRetrievedState<T extends SerializableItem> extends LoadedState<T>
   });
 }
 
-class ReloadingItemsState<T extends SerializableItem> extends LoadedState<T>
+class ReloadingItemsState<T extends PersistableMixin> extends LoadedState<T>
     implements ItemsBuildUi {
   const ReloadingItemsState({
     required super.sections,
@@ -70,7 +70,7 @@ class ReloadingItemsState<T extends SerializableItem> extends LoadedState<T>
   });
 }
 
-class ItemReplacedState<T extends SerializableItem>
+class ItemReplacedState<T extends PersistableMixin>
     extends ItemChangedState<T> {
   const ItemReplacedState({
     required super.itemSection,
@@ -84,7 +84,7 @@ class ItemReplacedState<T extends SerializableItem>
   });
 }
 
-class ItemRemovedState<T extends SerializableItem> extends ItemChangedState<T> {
+class ItemRemovedState<T extends PersistableMixin> extends ItemChangedState<T> {
   const ItemRemovedState({
     required super.itemSection,
     required super.reachedBottom,
@@ -96,7 +96,7 @@ class ItemRemovedState<T extends SerializableItem> extends ItemChangedState<T> {
   });
 }
 
-class ItemInsertedState<T extends SerializableItem>
+class ItemInsertedState<T extends PersistableMixin>
     extends ItemChangedState<T> {
   const ItemInsertedState({
     required super.itemSection,
@@ -113,7 +113,7 @@ class ItemInsertedState<T extends SerializableItem>
   List<Object?> get props => [...super.props, animated];
 }
 
-class ItemChangedState<T extends SerializableItem> extends LoadedState<T> {
+class ItemChangedState<T extends PersistableMixin> extends LoadedState<T> {
   const ItemChangedState({
     required this.itemSection,
     required super.reachedBottom,
@@ -139,7 +139,7 @@ class ItemChangedState<T extends SerializableItem> extends LoadedState<T> {
       ];
 }
 
-class ReloadFromCloudEmptyState<T extends SerializableItem>
+class ReloadFromCloudEmptyState<T extends PersistableMixin>
     extends ItemsManagerState<T> {
   ReloadFromCloudEmptyState({DateTime? loadId})
       : loadId = loadId ?? DateTime.now();
@@ -149,7 +149,7 @@ class ReloadFromCloudEmptyState<T extends SerializableItem>
   List<Object> get props => [loadId];
 }
 
-class LoadItemsFailedState<T extends SerializableItem>
+class LoadItemsFailedState<T extends PersistableMixin>
     extends ItemsManagerState<T> implements ItemsBuildUi {
   LoadItemsFailedState({
     DateTime? loadId,
@@ -162,7 +162,7 @@ class LoadItemsFailedState<T extends SerializableItem>
   List<Object> get props => [loadId, exceptionType];
 }
 
-class LoadMoreItemsFailedState<T extends SerializableItem>
+class LoadMoreItemsFailedState<T extends PersistableMixin>
     extends LoadedState<T> {
   LoadMoreItemsFailedState({
     DateTime? loadId,
@@ -177,7 +177,7 @@ class LoadMoreItemsFailedState<T extends SerializableItem>
   List<Object> get props => [loadId, exceptionType];
 }
 
-class LoadingMoreItemsState<T extends SerializableItem> extends LoadedState<T> {
+class LoadingMoreItemsState<T extends PersistableMixin> extends LoadedState<T> {
   LoadingMoreItemsState({
     DateTime? loadId,
     required super.reachedBottom,
@@ -189,7 +189,7 @@ class LoadingMoreItemsState<T extends SerializableItem> extends LoadedState<T> {
   List<Object> get props => [loadId];
 }
 
-class ItemsReloadedState<T extends SerializableItem> extends LoadedState<T> {
+class ItemsReloadedState<T extends PersistableMixin> extends LoadedState<T> {
   ItemsReloadedState({
     DateTime? loadId,
     required super.reachedBottom,

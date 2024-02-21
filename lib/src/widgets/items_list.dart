@@ -8,7 +8,7 @@ import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 /// {@template itemsList}
 /// A base class for showing list or grid of widgets on ui. For sample see [ItemsManagerBloc]
 /// {@endtemplate}
-class ItemsList<T extends SerializableItem, TRepo extends ItemsRepo<T>,
+class ItemsList<T extends PersistableMixin, TRepo extends ItemsRepo<T>,
     TBloc extends ItemsManagerBloc<T, TRepo>> extends StatefulWidget {
   const ItemsList({
     super.key,
@@ -25,7 +25,7 @@ class ItemsList<T extends SerializableItem, TRepo extends ItemsRepo<T>,
       stateBuilder?.call() ?? ItemsListState<T, TRepo, TBloc>();
 }
 
-class ItemsListState<T extends SerializableItem, TRepo extends ItemsRepo<T>,
+class ItemsListState<T extends PersistableMixin, TRepo extends ItemsRepo<T>,
         TBloc extends ItemsManagerBloc<T, TRepo>>
     extends State<ItemsList<T, TRepo, TBloc>>
     with

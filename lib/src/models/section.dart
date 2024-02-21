@@ -12,7 +12,7 @@ class LoadItemsResult<T> {
   final int count;
 }
 
-class Section<T extends SerializableItem> extends Equatable {
+class Section<T extends PersistableMixin> extends Equatable {
   const Section({
     this.sectionHeader,
     this.sectionFooter,
