@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:tatlacas_flutter_core/src/models/i_serializable_item.dart';
-import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
+import 'package:tatlacas_flutter_core/src/blocs/items_manager_bloc.dart';
+import 'package:tatlacas_flutter_core/src/widgets/zero_height_app_bar.dart';
 
-class ListContainer<T extends SerializableItem, TRepo extends ItemsRepo<T>,
-    TBloc extends ItemsManagerBloc<T, TRepo>> extends StatelessWidget {
+import 'items_list.dart';
+
+class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
   const ListContainer({
     super.key,
     this.listBuilderKey,
@@ -13,7 +14,7 @@ class ListContainer<T extends SerializableItem, TRepo extends ItemsRepo<T>,
     this.appBar,
   });
   final PreferredSizeWidget? appBar;
-  final ItemsListState<T, TRepo, TBloc> Function() listStateBuilder;
+  final ItemsListState<TBloc> Function() listStateBuilder;
   final Key? listBuilderKey;
   final bool buildInBase;
   final bool useScaffold;
@@ -24,11 +25,11 @@ class ListContainer<T extends SerializableItem, TRepo extends ItemsRepo<T>,
     if (useScaffold) {
       return Scaffold(
         appBar: appBar ?? ZeroHeightAppBar(),
-        body: ItemsList<T, TRepo, TBloc>(
+        body: ItemsList<TBloc>(
             key: listBuilderKey, stateBuilder: listStateBuilder),
       );
     } else {
-      return ItemsList<T, TRepo, TBloc>(
+      return ItemsList<TBloc>(
           key: listBuilderKey, stateBuilder: listStateBuilder);
     }
   }

@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:tatlacas_flutter_core/src/models/i_serializable_item.dart';
 
 class LoadItemsResult<T> {
   LoadItemsResult({required this.items, required this.count});
@@ -12,7 +11,7 @@ class LoadItemsResult<T> {
   final int count;
 }
 
-class Section<T extends SerializableItem> extends Equatable {
+class Section extends Equatable {
   const Section({
     this.sectionHeader,
     this.sectionFooter,
@@ -21,7 +20,7 @@ class Section<T extends SerializableItem> extends Equatable {
     this.horizontalScroll = false,
     this.items = const [],
   });
-  final List<T> items;
+  final List<dynamic> items;
   final dynamic sectionHeader;
   final dynamic sectionFooter;
   final bool usesGrid;
@@ -43,8 +42,8 @@ class Section<T extends SerializableItem> extends Equatable {
         horizontalScroll,
       ];
 
-  Section<T> copyWith({
-    List<T>? items,
+  Section copyWith({
+    List<dynamic>? items,
     dynamic sectionHeader,
     bool? usesGrid,
     bool? horizontalScroll,

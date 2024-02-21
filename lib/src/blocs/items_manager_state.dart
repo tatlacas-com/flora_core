@@ -2,33 +2,30 @@ part of 'items_manager_bloc.dart';
 
 abstract class ItemsBuildUi {}
 
-abstract class ItemsManagerState<T extends SerializableItem> extends Equatable {
+abstract class ItemsManagerState extends Equatable {
   const ItemsManagerState();
 }
 
-class ItemsLoadingState<T extends SerializableItem> extends ItemsManagerState<T>
-    implements ItemsBuildUi {
+class ItemsLoadingState extends ItemsManagerState implements ItemsBuildUi {
   const ItemsLoadingState();
 
   @override
   List<Object> get props => [];
 }
 
-class ItemsInitialState<T extends SerializableItem> extends ItemsManagerState<T>
-    implements ItemsBuildUi {
+class ItemsInitialState extends ItemsManagerState implements ItemsBuildUi {
   const ItemsInitialState();
 
   @override
   List<Object> get props => [];
 }
 
-abstract class LoadedState<T extends SerializableItem>
-    extends ItemsManagerState<T> {
+abstract class LoadedState extends ItemsManagerState {
   const LoadedState({
     required this.sections,
     required this.reachedBottom,
   });
-  final List<Section<T>> sections;
+  final List<Section> sections;
 
   int get totalSections => sections.length;
   final bool reachedBottom;
@@ -54,24 +51,21 @@ abstract class LoadedState<T extends SerializableItem>
   List<Object?> get props => [sections];
 }
 
-class ItemsRetrievedState<T extends SerializableItem> extends LoadedState<T>
-    implements ItemsBuildUi {
+class ItemsRetrievedState extends LoadedState implements ItemsBuildUi {
   const ItemsRetrievedState({
-    required super.sections,
+    required List<Section> items,
     super.reachedBottom = false,
-  });
+  }) : super(sections: items);
 }
 
-class ReloadingItemsState<T extends SerializableItem> extends LoadedState<T>
-    implements ItemsBuildUi {
+class ReloadingItemsState extends LoadedState implements ItemsBuildUi {
   const ReloadingItemsState({
-    required super.sections,
+    required List<Section> items,
     super.reachedBottom = false,
-  });
+  }) : super(sections: items);
 }
 
-class ItemReplacedState<T extends SerializableItem>
-    extends ItemChangedState<T> {
+class ItemReplacedState extends ItemChangedState {
   const ItemReplacedState({
     required super.itemSection,
     required super.itemIndex,
@@ -84,7 +78,7 @@ class ItemReplacedState<T extends SerializableItem>
   });
 }
 
-class ItemRemovedState<T extends SerializableItem> extends ItemChangedState<T> {
+class ItemRemovedState extends ItemChangedState {
   const ItemRemovedState({
     required super.itemSection,
     required super.reachedBottom,
@@ -96,8 +90,7 @@ class ItemRemovedState<T extends SerializableItem> extends ItemChangedState<T> {
   });
 }
 
-class ItemInsertedState<T extends SerializableItem>
-    extends ItemChangedState<T> {
+class ItemInsertedState extends ItemChangedState {
   const ItemInsertedState({
     required super.itemSection,
     required super.reachedBottom,
@@ -113,7 +106,7 @@ class ItemInsertedState<T extends SerializableItem>
   List<Object?> get props => [...super.props, animated];
 }
 
-class ItemChangedState<T extends SerializableItem> extends LoadedState<T> {
+class ItemChangedState extends LoadedState {
   const ItemChangedState({
     required this.itemSection,
     required super.reachedBottom,
@@ -139,8 +132,7 @@ class ItemChangedState<T extends SerializableItem> extends LoadedState<T> {
       ];
 }
 
-class ReloadFromCloudEmptyState<T extends SerializableItem>
-    extends ItemsManagerState<T> {
+class ReloadFromCloudEmptyState extends ItemsManagerState {
   ReloadFromCloudEmptyState({DateTime? loadId})
       : loadId = loadId ?? DateTime.now();
   final DateTime loadId;
@@ -149,8 +141,7 @@ class ReloadFromCloudEmptyState<T extends SerializableItem>
   List<Object> get props => [loadId];
 }
 
-class LoadItemsFailedState<T extends SerializableItem>
-    extends ItemsManagerState<T> implements ItemsBuildUi {
+class LoadItemsFailedState extends ItemsManagerState implements ItemsBuildUi {
   LoadItemsFailedState({
     DateTime? loadId,
     required this.exceptionType,
@@ -162,8 +153,7 @@ class LoadItemsFailedState<T extends SerializableItem>
   List<Object> get props => [loadId, exceptionType];
 }
 
-class LoadMoreItemsFailedState<T extends SerializableItem>
-    extends LoadedState<T> {
+class LoadMoreItemsFailedState extends LoadedState {
   LoadMoreItemsFailedState({
     DateTime? loadId,
     required super.reachedBottom,
@@ -177,7 +167,7 @@ class LoadMoreItemsFailedState<T extends SerializableItem>
   List<Object> get props => [loadId, exceptionType];
 }
 
-class LoadingMoreItemsState<T extends SerializableItem> extends LoadedState<T> {
+class LoadingMoreItemsState extends LoadedState {
   LoadingMoreItemsState({
     DateTime? loadId,
     required super.reachedBottom,
@@ -189,7 +179,7 @@ class LoadingMoreItemsState<T extends SerializableItem> extends LoadedState<T> {
   List<Object> get props => [loadId];
 }
 
-class ItemsReloadedState<T extends SerializableItem> extends LoadedState<T> {
+class ItemsReloadedState extends LoadedState {
   ItemsReloadedState({
     DateTime? loadId,
     required super.reachedBottom,

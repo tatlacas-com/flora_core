@@ -2,35 +2,32 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tatlacas_flutter_core/src/models/i_serializable_item.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 
 /// {@template itemsList}
 /// A base class for showing list or grid of widgets on ui. For sample see [ItemsManagerBloc]
 /// {@endtemplate}
-class ItemsList<T extends SerializableItem, TRepo extends ItemsRepo<T>,
-    TBloc extends ItemsManagerBloc<T, TRepo>> extends StatefulWidget {
+class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
   const ItemsList({
     super.key,
     this.stateBuilder,
     this.buildSliversInSliverOverlapInjector = false,
   });
-  final ItemsListState<T, TRepo, TBloc> Function()? stateBuilder;
+  final ItemsListState<TBloc> Function()? stateBuilder;
 
   final bool buildSliversInSliverOverlapInjector;
 
   @override
-  ItemsListState<T, TRepo, TBloc> createState() =>
+  ItemsListState<TBloc> createState() =>
       // ignore: no_logic_in_create_state
-      stateBuilder?.call() ?? ItemsListState<T, TRepo, TBloc>();
+      stateBuilder?.call() ?? ItemsListState<TBloc>();
 }
 
-class ItemsListState<T extends SerializableItem, TRepo extends ItemsRepo<T>,
-        TBloc extends ItemsManagerBloc<T, TRepo>>
-    extends State<ItemsList<T, TRepo, TBloc>>
+class ItemsListState<TBloc extends ItemsManagerBloc>
+    extends State<ItemsList<TBloc>>
     with
         AutomaticKeepAliveClientMixin,
-        ItemsSliversMixin<ItemsList<T, TRepo, TBloc>, T, TRepo, TBloc> {
+        ItemsSliversMixin<ItemsList<TBloc>, TBloc> {
   ItemsListState({
     ScrollController? nestedScrollController,
     this.customScrollController,
