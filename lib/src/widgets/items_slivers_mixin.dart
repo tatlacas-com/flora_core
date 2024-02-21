@@ -104,8 +104,11 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
       child: ListView(
         shrinkWrap: true,
         children: const [
-          Center(
-            child: CircularProgressIndicator(),
+          Padding(
+            padding: EdgeInsets.only(top: 24.0),
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
           ),
         ],
       ),
