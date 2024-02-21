@@ -5,6 +5,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:tatlacas_flutter_core/src/models/i_serializable_item.dart';
 import 'package:tatlacas_flutter_core/src/models/network_exception_type.dart';
 import 'package:tatlacas_flutter_core/src/models/section.dart';
 import 'package:tatlacas_flutter_core/src/models/tapped_item_kind.dart';
@@ -60,10 +61,12 @@ part 'items_manager_state.dart';
 ///
 /// ```
 /// {@endtemplate}
-abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
-    extends Bloc<ItemsManagerEvent, ItemsManagerState> {
+abstract class ItemsManagerBloc<T extends SerializableItem,
+        TRepo extends ItemsRepo<T>>
+    extends Bloc<ItemsManagerEvent, ItemsManagerState<T>> {
   ItemsManagerBloc(
-      {this.repo, ItemsManagerState initialState = const ItemsInitialState()})
+      {this.repo,
+      ItemsManagerState<T> initialState = const ItemsInitialState()})
       : super(initialState) {
     on<LoadItemsEvent>(
       (event, emit) => add(_LoaderEvent(event)),
@@ -90,7 +93,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   int get itemsCount {
     final currState = state;
-    if (currState is LoadedState) {
+    if (currState is LoadedState<T>) {
       return currState.sections.fold<int>(
           0, (previousValue, element) => element.items.length + previousValue);
     }
@@ -107,7 +110,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   FutureOr<void> _onLoaderEvent(
-      _LoaderEvent event, Emitter<ItemsManagerState> emit) async {
+      _LoaderEvent event, Emitter<ItemsManagerState<T>> emit) async {
     final loadEvent = event.event;
     await switch (loadEvent) {
       LoadItemsEvent() => onLoadItemsRequested(loadEvent, emit),
@@ -118,34 +121,37 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   @protected
   FutureOr<void> onEmitRetrievedEvent(
-      EmitRetrievedEvent event, Emitter<ItemsManagerState> emit) async {
-    if (state is! LoadedState) return;
-    final loadedState = state as LoadedState;
-    emit(ItemsRetrievedState(items: loadedState.sections));
+      EmitRetrievedEvent event, Emitter<ItemsManagerState<T>> emit) async {
+    if (state is! LoadedState<T>) return;
+    final loadedState = state as LoadedState<T>;
+    emit(ItemsRetrievedState<T>(sections: loadedState.sections));
   }
 
   @protected
   FutureOr<void> onReplaceItem(
-      ReplaceItemEvent event, Emitter<ItemsManagerState> emit) async {
-    if (state is! LoadedState) return;
-    final loadedState = state as LoadedState;
+      ReplaceItemEvent event, Emitter<ItemsManagerState<T>> emit) async {
+    if (state is! LoadedState<T>) return;
+    final loadedState = state as LoadedState<T>;
     final removedItem =
         loadedState.section(event.section).items.removeAt(event.index);
     loadedState.section(event.section).items.insert(event.index, event.item);
-    emit(ItemReplacedState(
+    emit(
+      ItemReplacedState<T>(
         reachedBottom: loadedState.reachedBottom,
         itemSection: event.section,
         itemIndex: event.index,
         removedItem: removedItem,
         insertedItem: event.item,
-        sections: loadedState.sections));
+        sections: loadedState.sections,
+      ),
+    );
   }
 
   @protected
   FutureOr<void> onInsertItem(
-      InsertItemEvent event, Emitter<ItemsManagerState> emit) async {
-    if (state is LoadedState) {
-      final state = (this.state as LoadedState);
+      InsertItemEvent event, Emitter<ItemsManagerState<T>> emit) async {
+    if (state is LoadedState<T>) {
+      final state = (this.state as LoadedState<T>);
       state.section(event.section).items.insert(event.index, event.item);
 
       emit(
@@ -163,9 +169,9 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   @protected
   FutureOr<void> onRemoveItem(
-      RemoveItemEvent event, Emitter<ItemsManagerState> emit) async {
-    if (state is LoadedState) {
-      final state = (this.state as LoadedState);
+      RemoveItemEvent event, Emitter<ItemsManagerState<T>> emit) async {
+    if (state is LoadedState<T>) {
+      final state = (this.state as LoadedState<T>);
       final removedItem =
           state.section(event.section).items.removeAt(event.index);
       emit(ItemRemovedState(
@@ -178,20 +184,20 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       if (state.section(event.section).isEmpty) {
         await Future.delayed(const Duration(milliseconds: 500));
         state.sections.removeAt(event.section);
-        emit(ItemsRetrievedState(items: state.sections));
+        emit(ItemsRetrievedState(sections: state.sections));
       }
     }
   }
 
   @protected
   FutureOr<void> onReloadItemsRequested(
-      ReloadItemsEvent event, Emitter<ItemsManagerState> emit) async {
+      ReloadItemsEvent event, Emitter<ItemsManagerState<T>> emit) async {
     try {
       final st = state;
-      if (st is LoadedState) {
+      if (st is LoadedState<T>) {
         emit(
           ReloadingItemsState(
-            items: st.sections,
+            sections: st.sections,
             reachedBottom: st.reachedBottom,
           ),
         );
@@ -245,8 +251,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
   }
 
-  Future<LoadItemsResult<Section>> loadItemsFromCloud(
-    Emitter<ItemsManagerState> emit, {
+  Future<LoadItemsResult<Section<T>>> loadItemsFromCloud(
+    Emitter<ItemsManagerState<T>> emit, {
     required ThemeData theme,
     required Function(String url, TappedItemKind kind) onTapUrl,
   }) async =>
@@ -256,8 +262,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       ) ??
       LoadItemsResult.empty();
 
-  Future<LoadItemsResult<Section>> loadItemsFromLocalStorage(
-    Emitter<ItemsManagerState> emit, {
+  Future<LoadItemsResult<Section<T>>> loadItemsFromLocalStorage(
+    Emitter<ItemsManagerState<T>> emit, {
     required ThemeData theme,
     required Function(String url, TappedItemKind kind) onTapUrl,
   }) async =>
@@ -268,13 +274,13 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       LoadItemsResult.empty();
 
   FutureOr<void> emitItemsRetrieved(
-    Emitter<ItemsManagerState> emit,
-    LoadItemsResult<Section> result, {
+    Emitter<ItemsManagerState<T>> emit,
+    LoadItemsResult<Section<T>> result, {
     required Function(String url, TappedItemKind kind) onTapUrl,
     required ThemeData theme,
   }) async {
     final st = state;
-    if (st is ItemsRetrievedState) {
+    if (st is ItemsRetrievedState<T>) {
       await replaceAllItems(
         st,
         emit,
@@ -282,12 +288,12 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         firstTime: true,
       );
     } else {
-      emit(ItemsRetrievedState(items: result.items));
+      emit(ItemsRetrievedState(sections: result.items));
     }
   }
 
-  Future<void> replaceAllItems(ItemsRetrievedState st,
-      Emitter<ItemsManagerState> emit, LoadItemsResult<Section> result,
+  Future<void> replaceAllItems(ItemsRetrievedState<T> st,
+      Emitter<ItemsManagerState<T>> emit, LoadItemsResult<Section<T>> result,
       {bool firstTime = false}) async {
     for (var i = 0; i < st.sections.length; i++) {
       while (st.sections[i].items.isNotEmpty) {
@@ -308,7 +314,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     final sections = result.items;
     for (var i = 0; i < sections.length; i++) {
       if (st.sections.length <= i) {
-        st.sections.add(sections[i].copyWith(items: <dynamic>[]));
+        st.sections.add(sections[i].copyWith(items: <T>[]));
       }
       for (final item in sections[i].items) {
         st.sections[i].items.add(item);
@@ -331,7 +337,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         if (firstTime && isLastItem && reachedBottom) {
           try {
             _insertBottomSpacer(
-              state as LoadedState,
+              state as LoadedState<T>,
               emit,
             );
           } catch (e) {
@@ -346,13 +352,13 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   FutureOr<void> emitItemsReloadRetrieved(
-    Emitter<ItemsManagerState> emit,
-    LoadItemsResult<Section> result, {
+    Emitter<ItemsManagerState<T>> emit,
+    LoadItemsResult<Section<T>> result, {
     required Function(String url, TappedItemKind kind) onTapUrl,
     required ThemeData theme,
   }) async {
     final st = state;
-    if (st is ItemsRetrievedState) {
+    if (st is ItemsRetrievedState<T>) {
       await replaceAllItems(
         st,
         emit,
@@ -360,23 +366,23 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         firstTime: true,
       );
     } else {
-      emit(ItemsRetrievedState(items: result.items));
+      emit(ItemsRetrievedState(sections: result.items));
     }
   }
 
   @protected
-  Future<List<Section>> loadingSkeletons() async => [];
+  Future<List<Section<T>>> loadingSkeletons() async => [];
 
   @protected
   FutureOr<void> onLoadItemsRequested(
-      LoadItemsEvent event, Emitter<ItemsManagerState> emit) async {
-    if (state is LoadingMoreItemsState) return;
+      LoadItemsEvent event, Emitter<ItemsManagerState<T>> emit) async {
+    if (state is LoadingMoreItemsState<T>) return;
     final skeletons = await loadingSkeletons();
     final hasSkeletons = skeletons.isNotEmpty;
     if (hasSkeletons) {
       emit(
         ItemsRetrievedState(
-          items: skeletons,
+          sections: skeletons,
           reachedBottom: true,
         ),
       );
@@ -417,7 +423,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   Future onLoadItemsException(
-      Emitter<ItemsManagerState> emit, dynamic e) async {
+      Emitter<ItemsManagerState<T>> emit, dynamic e) async {
     emit(LoadItemsFailedState(
         exceptionType: e is DioException
             ? NetworkExceptionType.other.fromCode(e.response?.statusCode)
@@ -431,8 +437,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   int get pageSize => repo?.pageSize ?? 20;
 
   Future<LoadItemsResult> prepareLoadMoreItems(
-      LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async {
-    var loadedState = state as LoadedState;
+      LoadMoreItemsEvent event, Emitter<ItemsManagerState<T>> emit) async {
+    var loadedState = state as LoadedState<T>;
     if (loadedState.sections.isEmpty) {
       return LoadItemsResult.empty();
     }
@@ -458,7 +464,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   Future<LoadItemsResult> loadMoreItems(LoadMoreItemsEvent event,
-          Emitter<ItemsManagerState> emit, int lastItemIndex) async =>
+          Emitter<ItemsManagerState<T>> emit, int lastItemIndex) async =>
       LoadItemsResult.empty();
 
   bool hasReachedBottom(int section, int count) => count < pageSize;
@@ -466,8 +472,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   bool removeLoadingIfBottomReached(int section) => true;
 
   FutureOr<void> emitMoreItemsRetrieved(
-      Emitter<ItemsManagerState> emit, LoadItemsResult result) async {
-    var loadedState = state as LoadedState;
+      Emitter<ItemsManagerState<T>> emit, LoadItemsResult result) async {
+    var loadedState = state as LoadedState<T>;
     if (loadedState.sections.isEmpty) {
       return;
     }
@@ -525,7 +531,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   void _insertBottomSpacer(
-      LoadedState loadedState, Emitter<ItemsManagerState> emit) {
+      LoadedState<T> loadedState, Emitter<ItemsManagerState<T>> emit) {
     var spacer = bottomSpacer;
     if (spacer != null) {
       if (loadedState.sections.isEmpty) {
@@ -549,9 +555,9 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   @protected
   FutureOr<void> onLoadMoreItemsEvent(
-      LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async {
+      LoadMoreItemsEvent event, Emitter<ItemsManagerState<T>> emit) async {
     if (state is! LoadedState) return;
-    var loadedState = state as LoadedState;
+    var loadedState = state as LoadedState<T>;
     if (loadedState.reachedBottom || loadedState.sections.isEmpty) return;
     try {
       emit(
@@ -569,8 +575,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
   }
 
-  Future onLoadMoreItemsException(Emitter<ItemsManagerState> emit,
-      LoadedState loadedState, dynamic e) async {
+  Future onLoadMoreItemsException(Emitter<ItemsManagerState<T>> emit,
+      LoadedState<T> loadedState, dynamic e) async {
     emit(
       LoadMoreItemsFailedState(
           reachedBottom: false,

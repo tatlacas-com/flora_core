@@ -2,10 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:tatlacas_flutter_core/src/models/i_serializable_item.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 
-mixin ItemsSliversMixin<T extends StatefulWidget,
-    TBloc extends ItemsManagerBloc> on State<T> {
+mixin ItemsSliversMixin<
+    T extends StatefulWidget,
+    TItemType extends SerializableItem,
+    TRepo extends ItemsRepo<TItemType>,
+    TBloc extends ItemsManagerBloc<TItemType, TRepo>> on State<T> {
   late TBloc bloc;
 
   final Map<int, GlobalKey<SliverAnimatedListState>> _sliverAnimatedListKeys =
