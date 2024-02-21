@@ -2,13 +2,15 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 class LoadItemsResult<T> {
-  LoadItemsResult({required this.items, required this.count});
+  LoadItemsResult(
+      {required this.items, required this.count, this.reloadFromCloud = false});
   factory LoadItemsResult.empty() => LoadItemsResult(items: [], count: 0);
 
   final List<T> items;
 
   /// count of items returned by the server
   final int count;
+  final bool reloadFromCloud;
 }
 
 class Section extends Equatable {

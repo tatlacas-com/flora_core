@@ -396,7 +396,9 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           theme: event.theme,
           onTapUrl: event.onTapUrl,
         );
-        return;
+        if (!result.reloadFromCloud) {
+          return;
+        }
       }
       result = await loadItemsFromCloud(
         emit,
