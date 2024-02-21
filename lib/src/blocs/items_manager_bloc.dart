@@ -389,7 +389,9 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         theme: event.theme,
         onTapUrl: event.onTapUrl,
       );
+      var foundCachedItems = false;
       if (result.items.isNotEmpty) {
+        foundCachedItems = true;
         await emitItemsRetrieved(
           emit,
           result,
@@ -405,12 +407,15 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         theme: event.theme,
         onTapUrl: event.onTapUrl,
       );
-      await emitItemsRetrieved(
-        emit,
-        result,
-        theme: event.theme,
-        onTapUrl: event.onTapUrl,
-      );
+      if ((result.items.isNotEmpty && result.items[0].items.isNotEmpty) ||
+          !foundCachedItems) {
+        await emitItemsRetrieved(
+          emit,
+          result,
+          theme: event.theme,
+          onTapUrl: event.onTapUrl,
+        );
+      }
     } catch (e) {
       debugPrint('Error: $runtimeType onLoadItemsRequested: $e');
       await onLoadItemsException(emit, e);
