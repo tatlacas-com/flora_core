@@ -138,7 +138,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
         addSectionSliver(sectionIndex, state, sections, context);
         sections.add(SliverToBoxAdapter(
           child: buildSectionFooter(
-              sectionIndex, context, state.sectionHeader(sectionIndex)),
+              sectionIndex, context, state.sectionFooter(sectionIndex)),
         ));
       }
     } else {
