@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tatlacas_flutter_core/src/models/i_serializable_item.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 
-class ListContainer<T extends PersistableMixin, TRepo extends ItemsRepo<T>,
+class ListContainer<T extends SerializableItem, TRepo extends ItemsRepo<T>,
     TBloc extends ItemsManagerBloc<T, TRepo>> extends StatelessWidget {
   const ListContainer({
     super.key,

@@ -61,7 +61,7 @@ part 'items_manager_state.dart';
 ///
 /// ```
 /// {@endtemplate}
-abstract class ItemsManagerBloc<T extends PersistableMixin,
+abstract class ItemsManagerBloc<T extends SerializableItem,
         TRepo extends ItemsRepo<T>>
     extends Bloc<ItemsManagerEvent, ItemsManagerState<T>> {
   ItemsManagerBloc(

@@ -7,7 +7,7 @@ import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 
 mixin ItemsSliversMixin<
     T extends StatefulWidget,
-    TItemType extends PersistableMixin,
+    TItemType extends SerializableItem,
     TRepo extends ItemsRepo<TItemType>,
     TBloc extends ItemsManagerBloc<TItemType, TRepo>> on State<T> {
   late TBloc bloc;

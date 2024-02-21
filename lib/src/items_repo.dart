@@ -6,7 +6,7 @@ import 'package:tatlacas_flutter_core/src/models/tapped_item_kind.dart';
 
 import 'models/section.dart';
 
-abstract class ItemsRepo<T extends PersistableMixin> {
+abstract class ItemsRepo<T extends SerializableItem> {
   const ItemsRepo();
   Future<LoadItemsResult<Section<T>>> loadItemsFromLocalStorage({
     required ThemeData theme,
