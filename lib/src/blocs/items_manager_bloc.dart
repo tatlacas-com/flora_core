@@ -390,18 +390,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           return;
         }
       } else {
-        final skeletons = await loadingSkeletons();
-        final hasSkeletons = skeletons.isNotEmpty;
-        if (hasSkeletons) {
-          emit(
-            ItemsRetrievedState(
-              items: skeletons,
-              reachedBottom: true,
-            ),
-          );
-        } else {
-          emit(const ItemsLoadingState());
-        }
+        await emitLoading(emit);
       }
       result = await loadItemsFromCloud(
         emit,
@@ -421,6 +410,21 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       debugPrint('Error: $runtimeType onLoadItemsRequested: $e');
       await onLoadItemsException(emit, e);
       rethrow;
+    }
+  }
+
+  Future<void> emitLoading(Emitter<ItemsManagerState> emit) async {
+    final skeletons = await loadingSkeletons();
+    final hasSkeletons = skeletons.isNotEmpty;
+    if (hasSkeletons) {
+      emit(
+        ItemsRetrievedState(
+          items: skeletons,
+          reachedBottom: true,
+        ),
+      );
+    } else {
+      emit(const ItemsLoadingState());
     }
   }
 
