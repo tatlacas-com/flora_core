@@ -371,18 +371,6 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   FutureOr<void> onLoadItemsRequested(
       LoadItemsEvent event, Emitter<ItemsManagerState> emit) async {
     if (state is LoadingMoreItemsState) return;
-    final skeletons = await loadingSkeletons();
-    final hasSkeletons = skeletons.isNotEmpty;
-    if (hasSkeletons) {
-      emit(
-        ItemsRetrievedState(
-          items: skeletons,
-          reachedBottom: true,
-        ),
-      );
-    } else {
-      emit(const ItemsLoadingState());
-    }
     try {
       var result = await loadItemsFromLocalStorage(
         emit,
@@ -400,6 +388,19 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         );
         if (!result.reloadFromCloud) {
           return;
+        }
+      } else {
+        final skeletons = await loadingSkeletons();
+        final hasSkeletons = skeletons.isNotEmpty;
+        if (hasSkeletons) {
+          emit(
+            ItemsRetrievedState(
+              items: skeletons,
+              reachedBottom: true,
+            ),
+          );
+        } else {
+          emit(const ItemsLoadingState());
         }
       }
       result = await loadItemsFromCloud(
