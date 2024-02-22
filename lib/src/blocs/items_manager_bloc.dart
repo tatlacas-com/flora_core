@@ -428,12 +428,29 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
   }
 
+  bool get keepLocalItemsOnError => true;
+
   Future onLoadItemsException(
       Emitter<ItemsManagerState> emit, dynamic e) async {
-    emit(LoadItemsFailedState(
-        exceptionType: e is DioException
-            ? NetworkExceptionType.other.fromCode(e.response?.statusCode)
-            : NetworkExceptionType.other));
+    final st = state;
+    if (keepLocalItemsOnError && st is LoadedState && st.isSectionNotEmpty(0)) {
+      final t = loadingMoreItem(0);
+      if (t.runtimeType != st.sections[0].items[0].runtimeType) {
+        emit(
+          ReloadItemsFailedState(
+              exceptionType: e is DioException
+                  ? NetworkExceptionType.other.fromCode(e.response?.statusCode)
+                  : NetworkExceptionType.other),
+        );
+        return;
+      }
+    }
+    emit(
+      LoadItemsFailedState(
+          exceptionType: e is DioException
+              ? NetworkExceptionType.other.fromCode(e.response?.statusCode)
+              : NetworkExceptionType.other),
+    );
   }
 
   dynamic loadingMoreItem(int section) => null;
