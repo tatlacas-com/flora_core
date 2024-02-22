@@ -430,12 +430,13 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   bool get keepLocalItemsOnError => true;
 
+  bool isSkeleton(dynamic item) => false;
+
   Future onLoadItemsException(
       Emitter<ItemsManagerState> emit, dynamic e) async {
     final st = state;
     if (keepLocalItemsOnError && st is LoadedState && st.isSectionNotEmpty(0)) {
-      final t = loadingMoreItem(0);
-      if (t.runtimeType != st.sections[0].items[0].runtimeType) {
+      if (!isSkeleton(st.sections[0].items[0])) {
         emit(
           ReloadItemsFailedState(
               sections: st.sections,
