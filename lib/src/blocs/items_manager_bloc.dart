@@ -438,6 +438,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       if (t.runtimeType != st.sections[0].items[0].runtimeType) {
         emit(
           ReloadItemsFailedState(
+              sections: st.sections,
+              reachedBottom: st.reachedBottom,
               exceptionType: e is DioException
                   ? NetworkExceptionType.other.fromCode(e.response?.statusCode)
                   : NetworkExceptionType.other),
