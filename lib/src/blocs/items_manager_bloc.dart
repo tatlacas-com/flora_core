@@ -19,6 +19,7 @@ part 'items_manager_state.dart';
 ///{@template itemsManagerBloc}
 /// A base class to facilitate the retrieval and processing of objects that will be shown on a [ItemsListState]
 ///
+/// Example usage:
 /// ```dart
 /// class ListBloc extends ItemsManagerBloc<ListRepo> {
 ///   ListBloc({required ListRepo repo}) : super(repo: repo);

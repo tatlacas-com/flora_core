@@ -134,15 +134,19 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
       for (int sectionIndex = 0;
           sectionIndex < state.totalSections;
           sectionIndex++) {
-        sections.add(SliverToBoxAdapter(
-          child: buildSectionHeader(
-              sectionIndex, context, state.sectionHeader(sectionIndex)),
-        ));
+        sections.add(
+          SliverToBoxAdapter(
+            child: buildSectionHeader(
+                sectionIndex, context, state.sectionHeader(sectionIndex)),
+          ),
+        );
         addSectionSliver(sectionIndex, state, sections, context);
-        sections.add(SliverToBoxAdapter(
-          child: buildSectionFooter(
-              sectionIndex, context, state.sectionFooter(sectionIndex)),
-        ));
+        sections.add(
+          SliverToBoxAdapter(
+            child: buildSectionFooter(
+                sectionIndex, context, state.sectionFooter(sectionIndex)),
+          ),
+        );
       }
     } else {
       sections.add(buildEmptySliver(context));
