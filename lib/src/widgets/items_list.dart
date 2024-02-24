@@ -73,7 +73,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   void checkLoadFirstTime(BuildContext context) {
     if (bloc.state is ItemsInitialState) {
-      bloc.add(LoadItemsEvent(theme: Theme.of(context), onTapUrl: onTapUrl));
+      bloc.add(LoadItemsEvent(theme: Theme.of(context)));
     }
   }
 
@@ -120,12 +120,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         .where((state) =>
             !(state is ReloadingItemsState || state is ItemsLoadingState))
         .first;
-    bloc.add(ReloadItemsEvent(theme: Theme.of(context), onTapUrl: onTapUrl));
+    bloc.add(ReloadItemsEvent(theme: Theme.of(context)));
     await reloading;
-  }
-
-  void onTapUrl(String url, TappedItemKind kind) {
-    throw UnimplementedError();
   }
 
   Widget buildScrollViewWithListeners(BuildContext context) {
@@ -182,8 +178,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     }
     var diff = scrollInfo.metrics.maxScrollExtent - scrollInfo.metrics.pixels;
     if (diff < reloadThresholdPixels) {
-      bloc.add(
-          LoadMoreItemsEvent(theme: Theme.of(context), onTapUrl: onTapUrl));
+      bloc.add(LoadMoreItemsEvent(theme: Theme.of(context)));
     }
   }
 

@@ -107,7 +107,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
           Padding(
             padding: EdgeInsets.only(top: 24.0),
             child: Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator.adaptive(),
             ),
           ),
         ],
