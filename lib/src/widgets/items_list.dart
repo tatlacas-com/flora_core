@@ -42,6 +42,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   bool get pullToRefresh => true;
   bool get canLoadMoreItems => true;
+  bool get canLoadMoreItemsHorizontal => false;
 
   bool get floatHeaderSlivers => false;
 
@@ -173,7 +174,12 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   void onScrollNotification(
       BuildContext context, ScrollNotification scrollInfo) {
-    if (!canLoadMoreItems) {
+    if (scrollInfo.metrics.axisDirection == AxisDirection.left ||
+        scrollInfo.metrics.axisDirection == AxisDirection.right) {
+      if (!canLoadMoreItemsHorizontal) {
+        return;
+      }
+    } else if (!canLoadMoreItems) {
       return;
     }
     var diff = scrollInfo.metrics.maxScrollExtent - scrollInfo.metrics.pixels;
