@@ -11,6 +11,7 @@ export 'src/models/network_exception_type.dart';
 export 'src/cubit/scroll_notification_bloc.dart';
 
 export 'src/widgets/items_list_state.dart';
+export 'src/widgets/items_list.dart';
 export 'src/widgets/items_slivers_mixin.dart';
 
 export 'src/models/app_theme_properties.dart';
