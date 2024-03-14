@@ -8,6 +8,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
     TBloc extends ItemsManagerBloc> on State<T> {
   late TBloc bloc;
   late ScrollNotificationBloc scrollNotificationCubit;
+  bool scrolling = false;
 
   final Map<int, GlobalKey<SliverAnimatedListState>> _sliverAnimatedListKeys =
       <int, GlobalKey<SliverAnimatedListState>>{};

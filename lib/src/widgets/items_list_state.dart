@@ -81,20 +81,31 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   List<BlocListener> blocListeners(BuildContext context) => [];
 
   Widget buildScrollView(BuildContext context) {
-    return NotificationListener<ScrollNotification>(
-      onNotification: (ScrollNotification scrollInfo) {
-        scrollNotificationCubit.add(ScrolledEvent(scrollInfo: scrollInfo));
-        scrollNotificationCubit.add(PostScrolledEvent(scrollInfo: scrollInfo));
-        onScrollNotification(context, scrollInfo);
-        return true;
+    return BlocListener<ScrollNotificationBloc, ScrollNotificationState>(
+      listener: (context, state) {
+        if (!scrolling && state is ScrolledNotificationState) {
+          scrolling = true;
+        }
+        if (scrolling && state is PostScrolledNotificationState) {
+          scrolling = false;
+        }
       },
-      child: pullToRefresh
-          ? RefreshIndicator(
-              key: refreshIndicatorKey,
-              onRefresh: () => onRefreshIndicatorRefresh(context),
-              child: buildCustomScrollView(context),
-            )
-          : buildCustomScrollView(context),
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          scrollNotificationCubit.add(ScrolledEvent(scrollInfo: scrollInfo));
+          scrollNotificationCubit
+              .add(PostScrolledEvent(scrollInfo: scrollInfo));
+          onScrollNotification(context, scrollInfo);
+          return true;
+        },
+        child: pullToRefresh
+            ? RefreshIndicator(
+                key: refreshIndicatorKey,
+                onRefresh: () => onRefreshIndicatorRefresh(context),
+                child: buildCustomScrollView(context),
+              )
+            : buildCustomScrollView(context),
+      ),
     );
   }
 
