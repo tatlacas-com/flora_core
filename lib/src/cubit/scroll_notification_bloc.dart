@@ -17,11 +17,11 @@ class ScrollNotificationBloc
 
   FutureOr<void> _onScrolledEvent(
       ScrolledEvent event, Emitter<ScrollNotificationState> emit) async {
-    emit(PostScrolledNotificationState(scrollInfo: event.scrollInfo));
+    emit(ScrolledNotificationState(scrollInfo: event.scrollInfo));
   }
 
   FutureOr<void> _onPostScrolledEvent(
       PostScrolledEvent event, Emitter<ScrollNotificationState> emit) async {
-    emit(ScrolledNotificationState(scrollInfo: event.scrollInfo));
+    emit(PostScrolledNotificationState(scrollInfo: event.scrollInfo));
   }
 }
