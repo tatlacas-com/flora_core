@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 
-import 'items_list.dart';
-
 class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
   const ListContainer({
     super.key,
