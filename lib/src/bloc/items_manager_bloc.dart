@@ -5,11 +5,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:tatlacas_flutter_core/src/models/network_exception_type.dart';
-import 'package:tatlacas_flutter_core/src/models/section.dart';
-import 'package:tatlacas_flutter_core/src/widgets/items_list.dart';
-
-import '../items_repo.dart';
+import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 
 part 'items_manager_event.dart';
 

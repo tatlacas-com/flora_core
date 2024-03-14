@@ -2,12 +2,15 @@ library tatlacas_flutter_core;
 
 export 'src/screen_utils.dart';
 export 'src/web_client.dart';
-export 'src/blocs/items_manager_bloc.dart';
+export 'src/bloc/items_manager_bloc.dart';
+export 'src/bloc/debouncable.dart';
 export 'src/items_repo.dart';
 export 'src/models/section.dart';
 export 'src/models/network_exception_type.dart';
 
-export 'src/widgets/items_list.dart';
+export 'src/cubit/scroll_notification_bloc.dart';
+
+export 'src/widgets/items_list_state.dart';
 export 'src/widgets/items_slivers_mixin.dart';
 
 export 'src/models/app_theme_properties.dart';

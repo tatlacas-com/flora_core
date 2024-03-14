@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tatlacas_flutter_core/src/blocs/items_manager_bloc.dart';
-import 'package:tatlacas_flutter_core/src/widgets/zero_height_app_bar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 
 import 'items_list.dart';
 
@@ -10,11 +10,11 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
     this.listBuilderKey,
     this.buildInBase = true,
     this.useScaffold = true,
-    required this.listStateBuilder,
+    required this.builder,
     this.appBar,
   });
   final PreferredSizeWidget? appBar;
-  final ItemsListState<TBloc> Function() listStateBuilder;
+  final ItemsListState<TBloc> Function() builder;
   final Key? listBuilderKey;
   final bool buildInBase;
   final bool useScaffold;
@@ -25,12 +25,16 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
     if (useScaffold) {
       return Scaffold(
         appBar: appBar ?? ZeroHeightAppBar(),
-        body: ItemsList<TBloc>(
-            key: listBuilderKey, stateBuilder: listStateBuilder),
+        body: BlocProvider(
+          create: (context) => ScrollNotificationBloc(),
+          child: ItemsList<TBloc>(key: listBuilderKey, builder: builder),
+        ),
       );
     } else {
-      return ItemsList<TBloc>(
-          key: listBuilderKey, stateBuilder: listStateBuilder);
+      return BlocProvider(
+        create: (context) => ScrollNotificationBloc(),
+        child: ItemsList<TBloc>(key: listBuilderKey, builder: builder),
+      );
     }
   }
 }

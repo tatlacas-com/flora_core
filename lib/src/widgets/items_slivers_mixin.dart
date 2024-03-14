@@ -7,6 +7,7 @@ import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
 mixin ItemsSliversMixin<T extends StatefulWidget,
     TBloc extends ItemsManagerBloc> on State<T> {
   late TBloc bloc;
+  late ScrollNotificationBloc scrollNotificationCubit;
 
   final Map<int, GlobalKey<SliverAnimatedListState>> _sliverAnimatedListKeys =
       <int, GlobalKey<SliverAnimatedListState>>{};
