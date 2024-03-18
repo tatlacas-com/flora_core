@@ -49,7 +49,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   void initState() {
     super.initState();
     bloc = context.read<TBloc>();
-    scrollNotificationCubit = context.read<ScrollNotificationBloc>();
+    scrollBloc = context.read<ScrollNotificationBloc>();
   }
 
   void checkLoadFirstTime(BuildContext context) {
@@ -92,9 +92,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       },
       child: NotificationListener<ScrollNotification>(
         onNotification: (ScrollNotification scrollInfo) {
-          scrollNotificationCubit.add(ScrolledEvent(scrollInfo: scrollInfo));
-          scrollNotificationCubit
-              .add(PostScrolledEvent(scrollInfo: scrollInfo));
+          scrollBloc.add(ScrolledEvent(scrollInfo: scrollInfo));
+          scrollBloc.add(PostScrolledEvent(scrollInfo: scrollInfo));
           onScrollNotification(context, scrollInfo);
           return true;
         },
