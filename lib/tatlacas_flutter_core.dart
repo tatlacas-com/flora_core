@@ -15,7 +15,7 @@ export 'src/widgets/items_list.dart';
 export 'src/widgets/items_slivers_mixin.dart';
 
 export 'src/models/app_theme_properties.dart';
-export 'src/models/i_preference_storage.dart';
+export 'src/prefs/i_preference_storage.dart';
 export 'src/widgets/screen_container.dart';
 export 'src/widgets/list_container.dart';
 

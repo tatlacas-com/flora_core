@@ -17,8 +17,10 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^8.0.1
   flutter_lints: ^3.0.1
+  flutter_secure_storage: ^9.0.0
   http: ^1.1.0
   rxdart: ^0.27.7
+  shared_preferences: ^2.2.3
   universal_platform: ^1.0.0+1
 
 dev_dependencies:
