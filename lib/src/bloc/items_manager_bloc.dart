@@ -291,11 +291,13 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
     var indx = 0;
     final sections = result.items;
+    var hasItems = false;
     for (var i = 0; i < sections.length; i++) {
       if (st.sections.length <= i) {
         st.sections.add(sections[i].copyWith(items: <dynamic>[]));
       }
       for (final item in sections[i].items) {
+        hasItems = true;
         st.sections[i].items.add(item);
         final isLastItem =
             (indx == sections[i].items.length - 1) && i == sections.length - 1;
@@ -327,6 +329,9 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           }
         }
       }
+    }
+    if (!hasItems) {
+      emit(ItemsRetrievedState(items: <Section>[].toList()));
     }
   }
 
@@ -378,14 +383,14 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         emit,
         theme: event.theme,
       );
-      if ((result.items.isNotEmpty && result.items[0].items.isNotEmpty) ||
-          !foundCachedItems) {
-        await emitItemsRetrieved(
-          emit,
-          result,
-          theme: event.theme,
-        );
-      }
+      // if ((result.items.isNotEmpty && result.items[0].items.isNotEmpty) ||
+      //     !foundCachedItems) {
+      await emitItemsRetrieved(
+        emit,
+        result,
+        theme: event.theme,
+      );
+      // }
     } catch (e) {
       debugPrint('Error: $runtimeType onLoadItemsRequested: $e');
       await onLoadItemsException(emit, e);
