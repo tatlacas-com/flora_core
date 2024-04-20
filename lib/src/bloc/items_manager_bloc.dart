@@ -69,14 +69,26 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       (event, emit) => add(_LoaderEvent(event)),
       transformer: droppable(),
     );
-    on<ReplaceItemEvent>(onReplaceItem);
-    on<InsertItemEvent>(onInsertItem);
-    on<RemoveItemEvent>(onRemoveItem);
+    on<ReplaceItemEvent>(
+      onReplaceItem,
+      transformer: sequential(),
+    );
+    on<InsertItemEvent>(
+      onInsertItem,
+      transformer: sequential(),
+    );
+    on<RemoveItemEvent>(
+      onRemoveItem,
+      transformer: sequential(),
+    );
     on<LoadMoreItemsEvent>(
       onLoadMoreItemsEvent,
       transformer: droppable(),
     );
-    on<EmitRetrievedEvent>(onEmitRetrievedEvent);
+    on<EmitRetrievedEvent>(
+      onEmitRetrievedEvent,
+      transformer: sequential(),
+    );
     on<_LoaderEvent>(
       _onLoaderEvent,
       transformer: droppable(),
