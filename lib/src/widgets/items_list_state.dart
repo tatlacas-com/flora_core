@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
+import 'package:tatlacas_flora_core/tatlacas_flora_core.dart';
 
 class ItemsListState<TBloc extends ItemsManagerBloc>
     extends State<ItemsList<TBloc>>

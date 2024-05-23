@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
+import 'package:tatlacas_flora_core/tatlacas_flora_core.dart';
 
 /// {@template itemsList}
 /// A base class for showing list or grid of widgets on ui. For sample see [ItemsManagerBloc]

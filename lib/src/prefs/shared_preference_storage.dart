@@ -1,5 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
+import 'package:tatlacas_flora_core/tatlacas_flora_core.dart';
 
 class SharedPreferenceStorage implements IPreferenceStorage {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();

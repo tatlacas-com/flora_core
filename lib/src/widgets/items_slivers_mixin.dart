@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
+import 'package:tatlacas_flora_core/tatlacas_flora_core.dart';
 
 mixin ItemsSliversMixin<T extends StatefulWidget,
     TBloc extends ItemsManagerBloc> on State<T> {

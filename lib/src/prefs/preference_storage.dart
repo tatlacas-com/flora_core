@@ -1,5 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:tatlacas_flutter_core/tatlacas_flutter_core.dart';
+import 'package:tatlacas_flora_core/tatlacas_flora_core.dart';
 
 class PreferenceStorage implements IPreferenceStorage {
   static const storage = FlutterSecureStorage();
