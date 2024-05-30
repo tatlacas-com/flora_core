@@ -12,8 +12,7 @@ abstract class ItemsManagerEvent extends Equatable {
 }
 
 final class LoadItemsEvent extends ItemsManagerEvent {
-  LoadItemsEvent({required this.theme});
-  final ThemeData theme;
+  LoadItemsEvent();
 }
 
 final class _LoaderEvent extends ItemsManagerEvent {
@@ -63,12 +62,10 @@ final class ReloadItemsEvent extends ItemsManagerEvent {
   ReloadItemsEvent({
     this.fromCloud = true,
     this.loadFromLocalIfCloudEmpty = true,
-    required this.theme,
     super.requestId,
   });
   final bool fromCloud;
   final bool loadFromLocalIfCloudEmpty;
-  final ThemeData theme;
 
   @override
   List<Object?> get props => [fromCloud, loadFromLocalIfCloudEmpty, requestId];
@@ -77,9 +74,7 @@ final class ReloadItemsEvent extends ItemsManagerEvent {
 final class LoadMoreItemsEvent extends ItemsManagerEvent {
   LoadMoreItemsEvent({
     super.requestId,
-    required this.theme,
   });
-  final ThemeData theme;
 }
 
 final class EmitRetrievedEvent extends ItemsManagerEvent {}

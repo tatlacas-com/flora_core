@@ -209,35 +209,29 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       if (event.fromCloud) {
         var result = await loadItemsFromCloud(
           emit,
-          theme: event.theme,
         );
         if (result.items.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
           await emitItemsReloadRetrieved(
             emit,
             result,
-            theme: event.theme,
           );
           return;
         }
         emit(ReloadFromCloudEmptyState());
         result = await loadItemsFromLocalStorage(
           emit,
-          theme: event.theme,
         );
         await emitItemsReloadRetrieved(
           emit,
           result,
-          theme: event.theme,
         );
       } else {
         var loadedItems = await loadItemsFromLocalStorage(
           emit,
-          theme: event.theme,
         );
         await emitItemsReloadRetrieved(
           emit,
           loadedItems,
-          theme: event.theme,
         );
       }
     } catch (e) {
@@ -248,28 +242,15 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   Future<LoadItemsResult<Section>> loadItemsFromCloud(
-    Emitter<ItemsManagerState> emit, {
-    required ThemeData theme,
-  }) async =>
-      await repo?.loadItemsFromCloud(
-        theme: theme,
-      ) ??
-      LoadItemsResult.empty();
+          Emitter<ItemsManagerState> emit) async =>
+      await repo?.loadItemsFromCloud() ?? LoadItemsResult.empty();
 
   Future<LoadItemsResult<Section>> loadItemsFromLocalStorage(
-    Emitter<ItemsManagerState> emit, {
-    required ThemeData theme,
-  }) async =>
-      await repo?.loadItemsFromLocalStorage(
-        theme: theme,
-      ) ??
-      LoadItemsResult.empty();
+          Emitter<ItemsManagerState> emit) async =>
+      await repo?.loadItemsFromLocalStorage() ?? LoadItemsResult.empty();
 
   FutureOr<void> emitItemsRetrieved(
-    Emitter<ItemsManagerState> emit,
-    LoadItemsResult<Section> result, {
-    required ThemeData theme,
-  }) async {
+      Emitter<ItemsManagerState> emit, LoadItemsResult<Section> result) async {
     final st = state;
     if (st is ItemsRetrievedState) {
       await replaceAllItems(
@@ -348,10 +329,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   FutureOr<void> emitItemsReloadRetrieved(
-    Emitter<ItemsManagerState> emit,
-    LoadItemsResult<Section> result, {
-    required ThemeData theme,
-  }) async {
+      Emitter<ItemsManagerState> emit, LoadItemsResult<Section> result) async {
     final st = state;
     if (st is ItemsRetrievedState) {
       await replaceAllItems(
@@ -375,15 +353,11 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     try {
       var result = await loadItemsFromLocalStorage(
         emit,
-        theme: event.theme,
       );
-      var foundCachedItems = false;
       if (result.items.isNotEmpty) {
-        foundCachedItems = true;
         await emitItemsRetrieved(
           emit,
           result,
-          theme: event.theme,
         );
         if (!result.reloadFromCloud) {
           return;
@@ -393,14 +367,12 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       }
       result = await loadItemsFromCloud(
         emit,
-        theme: event.theme,
       );
       // if ((result.items.isNotEmpty && result.items[0].items.isNotEmpty) ||
       //     !foundCachedItems) {
       await emitItemsRetrieved(
         emit,
         result,
-        theme: event.theme,
       );
       // }
     } catch (e) {

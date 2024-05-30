@@ -54,7 +54,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   void checkLoadFirstTime(BuildContext context) {
     if (bloc.state is ItemsInitialState) {
-      bloc.add(LoadItemsEvent(theme: Theme.of(context)));
+      bloc.add(LoadItemsEvent());
     }
   }
 
@@ -113,7 +113,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         .where((state) =>
             !(state is ReloadingItemsState || state is ItemsLoadingState))
         .first;
-    bloc.add(ReloadItemsEvent(theme: Theme.of(context)));
+    bloc.add(ReloadItemsEvent());
     await reloading;
   }
 
@@ -176,7 +176,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     }
     var diff = scrollInfo.metrics.maxScrollExtent - scrollInfo.metrics.pixels;
     if (diff < reloadThresholdPixels) {
-      bloc.add(LoadMoreItemsEvent(theme: Theme.of(context)));
+      bloc.add(LoadMoreItemsEvent());
     }
   }
 
