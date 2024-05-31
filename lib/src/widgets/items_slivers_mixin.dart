@@ -347,6 +347,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
     required int index,
     required dynamic item,
     Animation<double>? animation,
+    bool isReplace = false,
     bool isRemoved = false,
   }) {
     if (item is Widgetable) {
@@ -513,6 +514,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
         sections: state.sections,
         animated: state.animated,
       ),
+      isReplace: true,
     );
   }
 
@@ -560,6 +562,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
       index: state.itemIndex,
       animation: animation,
       item: state.insertedItem,
+      isReplace: true,
     );
   }
 
@@ -641,6 +644,8 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
   void insertListItem(
     ItemInsertedState state, {
     Duration duration = const Duration(milliseconds: 300),
+    bool animDurationZeroOnReplace = true,
+    bool isReplace = false,
   }) {
     if (state.sections[state.itemSection].usesGrid) {
       final animState = sliverAnimatedGridState(state.itemSection);
@@ -649,7 +654,9 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
             'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
       }
       animState?.insertItem(state.itemIndex,
-          duration: state.animated ? duration : Duration.zero);
+          duration: state.animated || (isReplace && !animDurationZeroOnReplace)
+              ? duration
+              : Duration.zero);
     } else if (state.sections[state.itemSection].horizontalScroll) {
       final animState = animatedListState(state.itemSection);
       if (animState == null) {
@@ -657,7 +664,9 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
             'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
       }
       animState?.insertItem(state.itemIndex,
-          duration: state.animated ? duration : Duration.zero);
+          duration: state.animated || (isReplace && !animDurationZeroOnReplace)
+              ? duration
+              : Duration.zero);
     } else {
       final animState = sliverAnimatedListState(state.itemSection);
       if (animState == null) {
@@ -665,7 +674,9 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
             'Tried to access null animateListState for section ${state.itemSection} ${state.itemIndex} in insertListItem');
       }
       animState?.insertItem(state.itemIndex,
-          duration: state.animated ? duration : Duration.zero);
+          duration: state.animated || (isReplace && !animDurationZeroOnReplace)
+              ? duration
+              : Duration.zero);
     }
   }
 
