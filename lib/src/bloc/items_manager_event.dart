@@ -47,7 +47,9 @@ final class RemoveItemEvent extends ChangeItemEvent {
     required super.item,
     required super.section,
     required super.index,
+    this.animated = true,
   });
+  final bool animated;
 }
 
 final class InsertItemEvent extends ChangeItemEvent {

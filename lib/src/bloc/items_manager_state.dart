@@ -75,6 +75,7 @@ class ItemReplacedState extends ItemChangedState {
     required super.removedItem,
     required super.insertedItem,
     required super.sections,
+    super.animated = false,
   });
 }
 
@@ -87,6 +88,7 @@ class ItemRemovedState extends ItemChangedState {
     required super.itemIndex,
     required super.removedItem,
     required super.sections,
+    super.animated = false,
   });
 }
 
@@ -99,11 +101,8 @@ class ItemInsertedState extends ItemChangedState {
     required super.itemIndex,
     required super.insertedItem,
     required super.sections,
-    this.animated = false,
+    super.animated = false,
   });
-  final bool animated;
-  @override
-  List<Object?> get props => [...super.props, animated];
 }
 
 class ItemChangedState extends LoadedState {
@@ -115,8 +114,10 @@ class ItemChangedState extends LoadedState {
     this.changeParams,
     this.insertedItem,
     this.id,
+    this.animated = false,
     required super.sections,
   });
+  final bool animated;
   final dynamic removedItem, insertedItem, changeParams;
   final int itemSection, itemIndex;
   final String? id;
@@ -129,6 +130,7 @@ class ItemChangedState extends LoadedState {
         itemIndex,
         id,
         changeParams,
+        animated,
       ];
 }
 

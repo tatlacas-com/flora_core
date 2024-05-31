@@ -133,9 +133,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return BlocConsumer<TBloc, ItemsManagerState>(
       listener: (context, state) {
         if (state is ItemRemovedState) {
-          removeItem(state);
+          removeListItem(state);
         } else if (state is ItemInsertedState) {
-          insertItem(state, animated: state.animated);
+          insertListItem(state);
         } else if (state is ItemReplacedState) {
           replaceItem(state);
         }

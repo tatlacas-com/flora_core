@@ -176,13 +176,16 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       final state = (this.state as LoadedState);
       final removedItem =
           state.section(event.section).items.removeAt(event.index);
-      emit(ItemRemovedState(
-        itemSection: event.section,
-        reachedBottom: state.reachedBottom,
-        itemIndex: event.index,
-        removedItem: removedItem,
-        sections: state.sections,
-      ));
+      emit(
+        ItemRemovedState(
+          itemSection: event.section,
+          reachedBottom: state.reachedBottom,
+          itemIndex: event.index,
+          removedItem: removedItem,
+          sections: state.sections,
+          animated: event.animated,
+        ),
+      );
       if (state.section(event.section).isEmpty) {
         await Future.delayed(const Duration(milliseconds: 500));
         state.sections.removeAt(event.section);
@@ -253,12 +256,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       Emitter<ItemsManagerState> emit, LoadItemsResult<Section> result) async {
     final st = state;
     if (st is ItemsRetrievedState) {
-      await replaceAllItems(
-        st,
-        emit,
-        result,
-        firstTime: true,
-      );
+      await replaceAllItems(st, emit, result, firstTime: true);
     } else {
       emit(ItemsRetrievedState(items: result.items));
     }
@@ -278,6 +276,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
             id: '${st.sections[i].items.length}',
             removedItem: item,
             sections: st.sections,
+            animated: false,
           ),
         );
       }
@@ -305,6 +304,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
             reachedBottom: reachedBottom,
             insertedItem: item,
             sections: st.sections,
+            animated: false,
           ),
         );
 
@@ -355,25 +355,17 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         emit,
       );
       if (result.items.isNotEmpty) {
-        await emitItemsRetrieved(
-          emit,
-          result,
-        );
+        await emitItemsRetrieved(emit, result);
         if (!result.reloadFromCloud) {
           return;
         }
       } else {
         await emitLoading(emit);
       }
-      result = await loadItemsFromCloud(
-        emit,
-      );
+      result = await loadItemsFromCloud(emit);
       // if ((result.items.isNotEmpty && result.items[0].items.isNotEmpty) ||
       //     !foundCachedItems) {
-      await emitItemsRetrieved(
-        emit,
-        result,
-      );
+      await emitItemsRetrieved(emit, result);
       // }
     } catch (e) {
       debugPrint('Error: $runtimeType onLoadItemsRequested: $e');
@@ -452,6 +444,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           itemIndex: lastItemIndex,
           insertedItem: insertedItem,
           sections: loadedState.sections,
+          animated: true,
         ),
       );
     }
@@ -488,6 +481,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
               itemIndex: lastSectionItems.length,
               removedItem: removed,
               sections: loadedState.sections,
+              animated: false,
             ),
           );
         }
@@ -508,6 +502,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           itemIndex: indx++,
           insertedItem: item,
           sections: loadedState.sections,
+          animated: true,
         ),
       );
     }
@@ -543,6 +538,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           itemIndex: lastSectionItems.length - 1,
           insertedItem: spacer,
           sections: loadedState.sections,
+          animated: true,
         ),
       );
     }
