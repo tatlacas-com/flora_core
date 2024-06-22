@@ -9,9 +9,7 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
     this.buildInBase = true,
     this.useScaffold = true,
     required this.builder,
-    this.appBar,
   });
-  final PreferredSizeWidget? appBar;
   final ItemsListState<TBloc> Function() builder;
   final Key? listBuilderKey;
   final bool buildInBase;
@@ -22,7 +20,6 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
     if (!buildInBase) return const SizedBox();
     if (useScaffold) {
       return Scaffold(
-        appBar: appBar ?? ZeroHeightAppBar(),
         body: BlocProvider(
           create: (context) => ScrollNotificationBloc(),
           child: ItemsList<TBloc>(key: listBuilderKey, builder: builder),

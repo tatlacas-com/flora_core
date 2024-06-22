@@ -15,10 +15,8 @@ export 'src/widgets/items_list.dart';
 export 'src/widgets/items_slivers_mixin.dart';
 
 export 'src/models/app_theme_properties.dart';
-export 'src/widgets/screen_container.dart';
 export 'src/widgets/list_container.dart';
 
-export 'src/widgets/zero_height_app_bar.dart';
 export 'src/for_platform.dart';
 export 'src/models/widgetable.dart';
 export 'src/extensions.dart';
