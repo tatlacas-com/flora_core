@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:tatlacas_flora_core/tatlacas_flora_core.dart';
+import 'package:flora_core/flora_core.dart';
 
 part 'scroll_notification_state.dart';
 part 'scroll_notification_event.dart';

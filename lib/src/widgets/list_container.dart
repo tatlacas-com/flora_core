@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tatlacas_flora_core/tatlacas_flora_core.dart';
+import 'package:flora_core/flora_core.dart';
 
 class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
   const ListContainer({

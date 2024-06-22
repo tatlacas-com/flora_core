@@ -1,3 +1,3 @@
-# tatlacas_flora_core
+# flora_core
 
 Bootstrap for tatlacas flutter apps

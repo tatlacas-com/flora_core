@@ -1,4 +1,4 @@
-library tatlacas_flora_core;
+library flora_core;
 
 export 'src/screen_utils.dart';
 export 'src/web_client.dart';

@@ -5,7 +5,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:tatlacas_flora_core/tatlacas_flora_core.dart';
+import 'package:flora_core/flora_core.dart';
 
 part 'items_manager_event.dart';
 
