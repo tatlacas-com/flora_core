@@ -42,7 +42,8 @@ abstract class LoadedState extends ItemsManagerState {
 
   Section section(int section) => sections[section];
 
-  bool usesGrid(int section) => sections[section].usesGrid;
+  ItemPresentationStyle presentationStyle(int section) =>
+      sections[section].presentationStyle;
 
   dynamic sectionHeader(int section) => sections[section].sectionHeader;
   dynamic sectionFooter(int section) => sections[section].sectionFooter;

@@ -244,16 +244,16 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
   }
 
-  Future<LoadItemsResult<Section>> loadItemsFromCloud(
+  Future<ResponseItems<Section>> loadItemsFromCloud(
           Emitter<ItemsManagerState> emit) async =>
-      await repo?.loadItemsFromCloud() ?? LoadItemsResult.empty();
+      await repo?.loadItemsFromCloud() ?? ResponseItems.empty();
 
-  Future<LoadItemsResult<Section>> loadItemsFromLocalStorage(
+  Future<ResponseItems<Section>> loadItemsFromLocalStorage(
           Emitter<ItemsManagerState> emit) async =>
-      await repo?.loadItemsFromLocalStorage() ?? LoadItemsResult.empty();
+      await repo?.loadItemsFromLocalStorage() ?? ResponseItems.empty();
 
   FutureOr<void> emitItemsRetrieved(
-      Emitter<ItemsManagerState> emit, LoadItemsResult<Section> result) async {
+      Emitter<ItemsManagerState> emit, ResponseItems<Section> result) async {
     final st = state;
     if (st is ItemsRetrievedState) {
       await replaceAllItems(st, emit, result, firstTime: true);
@@ -263,7 +263,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   Future<void> replaceAllItems(ItemsRetrievedState st,
-      Emitter<ItemsManagerState> emit, LoadItemsResult<Section> result,
+      Emitter<ItemsManagerState> emit, ResponseItems<Section> result,
       {bool firstTime = false}) async {
     for (var i = 0; i < st.sections.length; i++) {
       while (st.sections[i].items.isNotEmpty) {
@@ -329,7 +329,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   }
 
   FutureOr<void> emitItemsReloadRetrieved(
-      Emitter<ItemsManagerState> emit, LoadItemsResult<Section> result) async {
+      Emitter<ItemsManagerState> emit, ResponseItems<Section> result) async {
     final st = state;
     if (st is ItemsRetrievedState) {
       await replaceAllItems(
@@ -423,11 +423,11 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
 
   int get pageSize => repo?.pageSize ?? 20;
 
-  Future<LoadItemsResult> prepareLoadMoreItems(
+  Future<ResponseItems> prepareLoadMoreItems(
       LoadMoreItemsEvent event, Emitter<ItemsManagerState> emit) async {
     var loadedState = state as LoadedState;
     if (loadedState.sections.isEmpty) {
-      return LoadItemsResult.empty();
+      return ResponseItems.empty();
     }
     var lastSectionIndex = loadedState.sections.length - 1;
     final lastSectionItems = loadedState.sections[lastSectionIndex].items;
@@ -451,16 +451,16 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     return await loadMoreItems(event, emit, lastSectionItems.length);
   }
 
-  Future<LoadItemsResult> loadMoreItems(LoadMoreItemsEvent event,
+  Future<ResponseItems> loadMoreItems(LoadMoreItemsEvent event,
           Emitter<ItemsManagerState> emit, int lastItemIndex) async =>
-      LoadItemsResult.empty();
+      ResponseItems.empty();
 
   bool hasReachedBottom(int section, int count) => count < pageSize;
 
   bool removeLoadingIfBottomReached(int section) => true;
 
   FutureOr<void> emitMoreItemsRetrieved(
-      Emitter<ItemsManagerState> emit, LoadItemsResult result) async {
+      Emitter<ItemsManagerState> emit, ResponseItems result) async {
     var loadedState = state as LoadedState;
     if (loadedState.sections.isEmpty) {
       return;

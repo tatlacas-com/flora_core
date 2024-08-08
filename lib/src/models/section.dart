@@ -1,16 +1,25 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-class LoadItemsResult<T> {
-  LoadItemsResult(
+class ResponseItems<T> {
+  ResponseItems(
       {required this.items, required this.count, this.reloadFromCloud = false});
-  factory LoadItemsResult.empty() => LoadItemsResult(items: [], count: 0);
+  factory ResponseItems.empty() => ResponseItems(items: [], count: 0);
 
   final List<T> items;
 
-  /// count of items returned by the server
+  /// count of items returned by the server. Is used to compare pageSize with response to determine if all items have been retrieved.
+  /// If count < pageSize then it is assumed that all items have been retrieved
   final int count;
   final bool reloadFromCloud;
+}
+
+enum ItemPresentationStyle {
+  list,
+  grid;
+
+  bool get isGrid => this == grid;
+  bool get isList => this == list;
 }
 
 class Section extends Equatable {
@@ -18,14 +27,14 @@ class Section extends Equatable {
     this.sectionHeader,
     this.sectionFooter,
     this.emptyEntity = const SizedBox(),
-    this.usesGrid = false,
+    this.presentationStyle = ItemPresentationStyle.list,
     this.horizontalScroll = false,
     this.items = const [],
   });
   final List<dynamic> items;
   final dynamic sectionHeader;
   final dynamic sectionFooter;
-  final bool usesGrid;
+  final ItemPresentationStyle presentationStyle;
   final bool horizontalScroll;
   bool get isEmpty => items.isEmpty;
   final dynamic emptyEntity;
@@ -40,21 +49,21 @@ class Section extends Equatable {
         items,
         sectionHeader,
         sectionFooter,
-        usesGrid,
+        presentationStyle,
         horizontalScroll,
       ];
 
   Section copyWith({
     List<dynamic>? items,
     dynamic sectionHeader,
-    bool? usesGrid,
+    ItemPresentationStyle? presentationStyle,
     bool? horizontalScroll,
     dynamic emptyEntity,
   }) {
     return Section(
       items: items ?? this.items,
       sectionHeader: sectionHeader ?? this.sectionHeader,
-      usesGrid: usesGrid ?? this.usesGrid,
+      presentationStyle: presentationStyle ?? this.presentationStyle,
       horizontalScroll: horizontalScroll ?? this.horizontalScroll,
       emptyEntity: emptyEntity ?? this.emptyEntity,
     );

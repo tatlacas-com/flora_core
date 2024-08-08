@@ -4,10 +4,10 @@ import 'models/section.dart';
 
 abstract class ItemsRepo {
   const ItemsRepo();
-  Future<LoadItemsResult<Section>> loadItemsFromLocalStorage() async =>
-      LoadItemsResult<Section>.empty();
+  Future<ResponseItems<Section>> loadItemsFromLocalStorage() async =>
+      ResponseItems<Section>.empty();
 
-  Future<LoadItemsResult<Section>> loadItemsFromCloud() async =>
-      LoadItemsResult<Section>.empty();
+  Future<ResponseItems<Section>> loadItemsFromCloud() async =>
+      ResponseItems<Section>.empty();
   int get pageSize => 20;
 }

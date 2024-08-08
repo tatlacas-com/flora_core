@@ -164,7 +164,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
           context, sectionIndex, state.section(sectionIndex).emptyEntity));
     } else {
       sections.add(
-        state.usesGrid(sectionIndex)
+        state.presentationStyle(sectionIndex).isGrid
             ? sectionSliverGrid(sectionIndex, context,
                 state.section(sectionIndex), marginBottom)
             : sectionSliverList(sectionIndex, context,
@@ -255,7 +255,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
         child: GridView.builder(
           gridDelegate: _buildSliverGridDelegate(section),
           itemBuilder: (context, index) {
-            return buildListItem(
+            return buildItem(
               context: context,
               section: section,
               index: index,
@@ -329,7 +329,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
       gridDelegate: _buildSliverGridDelegate(section),
       delegate: SliverChildBuilderDelegate(
         (context, index) {
-          return buildListItem(
+          return buildItem(
             context: context,
             section: section,
             index: index,
@@ -341,7 +341,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
     );
   }
 
-  Widget buildListItem({
+  Widget buildItem({
     required BuildContext context,
     required int section,
     required int index,
@@ -402,7 +402,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
   ListView _buildHorizontalList(int section, Section sectionItems) {
     return ListView.builder(
       itemBuilder: (context, index) {
-        return buildListItem(
+        return buildItem(
           context: context,
           section: section,
           index: index,
@@ -443,7 +443,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
       key: ValueKey('${section}sectionSliverList'),
       delegate: SliverChildBuilderDelegate(
         (context, index) {
-          return buildListItem(
+          return buildItem(
             context: context,
             section: section,
             index: index,
@@ -540,7 +540,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
         begin: 0,
         end: 1,
       ).animate(animation),
-      child: buildListItem(
+      child: buildItem(
         context: context,
         section: section,
         index: index,
@@ -556,7 +556,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
     required Animation<double> animation,
     required ItemReplacedState state,
   }) {
-    return buildListItem(
+    return buildItem(
       context: context,
       section: state.itemSection,
       index: state.itemIndex,
@@ -587,7 +587,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
     ItemRemovedState state, {
     Duration duration = const Duration(milliseconds: 300),
   }) {
-    if (state.sections[state.itemSection].usesGrid) {
+    if (state.sections[state.itemSection].presentationStyle.isGrid) {
       final animState = sliverAnimatedGridState(state.itemSection);
       if (animState == null) {
         debugPrint(
@@ -647,7 +647,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
     bool animDurationZeroOnReplace = true,
     bool isReplace = false,
   }) {
-    if (state.sections[state.itemSection].usesGrid) {
+    if (state.sections[state.itemSection].presentationStyle.isGrid) {
       final animState = sliverAnimatedGridState(state.itemSection);
       if (animState == null) {
         debugPrint(
