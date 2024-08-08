@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TestItemsBloc extends ItemsManagerBloc {
   @override
-  Future<ResponseItems<Section>> loadItemsFromLocalStorage(
+  Future<ResponseItems<Section>> getLocalItems(
       Emitter<ItemsManagerState> emit) async {
     final section0 = [0, 1, 2];
     return ResponseItems(

@@ -210,7 +210,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
         emit(const ItemsLoadingState());
       }
       if (event.fromCloud) {
-        var result = await loadItemsFromCloud(
+        var result = await getRemoteItems(
           emit,
         );
         if (result.items.isNotEmpty || !event.loadFromLocalIfCloudEmpty) {
@@ -221,7 +221,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           return;
         }
         emit(ReloadFromCloudEmptyState());
-        result = await loadItemsFromLocalStorage(
+        result = await getLocalItems(
           emit,
         );
         await emitItemsReloadRetrieved(
@@ -229,7 +229,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
           result,
         );
       } else {
-        var loadedItems = await loadItemsFromLocalStorage(
+        var loadedItems = await getLocalItems(
           emit,
         );
         await emitItemsReloadRetrieved(
@@ -244,13 +244,15 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
   }
 
-  Future<ResponseItems<Section>> loadItemsFromCloud(
+  /// Get items from api/cloud. Called after [getLocalItems] returns empty or count < pageSize
+  Future<ResponseItems<Section>> getRemoteItems(
           Emitter<ItemsManagerState> emit) async =>
-      await repo?.loadItemsFromCloud() ?? ResponseItems.empty();
+      await repo?.getRemoteItems() ?? ResponseItems.empty();
 
-  Future<ResponseItems<Section>> loadItemsFromLocalStorage(
+  /// get items from local storage/cache etc. No API calls expected in this method. Called first, if empty/not full page then [getRemoteItems] is called
+  Future<ResponseItems<Section>> getLocalItems(
           Emitter<ItemsManagerState> emit) async =>
-      await repo?.loadItemsFromLocalStorage() ?? ResponseItems.empty();
+      await repo?.getLocalItems() ?? ResponseItems.empty();
 
   FutureOr<void> emitItemsRetrieved(
       Emitter<ItemsManagerState> emit, ResponseItems<Section> result) async {
@@ -351,7 +353,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       LoadItemsEvent event, Emitter<ItemsManagerState> emit) async {
     if (state is LoadingMoreItemsState) return;
     try {
-      var result = await loadItemsFromLocalStorage(
+      var result = await getLocalItems(
         emit,
       );
       if (result.items.isNotEmpty) {
@@ -362,7 +364,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
       } else {
         await emitLoading(emit);
       }
-      result = await loadItemsFromCloud(emit);
+      result = await getRemoteItems(emit);
       // if ((result.items.isNotEmpty && result.items[0].items.isNotEmpty) ||
       //     !foundCachedItems) {
       await emitItemsRetrieved(emit, result);
