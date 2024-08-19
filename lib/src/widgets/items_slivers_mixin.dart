@@ -9,7 +9,6 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
   late TBloc bloc;
   late ScrollNotificationBloc scrollBloc;
   bool scrolling = false;
-  bool get useNestedScrollView;
   List<Widget> buildAppBarSlivers(BuildContext context);
 
   final Map<int, GlobalKey<SliverAnimatedListState>> _sliverAnimatedListKeys =
@@ -121,7 +120,7 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
 
   List<Widget> buildLoadingSlivers(BuildContext context) {
     return [
-      if (!useNestedScrollView) ...buildAppBarSlivers(context),
+      ...buildAppBarSlivers(context),
       SliverList.list(
         children: [buildLoadingView(context)],
       )
@@ -129,14 +128,13 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
   }
 
   List<Widget> buildSections(BuildContext context, ItemsManagerState state) {
-    if (!useNestedScrollView) {}
     if (state is ItemsLoadingState ||
         state is ItemsInitialState ||
         state is! LoadedState) {
       return buildLoadingSlivers(context);
     }
     final List<Widget> sections = [
-      if (!useNestedScrollView) ...buildAppBarSlivers(context),
+      ...buildAppBarSlivers(context),
     ];
     if (state.isNotEmpty) {
       for (int sectionIndex = 0;

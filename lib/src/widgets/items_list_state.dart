@@ -9,14 +9,10 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         AutomaticKeepAliveClientMixin,
         ItemsSliversMixin<ItemsList<TBloc>, TBloc> {
   ItemsListState({
-    ScrollController? nestedScrollController,
     ScrollController? customScrollController,
     this.scrollPhysics,
-    this.useNestedScrollView = false,
-  }) : assert(!useNestedScrollView || customScrollController == null) {
-    _disposeController = nestedScrollController == null;
-    this.outerScrollController = nestedScrollController ?? ScrollController();
-    if (!useNestedScrollView && customScrollController == null) {
+  }) {
+    if (customScrollController == null) {
       this.customScrollController = ScrollController();
       _disposeCustomController = true;
     } else {
@@ -24,7 +20,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       _disposeCustomController = false;
     }
   }
-  late bool _disposeController;
   late bool _disposeCustomController;
 
   double get reloadThresholdPixels => 250;
@@ -35,13 +30,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   bool get floatHeaderSlivers => false;
 
-  @override
-  final bool useNestedScrollView;
-
-  late final ScrollController outerScrollController;
   late final ScrollController? customScrollController;
-  ScrollController get primaryScrollController =>
-      useNestedScrollView ? outerScrollController : customScrollController!;
+  ScrollController get primaryScrollController => customScrollController!;
   final ScrollPhysics? scrollPhysics;
 
   ScrollDirection get scrollDirection =>
@@ -52,14 +42,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   @protected
   final GlobalKey<RefreshIndicatorState> refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
-
-  final GlobalKey<NestedScrollViewState> nestedScrollViewGlobalKey =
-      GlobalKey();
-  ScrollController? get innerController {
-    return useNestedScrollView
-        ? nestedScrollViewGlobalKey.currentState!.innerController
-        : null;
-  }
 
   @override
   void initState() {
@@ -81,17 +63,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkLoadFirstTime(context);
     });
-    return useNestedScrollView
-        ? NestedScrollView(
-            key: nestedScrollViewGlobalKey,
-            controller: outerScrollController,
-            floatHeaderSlivers: floatHeaderSlivers,
-            headerSliverBuilder: (BuildContext cnxt, bool innerBoxIsScrolled) {
-              return buildAppBarSlivers(context);
-            },
-            body: _buildScrollViewWithListeners(context),
-          )
-        : _buildScrollViewWithListeners(context);
+    return _buildScrollViewWithListeners(context);
   }
 
   List<BlocListener> blocListeners(BuildContext context) => [];
@@ -238,9 +210,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   @override
   void dispose() {
-    if (_disposeController) {
-      outerScrollController.dispose();
-    }
     if (_disposeCustomController) {
       customScrollController?.dispose();
     }
