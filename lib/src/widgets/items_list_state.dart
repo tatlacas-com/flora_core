@@ -15,8 +15,15 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }) : assert(!useNestedScrollView || customScrollController == null) {
     _disposeController = nestedScrollController == null;
     this.nestedScrollController = nestedScrollController ?? ScrollController();
+    if (!useNestedScrollView && customScrollController == null) {
+      this.customScrollController = ScrollController();
+      _disposeCustomController = true;
+    } else {
+      _disposeCustomController = false;
+    }
   }
   late bool _disposeController;
+  late bool _disposeCustomController;
 
   double get reloadThresholdPixels => 250;
 
@@ -29,10 +36,10 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   final bool useNestedScrollView;
 
   late final ScrollController nestedScrollController;
-  final ScrollController? customScrollController;
-  ScrollController? _innerScrollController;
-  ScrollController? get primaryScrollController =>
-      useNestedScrollView ? _innerScrollController : customScrollController;
+  late final ScrollController? customScrollController;
+  late ScrollController _innerScrollController;
+  ScrollController get primaryScrollController =>
+      useNestedScrollView ? _innerScrollController : customScrollController!;
   final ScrollPhysics? scrollPhysics;
 
   bool get buildSliversInSliverOverlapInjector => false;
@@ -231,7 +238,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     if (_disposeController) {
       nestedScrollController.dispose();
     }
-
+    if (_disposeCustomController) {
+      customScrollController?.dispose();
+    }
     super.dispose();
   }
 
