@@ -5,7 +5,10 @@ class TestItemsBloc extends ItemsManagerBloc {
   @override
   Future<ResponseItems<Section>> getLocalItems(
       Emitter<ItemsManagerState> emit) async {
-    final section0 = [0, 1, 2];
+    final section0 = List.generate(
+      200,
+      (index) => index,
+    );
     return ResponseItems(
       items: [Section(items: section0)],
       count: section0.length,

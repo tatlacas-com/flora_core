@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flora_core/flora_core.dart';
 
@@ -9,16 +10,17 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         ItemsSliversMixin<ItemsList<TBloc>, TBloc> {
   ItemsListState({
     ScrollController? nestedScrollController,
-    this.customScrollController,
+    ScrollController? customScrollController,
     this.scrollPhysics,
-    this.useNestedScrollView = true,
+    this.useNestedScrollView = false,
   }) : assert(!useNestedScrollView || customScrollController == null) {
     _disposeController = nestedScrollController == null;
-    this.nestedScrollController = nestedScrollController ?? ScrollController();
+    this.outerScrollController = nestedScrollController ?? ScrollController();
     if (!useNestedScrollView && customScrollController == null) {
       this.customScrollController = ScrollController();
       _disposeCustomController = true;
     } else {
+      this.customScrollController = customScrollController;
       _disposeCustomController = false;
     }
   }
@@ -33,14 +35,17 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   bool get floatHeaderSlivers => false;
 
+  @override
   final bool useNestedScrollView;
 
-  late final ScrollController nestedScrollController;
+  late final ScrollController outerScrollController;
   late final ScrollController? customScrollController;
-  late ScrollController _innerScrollController;
   ScrollController get primaryScrollController =>
-      useNestedScrollView ? _innerScrollController : customScrollController!;
+      useNestedScrollView ? outerScrollController : customScrollController!;
   final ScrollPhysics? scrollPhysics;
+
+  ScrollDirection get scrollDirection =>
+      primaryScrollController.position.userScrollDirection;
 
   bool get buildSliversInSliverOverlapInjector => false;
 
@@ -79,7 +84,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     return useNestedScrollView
         ? NestedScrollView(
             key: nestedScrollViewGlobalKey,
-            controller: nestedScrollController,
+            controller: outerScrollController,
             floatHeaderSlivers: floatHeaderSlivers,
             headerSliverBuilder: (BuildContext cnxt, bool innerBoxIsScrolled) {
               return buildAppBarSlivers(context);
@@ -129,9 +134,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }
 
   Widget _buildScrollViewWithListeners(BuildContext context) {
-    if (useNestedScrollView) {
-      _innerScrollController = PrimaryScrollController.of(context);
-    }
     final listeners = blocListeners(context);
     if (listeners.isNotEmpty) {
       return MultiBlocListener(
@@ -229,6 +231,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     ];
   }
 
+  @override
   List<Widget> buildAppBarSlivers(BuildContext context) {
     return [];
   }
@@ -236,7 +239,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   @override
   void dispose() {
     if (_disposeController) {
-      nestedScrollController.dispose();
+      outerScrollController.dispose();
     }
     if (_disposeCustomController) {
       customScrollController?.dispose();
