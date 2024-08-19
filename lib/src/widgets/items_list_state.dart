@@ -11,7 +11,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     ScrollController? nestedScrollController,
     this.customScrollController,
     this.scrollPhysics,
-  }) {
+    this.useNestedScrollView = true,
+  }) : assert(!useNestedScrollView || customScrollController == null) {
     _disposeController = nestedScrollController == null;
     this.nestedScrollController = nestedScrollController ?? ScrollController();
   }
@@ -25,10 +26,13 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   bool get floatHeaderSlivers => false;
 
-  bool get useNestedScrollView => true;
+  final bool useNestedScrollView;
 
   late final ScrollController nestedScrollController;
   final ScrollController? customScrollController;
+  ScrollController? _innerScrollController;
+  ScrollController? get primaryScrollController =>
+      useNestedScrollView ? _innerScrollController : customScrollController;
   final ScrollPhysics? scrollPhysics;
 
   bool get buildSliversInSliverOverlapInjector => false;
@@ -73,14 +77,14 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
             headerSliverBuilder: (BuildContext cnxt, bool innerBoxIsScrolled) {
               return buildAppBarSlivers(context);
             },
-            body: buildScrollViewWithListeners(context),
+            body: _buildScrollViewWithListeners(context),
           )
-        : buildScrollViewWithListeners(context);
+        : _buildScrollViewWithListeners(context);
   }
 
   List<BlocListener> blocListeners(BuildContext context) => [];
 
-  Widget buildScrollView(BuildContext context) {
+  Widget _buildScrollView(BuildContext context) {
     return BlocListener<ScrollNotificationBloc, ScrollNotificationState>(
       listener: (context, state) {
         if (!scrolling && state is ScrolledNotificationState) {
@@ -101,9 +105,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
             ? RefreshIndicator(
                 key: refreshIndicatorKey,
                 onRefresh: () => onRefreshIndicatorRefresh(context),
-                child: buildCustomScrollView(context),
+                child: _buildCustomScrollView(context),
               )
-            : buildCustomScrollView(context),
+            : _buildCustomScrollView(context),
       ),
     );
   }
@@ -117,19 +121,22 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     await reloading;
   }
 
-  Widget buildScrollViewWithListeners(BuildContext context) {
+  Widget _buildScrollViewWithListeners(BuildContext context) {
+    if (useNestedScrollView) {
+      _innerScrollController = PrimaryScrollController.of(context);
+    }
     final listeners = blocListeners(context);
     if (listeners.isNotEmpty) {
       return MultiBlocListener(
         listeners: listeners,
-        child: buildScrollView(context),
+        child: _buildScrollView(context),
       );
     } else {
-      return buildScrollView(context);
+      return _buildScrollView(context);
     }
   }
 
-  Widget buildCustomScrollView(BuildContext context) {
+  Widget _buildCustomScrollView(BuildContext context) {
     return BlocConsumer<TBloc, ItemsManagerState>(
       listener: (context, state) {
         if (state is ItemRemovedState) {

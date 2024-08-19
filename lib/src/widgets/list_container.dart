@@ -7,9 +7,8 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
     this.listBuilderKey,
     this.buildInBase = true,
     this.useScaffold = true,
-    @factory required this.builder,
+    required this.builder,
   });
-  @factory
   final ItemsListState<TBloc> Function() builder;
   final Key? listBuilderKey;
 

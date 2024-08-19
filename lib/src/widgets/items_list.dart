@@ -8,10 +8,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
   const ItemsList({
     super.key,
-    @factory this.builder,
+    this.builder,
     this.buildSliversInSliverOverlapInjector = false,
   });
-  @factory
   final ItemsListState<TBloc> Function()? builder;
 
   final bool buildSliversInSliverOverlapInjector;
@@ -28,7 +27,6 @@ class ItemsListWidget<TBloc extends ItemsManagerBloc> extends StatelessWidget {
     this.builder,
     this.listBuilderKey,
   });
-  @factory
   final ItemsListState<TBloc> Function()? builder;
   final Key? listBuilderKey;
 
