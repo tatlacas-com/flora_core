@@ -7,6 +7,7 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
     this.listBuilderKey,
     this.buildInBase = true,
     this.useScaffold = true,
+    this.withSliverOverlapInjector = false,
     required this.builder,
   });
   final ItemsListState<TBloc> Function(BuildContext context) builder;
@@ -17,6 +18,7 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
 
   /// if true, build() will use Scaffold widget. Defaults to true
   final bool useScaffold;
+  final bool withSliverOverlapInjector;
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +28,14 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
         body: ItemsListWidget<TBloc>(
           key: listBuilderKey,
           builder: builder,
+          withSliverOverlapInjector: withSliverOverlapInjector,
         ),
       );
     } else {
       return ItemsListWidget<TBloc>(
         key: listBuilderKey,
         builder: builder,
+        withSliverOverlapInjector: withSliverOverlapInjector,
       );
     }
   }

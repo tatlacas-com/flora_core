@@ -168,8 +168,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget buildItemsRetrievedScrollView(
       BuildContext context, ItemsManagerState state) {
-    var withInjector = widget.buildSliversInSliverOverlapInjector ||
-        buildSliversInSliverOverlapInjector;
+    var withInjector =
+        widget.withSliverOverlapInjector || buildSliversInSliverOverlapInjector;
     final key = '${runtimeType}Items';
     return CustomScrollView(
       key: PageStorageKey<String>(key),

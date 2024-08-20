@@ -10,12 +10,12 @@ class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
     super.key,
     this.builder,
     required this.context,
-    this.buildSliversInSliverOverlapInjector = false,
+    this.withSliverOverlapInjector = false,
   });
   final BuildContext context;
   final ItemsListState<TBloc> Function(BuildContext context)? builder;
 
-  final bool buildSliversInSliverOverlapInjector;
+  final bool withSliverOverlapInjector;
 
   @override
   ItemsListState<TBloc> createState() =>
@@ -28,9 +28,11 @@ class ItemsListWidget<TBloc extends ItemsManagerBloc> extends StatelessWidget {
     super.key,
     this.builder,
     this.listBuilderKey,
+    this.withSliverOverlapInjector = false,
   });
   final ItemsListState<TBloc> Function(BuildContext context)? builder;
   final Key? listBuilderKey;
+  final bool withSliverOverlapInjector;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +42,7 @@ class ItemsListWidget<TBloc extends ItemsManagerBloc> extends StatelessWidget {
         key: listBuilderKey,
         context: context,
         builder: builder,
+        withSliverOverlapInjector: withSliverOverlapInjector,
       ),
     );
   }
