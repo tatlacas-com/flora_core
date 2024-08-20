@@ -9,18 +9,16 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         AutomaticKeepAliveClientMixin,
         ItemsSliversMixin<ItemsList<TBloc>, TBloc> {
   ItemsListState({
-    ScrollController? customScrollController,
+    ScrollController? scrollController,
+    bool needsScrollController = true,
     this.scrollPhysics,
-  }) {
-    if (customScrollController == null) {
-      this.customScrollController = ScrollController();
-      _disposeCustomController = true;
+  }) : assert(scrollController == null || needsScrollController) {
+    if (scrollController == null && needsScrollController) {
+      this.scrollController = ScrollController();
     } else {
-      this.customScrollController = customScrollController;
-      _disposeCustomController = false;
+      this.scrollController = scrollController;
     }
   }
-  late bool _disposeCustomController;
 
   double get reloadThresholdPixels => 250;
 
@@ -30,8 +28,8 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   bool get floatHeaderSlivers => false;
 
-  late final ScrollController? customScrollController;
-  ScrollController get primaryScrollController => customScrollController!;
+  late final ScrollController? scrollController;
+  ScrollController get primaryScrollController => scrollController!;
   final ScrollPhysics? scrollPhysics;
 
   ScrollDirection get scrollDirection =>
@@ -177,7 +175,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: PageStorageKey<String>(key),
       physics: scrollPhysics ??
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-      controller: customScrollController,
+      controller: scrollController,
       //needed for RefreshIndicator to work
       slivers: withInjector
           ? buildSectionsWithOverlapInjector(context, state)
@@ -187,7 +185,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget _buildLoadingFailed(LoadItemsFailedState state, BuildContext context) {
     return CustomScrollView(
-      controller: customScrollController,
+      controller: scrollController,
       key: PageStorageKey<String>(runtimeType.toString()),
       slivers: buildLoadingFailedSlivers(context, state),
     );
@@ -210,9 +208,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   @override
   void dispose() {
-    if (_disposeCustomController) {
-      customScrollController?.dispose();
-    }
+    scrollController?.dispose();
     super.dispose();
   }
 
