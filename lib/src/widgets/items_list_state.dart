@@ -12,6 +12,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
     ScrollController? scrollController,
     bool needsScrollController = true,
     this.scrollPhysics,
+    this.pageStorageKey,
   }) : assert(scrollController == null || needsScrollController) {
     if (scrollController == null && needsScrollController) {
       this.scrollController = ScrollController();
@@ -27,6 +28,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   bool get canLoadMoreItemsHorizontal => false;
 
   bool get floatHeaderSlivers => false;
+  final PageStorageKey? pageStorageKey;
 
   late final ScrollController? scrollController;
   ScrollController get primaryScrollController => scrollController!;
@@ -172,7 +174,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
         widget.withSliverOverlapInjector || buildSliversInSliverOverlapInjector;
     final key = '${runtimeType}Items';
     return CustomScrollView(
-      key: PageStorageKey<String>(key),
+      key: pageStorageKey ?? PageStorageKey<String>(key),
       physics: scrollPhysics ??
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       controller: scrollController,
@@ -186,7 +188,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   Widget _buildLoadingFailed(LoadItemsFailedState state, BuildContext context) {
     return CustomScrollView(
       controller: scrollController,
-      key: PageStorageKey<String>(runtimeType.toString()),
+      key: pageStorageKey ?? PageStorageKey<String>(runtimeType.toString()),
       slivers: buildLoadingFailedSlivers(context, state),
     );
   }
