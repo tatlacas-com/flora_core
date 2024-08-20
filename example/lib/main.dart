@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: BlocProvider(
         create: (context) => TestItemsBloc(),
         child: ListContainer(
-          builder: () => TestItemsPage(),
+          builder: (context) => TestItemsPage(),
         ),
       ),
     );

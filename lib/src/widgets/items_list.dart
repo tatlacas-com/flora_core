@@ -9,16 +9,18 @@ class ItemsList<TBloc extends ItemsManagerBloc> extends StatefulWidget {
   const ItemsList({
     super.key,
     this.builder,
+    required this.context,
     this.buildSliversInSliverOverlapInjector = false,
   });
-  final ItemsListState<TBloc> Function()? builder;
+  final BuildContext context;
+  final ItemsListState<TBloc> Function(BuildContext context)? builder;
 
   final bool buildSliversInSliverOverlapInjector;
 
   @override
   ItemsListState<TBloc> createState() =>
       // ignore: no_logic_in_create_state
-      builder?.call() ?? ItemsListState<TBloc>();
+      builder?.call(context) ?? ItemsListState<TBloc>();
 }
 
 class ItemsListWidget<TBloc extends ItemsManagerBloc> extends StatelessWidget {
@@ -27,7 +29,7 @@ class ItemsListWidget<TBloc extends ItemsManagerBloc> extends StatelessWidget {
     this.builder,
     this.listBuilderKey,
   });
-  final ItemsListState<TBloc> Function()? builder;
+  final ItemsListState<TBloc> Function(BuildContext context)? builder;
   final Key? listBuilderKey;
 
   @override
@@ -36,6 +38,7 @@ class ItemsListWidget<TBloc extends ItemsManagerBloc> extends StatelessWidget {
       create: (context) => ScrollNotificationBloc(),
       child: ItemsList<TBloc>(
         key: listBuilderKey,
+        context: context,
         builder: builder,
       ),
     );

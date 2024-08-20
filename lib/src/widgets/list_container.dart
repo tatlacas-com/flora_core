@@ -9,7 +9,7 @@ class ListContainer<TBloc extends ItemsManagerBloc> extends StatelessWidget {
     this.useScaffold = true,
     required this.builder,
   });
-  final ItemsListState<TBloc> Function() builder;
+  final ItemsListState<TBloc> Function(BuildContext context) builder;
   final Key? listBuilderKey;
 
   /// Set false if you want to override and construct own widgets. Defaults to true
