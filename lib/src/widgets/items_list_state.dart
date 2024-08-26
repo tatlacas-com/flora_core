@@ -16,12 +16,14 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   }) : assert(scrollController == null || needsScrollController) {
     if (scrollController == null && needsScrollController) {
       this.scrollController = ScrollController();
+      _mustDisposeController = true;
     } else {
       this.scrollController = scrollController;
     }
   }
 
   double get reloadThresholdPixels => 250;
+  bool _mustDisposeController = false;
 
   bool get pullToRefresh => true;
   bool get canLoadMoreItems => true;
@@ -210,7 +212,9 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   @override
   void dispose() {
-    scrollController?.dispose();
+    if (_mustDisposeController) {
+      scrollController?.dispose();
+    }
     super.dispose();
   }
 
