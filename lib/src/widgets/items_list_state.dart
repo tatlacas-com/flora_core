@@ -39,7 +39,10 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
   ScrollDirection get scrollDirection =>
       primaryScrollController.position.userScrollDirection;
 
+  @override
   bool get buildSliversInSliverOverlapInjector => false;
+  @override
+  bool get withSliverOverlapInjector => widget.withSliverOverlapInjector;
 
   @protected
   final GlobalKey<RefreshIndicatorState> refreshIndicatorKey =
@@ -172,8 +175,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
 
   Widget buildItemsRetrievedScrollView(
       BuildContext context, ItemsManagerState state) {
-    var withInjector =
-        widget.withSliverOverlapInjector || buildSliversInSliverOverlapInjector;
     final key = '${runtimeType}Items';
     return CustomScrollView(
       key: pageStorageKey ?? PageStorageKey<String>(key),
@@ -181,9 +182,7 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       controller: scrollController,
       //needed for RefreshIndicator to work
-      slivers: withInjector
-          ? buildSectionsWithOverlapInjector(context, state)
-          : buildSections(context, state),
+      slivers: buildSections(context, state),
     );
   }
 
@@ -193,16 +192,6 @@ class ItemsListState<TBloc extends ItemsManagerBloc>
       key: pageStorageKey ?? PageStorageKey<String>(runtimeType.toString()),
       slivers: buildLoadingFailedSlivers(context, state),
     );
-  }
-
-  List<Widget> buildSectionsWithOverlapInjector(
-      BuildContext context, ItemsManagerState state) {
-    return [
-      SliverOverlapInjector(
-        handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-      ),
-      ...buildSections(context, state)
-    ];
   }
 
   @override

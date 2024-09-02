@@ -9,6 +9,8 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
   late TBloc bloc;
   late ScrollNotificationBloc scrollBloc;
   bool scrolling = false;
+  bool get buildSliversInSliverOverlapInjector;
+  bool get withSliverOverlapInjector;
   List<Widget> buildAppBarSlivers(BuildContext context);
 
   final Map<int, GlobalKey<SliverAnimatedListState>> _sliverAnimatedListKeys =
@@ -89,9 +91,22 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
   List<Widget> buildLoadingFailedSlivers(
       BuildContext context, LoadItemsFailedState state) {
     return [
+      ...defaultSlivers(context),
       SliverList.list(
-        children: [buildLoadingFailedWidget(context, state)],
+        children: [
+          buildLoadingFailedWidget(context, state),
+        ],
       )
+    ];
+  }
+
+  List<Widget> defaultSlivers(BuildContext context) {
+    return [
+      if (withSliverOverlapInjector || buildSliversInSliverOverlapInjector)
+        SliverOverlapInjector(
+          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+        ),
+      ...buildAppBarSlivers(context),
     ];
   }
 
@@ -120,7 +135,6 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
 
   List<Widget> buildLoadingSlivers(BuildContext context) {
     return [
-      ...buildAppBarSlivers(context),
       SliverList.list(
         children: [buildLoadingView(context)],
       )
@@ -128,14 +142,13 @@ mixin ItemsSliversMixin<T extends StatefulWidget,
   }
 
   List<Widget> buildSections(BuildContext context, ItemsManagerState state) {
+    final List<Widget> sections = defaultSlivers(context);
     if (state is ItemsLoadingState ||
         state is ItemsInitialState ||
         state is! LoadedState) {
-      return buildLoadingSlivers(context);
+      sections.addAll(buildLoadingSlivers(context));
+      return sections;
     }
-    final List<Widget> sections = [
-      ...buildAppBarSlivers(context),
-    ];
     if (state.isNotEmpty) {
       for (int sectionIndex = 0;
           sectionIndex < state.totalSections;

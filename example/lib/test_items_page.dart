@@ -3,8 +3,61 @@ import 'package:flora_core/flora_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+class AnimtedSwitchView extends StatelessWidget {
+  const AnimtedSwitchView(
+      {super.key,
+      required this.child,
+      this.duration,
+      required this.switcherKey});
+  final Widget child;
+  final Duration? duration;
+  final Key switcherKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 500),
+      transitionBuilder: (child, animation) => SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0.0, 1.0),
+          end: const Offset(0.0, 0.0),
+        ).animate(animation),
+        child: FadeTransition(
+          opacity: animation,
+          child: child,
+        ),
+      ),
+      child: KeyedSubtree(
+        key: switcherKey,
+        child: child,
+      ),
+    );
+  }
+}
+
 class TestItemsPage extends ItemsListState<TestItemsBloc> {
   bool _goingUp = false;
+
+  @override
+  List<Widget> buildAppBarSlivers(BuildContext context) {
+    return [
+      const SliverAppBar(
+        floating: true,
+        titleSpacing: 0,
+        title: Text('Test App'),
+        centerTitle: true,
+      ),
+    ];
+  }
+
+  @override
+  Widget buildItemsRetrievedScrollView(
+      BuildContext context, ItemsManagerState state) {
+    return AnimtedSwitchView(
+      switcherKey: ValueKey(state.runtimeType),
+      child: super.buildItemsRetrievedScrollView(context, state),
+    );
+  }
 
   @override
   void onScrollNotification(
