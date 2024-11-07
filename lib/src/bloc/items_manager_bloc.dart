@@ -264,8 +264,8 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
     }
   }
 
-  Future<void> replaceAllItems(ItemsRetrievedState st,
-      Emitter<ItemsManagerState> emit, ResponseItems<Section> result,
+  Future<void> replaceAllItems(LoadedState st, Emitter<ItemsManagerState> emit,
+      ResponseItems<Section> result,
       {bool firstTime = false}) async {
     for (var i = 0; i < st.sections.length; i++) {
       while (st.sections[i].items.isNotEmpty) {
@@ -333,7 +333,7 @@ abstract class ItemsManagerBloc<TRepo extends ItemsRepo>
   FutureOr<void> emitItemsReloadRetrieved(
       Emitter<ItemsManagerState> emit, ResponseItems<Section> result) async {
     final st = state;
-    if (st is ItemsRetrievedState) {
+    if (st is LoadedState) {
       await replaceAllItems(
         st,
         emit,

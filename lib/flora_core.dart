@@ -20,7 +20,6 @@ export 'src/widgets/list_container.dart';
 export 'src/for_platform.dart';
 export 'src/models/widgetable.dart';
 export 'src/extensions.dart';
-export 'src/copy_with.dart';
 
 export 'src/prefs/i_preference_storage.dart';
 export 'src/prefs/preference_storage.dart';
